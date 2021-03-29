@@ -1,0 +1,38 @@
+
+<app-loader></app-loader>
+<div class="auth-wrapper">
+  <div class="auth-content">
+    <div class="auth-bg">
+      <span class="r"></span>
+      <span class="r s"></span>
+      <span class="r s"></span>
+      <span class="r"></span>
+    </div>
+    <div class="card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="card-body text-center">
+          <div class="mb-4">
+            <i class="feather icon-unlock auth-icon"></i>
+          </div>
+          <h3 class="mb-4">4HOME | Login</h3>
+          <div class="input-group" [ngClass]="{'mb-3': !form.get('email').hasError('pattern')}">
+            <input class="form-control" type="email" placeholder="Correo" formControlName="email">
+          </div>
+          <div class="is-invalid" *ngIf="submitted && form.get('email').hasError('required')">
+            <span class="badge badge-danger">El correo es requerido</span>
+          </div>
+          <div class="is-invalid" *ngIf="form.get('email').hasError('pattern') && form.get('email').touched">
+            <span class="badge badge-danger">El correo no es valido</span>
+          </div>
+          <div class="input-group" [ngClass]="{'mb-3': !form.get('password').hasError('pattern')}">
+            <input class="form-control" [type]="showpassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password">
+          </div>
+          <div class="is-invalid" *ngIf="form.get('password').hasError('pattern') && form.get('password').touched">
+              <span class="badge badge-danger">La contraseña no es valida</span>
+            </div>
+          <button type="submit" class="btn btn-primary mb-4"[disabled]="!form.valid">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
