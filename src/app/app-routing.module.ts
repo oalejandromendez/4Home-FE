@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './guards/auth/auth.guard';
+import { DashboardComponent } from './pages/common/dashboard/dashboard.component';
 import { AdminComponent } from './theme/layout/admin/admin.component';
 
 const routes: Routes = [
@@ -11,8 +12,12 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'dashboard/default',
+        redirectTo: 'dashboard',
         pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        component: DashboardComponent
       },
     ]
   },

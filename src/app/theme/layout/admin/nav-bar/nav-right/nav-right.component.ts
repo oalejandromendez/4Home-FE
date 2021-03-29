@@ -2,6 +2,10 @@ import {Component, DoCheck, OnInit} from '@angular/core';
 import {NgbDropdownConfig} from '@ng-bootstrap/ng-bootstrap';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {DattaConfig} from '../../../../../app-config';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { LoaderService } from 'src/app/services/common/loader/loader.service';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 
 @Component({
   selector: 'app-nav-right',
@@ -35,11 +39,26 @@ export class NavRightComponent implements OnInit, DoCheck {
   public friendId: boolean;
   public dattaConfig: any;
 
-  constructor(config: NgbDropdownConfig) {
+  authUser: any;
+  name: string;
+  lastname: string;
+
+  constructor(
+    config: NgbDropdownConfig,
+    private authService: AuthService,
+    private loaderService: LoaderService,
+    private router: Router
+    ) {
     config.placement = 'bottom-right';
     this.visibleUserList = false;
     this.chatMessage = false;
     this.dattaConfig = DattaConfig.config;
+
+    this.authUser = this.authService.authUser();
+    if ( this.authUser ) {
+      this.name = this.authUser.name;
+      this.lastname = this.authUser.lastname;
+    }
   }
 
   ngOnInit() {
@@ -56,5 +75,20 @@ export class NavRightComponent implements OnInit, DoCheck {
     } else {
       this.dattaConfig['rtl-layout'] = false;
     }
+  }
+
+  logout() {
+    this.loaderService.loading(false);
+    this.loaderService.checkToken(false);
+    this.authService.logout().subscribe((data: any) => {
+      this.loaderService.loading(true);
+      this.router.navigateByUrl('/login');
+    }, (err) => {
+      Swal.fire({
+        type: 'error',
+        title: 'Error',
+        text: 'Error en el servidor'
+      });
+    });
   }
 }

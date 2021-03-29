@@ -30,7 +30,7 @@
           <div class="is-invalid" *ngIf="form.get('password').hasError('pattern') && form.get('password').touched">
               <span class="badge badge-danger">La contraseña no es valida</span>
             </div>
-          <button type="submit" class="btn btn-primary mb-4"[disabled]="!form.valid">Login</button>
+          <button type="submit" class="btn btn-primary mb-4">Login</button>
         </div>
       </form>
     </div>

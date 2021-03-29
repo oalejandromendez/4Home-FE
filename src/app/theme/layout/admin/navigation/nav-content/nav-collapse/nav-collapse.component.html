@@ -13,7 +13,7 @@
   </li>
   <ng-template #itemContent>
       <span class="pcoded-micon" *ngIf="item.icon">
-        <i class="{{item.icon}}"></i>
+        <img class="img-fluid mCS_img_loaded" src="{{item.icon}}" alt="Theme-Logo">
       </span>
     <span class="pcoded-mtext">{{item.title}}
       <span *ngIf="item.badge && themeLayout === 'horizontal'" class="badge label" [ngClass]="item.badge.type">

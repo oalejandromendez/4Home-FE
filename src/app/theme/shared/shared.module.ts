@@ -9,6 +9,7 @@ import 'mousetrap';
 import {GalleryModule} from '@ks89/angular-modal-gallery';
 import {SpinnerComponent} from './components/spinner/spinner.component';
 import { LoaderComponent } from 'src/app/pages/common/loader/loader.component';
+import { DashboardComponent } from 'src/app/pages/common/dashboard/dashboard.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -33,11 +34,13 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     GalleryModule,
     ClickOutsideModule,
     SpinnerComponent,
-    LoaderComponent
+    LoaderComponent,
+    DashboardComponent
   ],
   declarations: [
     SpinnerComponent,
-    LoaderComponent
+    LoaderComponent,
+    DashboardComponent
   ],
   providers: [
     {

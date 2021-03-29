@@ -20,7 +20,9 @@
     </a>
   </li>
   <ng-template #itemIcon>
-    <span *ngIf="item.icon" class="pcoded-micon"><i class="feather" [ngClass]="item.icon"></i></span>
+    <span *ngIf="item.icon" class="pcoded-micon">
+      <img class="img-fluid mCS_img_loaded" src="{{item.icon}}" alt="Theme-Logo">
+    </span>
   </ng-template>
   <ng-template #itemBadge>
     <span *ngIf="item.badge && themeLayout === 'vertical'" class="pcoded-badge label" [ngClass]="item.badge.type">

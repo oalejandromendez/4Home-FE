@@ -55,4 +55,21 @@ export class AuthService {
       return false;
     }
   }
+
+  authUser() {
+    if (sessionStorage.getItem('user')) {
+      return JSON.parse(sessionStorage.getItem('user'));
+    } else {
+      return false;
+    }
+  }
+
+  logout() {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + sessionStorage.getItem('tokenqm'),
+      Accept: 'application/json'
+    });
+    return this.http.get(`${this.host}/api/auth/logout`, { headers });
+  }
 }

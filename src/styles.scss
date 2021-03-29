@@ -31,3 +31,84 @@
   text-align: left;
   margin: 5px 0px;
 }
+
+header {
+  background-color: #03a9f4;
+}
+
+.pcoded-header .input-group .input-group-text, .pcoded-header a, .pcoded-header dropdown-toggle {
+  color: #ffffff !important;
+}
+
+i.feather.icon-x.input-group-text {
+  color: #f44336 !important;
+}
+
+.pcoded-header .dropdown .profile-notification .pro-body li a {
+  color: #000 !important;
+}
+
+.pcoded-navbar {
+  box-shadow: none;
+  width: 200px;
+  background: #ffffff;
+  color: #000000;
+}
+
+.pcoded-navbar .header-logo {
+  width: 200px;
+}
+
+.navbar-brand {
+  background: #ffffff;
+}
+
+.b-brand .b-title {
+  color: #000;
+  font-weight: bold;
+}
+
+.pcoded-navbar .mobile-menu span {
+  background-color: #000000;
+}
+
+.pcoded-navbar .mobile-menu span:after, .pcoded-navbar .mobile-menu span:before {
+  background-color: #000000;
+}
+
+.pcoded-header {
+  width: calc(100% - 200px);
+  margin-left: 200px;
+}
+
+.pcoded-main-container {
+  margin-left: 200px;
+}
+
+.pcoded-navbar .pcoded-menu-caption {
+  color: #4e4e4e;
+}
+
+.pcoded-navbar a {
+  color: #000000;
+}
+
+.pcoded-navbar .pcoded-inner-navbar > app-nav-group > app-nav-collapse > li.active > a, .pcoded-navbar .pcoded-inner-navbar > app-nav-group > app-nav-collapse > li.pcoded-trigger > a, .pcoded-navbar .pcoded-inner-navbar app-nav-item > li.nav-item.active > a, .pcoded-navbar .pcoded-inner-navbar app-nav-item > li.nav-item.pcoded-trigger > a {
+  background: #03a9f4;
+}
+
+.pcoded-navbar .pcoded-submenu {
+  background: #ffffff;
+}
+
+.pcoded-navbar.navbar-collapsed:hover {
+  width: 200px !important;
+}
+
+.pcoded-navbar.navbar-collapsed:hover .header-logo {
+  width: 200px;
+}
+
+.pcoded-navbar .pcoded-inner-navbar li > a > .pcoded-micon {
+  width: 40px;
+}
