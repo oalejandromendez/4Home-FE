@@ -22,6 +22,8 @@ import { NavSearchComponent } from './theme/layout/admin/nav-bar/nav-left/nav-se
 import { NavRightComponent } from './theme/layout/admin/nav-bar/nav-right/nav-right.component';
 import { ConfigurationComponent } from './theme/layout/admin/configuration/configuration.component';
 import { HttpClientModule } from '@angular/common/http';
+import { DataTableLanguage } from './models/common/datatable';
+import { ToastyService } from 'ng2-toasty';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,7 @@ import { HttpClientModule } from '@angular/common/http';
     NgbTabsetModule,
     HttpClientModule
   ],
-  providers: [NavigationItem],
+  providers: [NavigationItem, DataTableLanguage, ToastyService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

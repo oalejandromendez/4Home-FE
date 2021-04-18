@@ -67,7 +67,7 @@ export class AuthService {
   logout() {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + sessionStorage.getItem('tokenqm'),
+      Authorization: 'Bearer ' + sessionStorage.getItem('token'),
       Accept: 'application/json'
     });
     return this.http.get(`${this.host}/api/auth/logout`, { headers });

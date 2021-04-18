@@ -1,0 +1,128 @@
+<div class="d-flex">
+
+    <div class="col-md-12">
+        <div class="card user-profile-list mb-0" style="margin-top: -15px;">
+            <div class="card-header">
+                <h4>Lista de Jornadas</h4>
+            </div>
+
+            <div class="card-body">
+                <div *ngIf="canSee" lass="dt-responsive table-responsive ">
+                    <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger " class="display row-border hover table-striped " style="width:100% ">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>Nombre</th>
+                                <th>Hora Inicial</th>
+                                <th>Hora Final</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="workingdays?.length !=0 ">
+                            <tr *ngFor="let workingday of workingdays; let index = index ">
+                                <td>{{ workingday.id }}</td>
+                                <td>{{ workingday.name }}</td>
+                                <td>{{ workingday.init_hour }}</td>
+                                <td>{{ workingday.end_hour }}</td>
+                                <td>
+                                    <span *ngIf="workingday.status === 1" class="badge badge-success">ACTIVO</span>
+                                    <span *ngIf="workingday.status === 0" class="badge badge-danger">INACTIVO</span>
+                                </td>
+                                <td>
+                                    <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(workingday.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
+                                <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
+                            </button>
+
+                                    <button *ngIf="canDelete" type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(workingday.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
+                                <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
+                            </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div *ngIf="!canSee" class="text-align-center">
+                    <label class="badge badge-info f-20">NO TIENE PERMISO PARA VER LA LISTA DE JORNADAS</label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<ng2-toasty [position]="'top-right'"></ng2-toasty>
+
+<form [formGroup]="form">
+    <ng-template #modalForm let-c="close" let-d="dismiss">
+        <div class="modal-header">
+            <h5 *ngIf="!id" class="modal-title">Nueva Jornada</h5>
+            <h5 *ngIf="id" class="modal-title">Modificar Jornada</h5>
+            <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+        </div>
+        <div class="modal-body">
+
+            <div class='form-group'>
+                <label class="col-form-label">Nombre*</label>
+
+                <div class="p-0 pl-2 align-self-center ">
+                    <input type="text" class="form-control" formControlName="name" maxlength="50" autofocus>
+                    <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('required')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre es requerido</span>
+                    </div>
+                    <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('maxlength')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre supera el maximo de caracteres permitido</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class='form-group'>
+                <label class="col-form-label">Hora Inicial*</label>
+
+                <div class="p-0 pl-2 align-self-center ">
+                    <ngb-timepicker formControlName="init_hour" [meridian]="true"></ngb-timepicker>
+                    <div class="is-invalid" *ngIf="submitted && form.get('init_hour').hasError('required')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">La hora de inicio es requerido</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class='form-group'>
+                <label class="col-form-label">Hora Final*</label>
+
+                <div class="p-0 pl-2 align-self-center ">
+                    <ngb-timepicker formControlName="end_hour" [meridian]="true"></ngb-timepicker>
+                    <div class="is-invalid" *ngIf="submitted && form.get('end_hour').hasError('required')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">La hora final es requerido</span>
+                    </div>
+                    <div class="is-invalid" *ngIf="form.hasError('hours')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">La hora final debe ser mayor que la hora inicio</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-form-label pb-0">Estado</label><br>
+                <div class="d-flex align-items-center">
+                    <div class="switch switch-success d-inline m-r-10">
+                        <input type="checkbox" id="status" formControlName="status">
+                        <label for="status" class="cr cr-hw"></label>
+                    </div>
+                    <div>
+                        <span class="badge m-r-5 badge-success ml-2 mt-2" *ngIf="form.get('status').value">Activo</span>
+                        <span class="badge m-r-5 badge-danger ml-2 mt-2" *ngIf="!form.get('status').value">Inactivo</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')" (click)="cancel();">Cancelar</button>
+            <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" [disabled]="!form.valid" (click)="onSubmit()">Guardar</button>
+            <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2" [disabled]="!form.valid" (click)="onSubmit()">Editar</button>
+        </div>
+    </ng-template>
+</form>
+<button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
+<button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>

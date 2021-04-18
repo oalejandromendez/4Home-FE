@@ -10,6 +10,11 @@ import {GalleryModule} from '@ks89/angular-modal-gallery';
 import {SpinnerComponent} from './components/spinner/spinner.component';
 import { LoaderComponent } from 'src/app/pages/common/loader/loader.component';
 import { DashboardComponent } from 'src/app/pages/common/dashboard/dashboard.component';
+import { ToastyModule } from 'ng2-toasty';
+import { DataTablesModule } from 'angular-datatables';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { AngularCalendarYearViewModule } from 'angular-calendar-year-view';
+
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -23,7 +28,11 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ReactiveFormsModule,
     BreadcrumbModule,
     GalleryModule.forRoot(),
-    ClickOutsideModule
+    ClickOutsideModule,
+    DataTablesModule,
+    NgSelectModule,
+    AngularCalendarYearViewModule,
+    ToastyModule.forRoot()
   ],
   exports: [
     CommonModule,
@@ -35,7 +44,11 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ClickOutsideModule,
     SpinnerComponent,
     LoaderComponent,
-    DashboardComponent
+    DashboardComponent,
+    ToastyModule,
+    DataTablesModule,
+    NgSelectModule,
+    AngularCalendarYearViewModule
   ],
   declarations: [
     SpinnerComponent,

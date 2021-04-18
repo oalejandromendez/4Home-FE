@@ -5,7 +5,7 @@ import {DattaConfig} from '../../../../../app-config';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoaderService } from 'src/app/services/common/loader/loader.service';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-nav-right',
@@ -78,16 +78,18 @@ export class NavRightComponent implements OnInit, DoCheck {
   }
 
   logout() {
-    this.loaderService.loading(false);
-    this.loaderService.checkToken(false);
+    this.loaderService.loading(true);
     this.authService.logout().subscribe((data: any) => {
-      this.loaderService.loading(true);
-      this.router.navigateByUrl('/login');
+      sessionStorage.clear();
+      localStorage.clear();
+      this.loaderService.loading(false);
+      this.router.navigateByUrl('/auth/login');
     }, (err) => {
+      this.loaderService.loading(false);
       Swal.fire({
-        type: 'error',
+        icon: 'error',
         title: 'Error',
-        text: 'Error en el servidor'
+        text:  'Error en el servidor'
       });
     });
   }

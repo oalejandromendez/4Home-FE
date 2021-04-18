@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AuthModel } from 'src/app/models/auth/auth.model';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoaderService } from 'src/app/services/common/loader/loader.service';
-import Swal from 'sweetalert2/dist/sweetalert2.js'
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -53,9 +53,9 @@ export class LoginComponent implements OnInit {
     }, (err) => {
       this.loaderService.loading(false);
       Swal.fire({
-        type: 'error',
+        icon: 'error',
         title: 'Error',
-        text: 'El correo o la contraseña no son correctos, verifique.'
+        text:  'Los credenciales de acceso son incorrectas'
       });
     });
   }
