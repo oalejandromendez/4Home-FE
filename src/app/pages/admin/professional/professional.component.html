@@ -12,9 +12,9 @@
                         <thead>
                             <tr>
                                 <th>id</th>
+                                <th>Identificación</th>
                                 <th>Nombre</th>
                                 <th>Apellido</th>
-                                <th>Email</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -22,9 +22,9 @@
                         <tbody *ngIf="professionals?.length !=0 ">
                             <tr *ngFor="let professional of professionals; let index = index ">
                                 <td>{{ professional.id }}</td>
+                                <td>{{ professional.identification }}</td>
                                 <td>{{ professional.name }}</td>
                                 <td>{{ professional.lastname }}</td>
-                                <td>{{ professional.email }}</td>
                                 <td>
                                     <span *ngIf="professional.status === 1" class="badge badge-success">ACTIVO</span>
                                     <span *ngIf="professional.status === 0" class="badge badge-danger">INACTIVO</span>

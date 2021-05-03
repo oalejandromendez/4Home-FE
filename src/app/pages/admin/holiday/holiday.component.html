@@ -1,1 +1,58 @@
-<p>holiday works!</p>
+<div class="d-flex">
+    <div class="col-md-12">
+        <div class="card user-profile-list mb-0" style="margin-top: -15px;">
+            <div class="card-header" style="padding: 10px 25px;">
+                <h4 class="m-0">Festivos</h4>
+            </div>
+
+            <div class="card-body p-0">
+                <div *ngIf="canSee" class="card-body">
+                    <full-calendar #calendar deepChangeDetection="true" [options]="calendarOptions"></full-calendar>
+                </div>
+                <div *ngIf="!canSee" class="card-body text-center">
+                    <label class="badge badge-info f-20">NO TIENE PERMISO PARA VER LOS FESTIVOS</label>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<ng2-toasty [position]="'top-right'"></ng2-toasty>
+
+<form [formGroup]="form">
+    <ng-template #modalForm let-c="close" let-d="dismiss">
+        <div class="modal-header">
+            <h5 *ngIf="!id" class="modal-title">Nuevo Festivo</h5>
+            <h5 *ngIf="id" class="modal-title">Modificar Festivo</h5>
+            <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+
+            <div class='form-group'>
+                <label class="col-form-label">Nombre*</label>
+                <div class="align-self-center ">
+                    <input type="text" class="form-control" formControlName="name" maxlength="50" autofocus>
+                    <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('required')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre es requerido</span>
+                    </div>
+                    <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('maxlength')">
+                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre supera el maximo de caracteres permitido</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')" (click)="cancel();">Cancelar</button>
+            <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" [disabled]="!form.valid" (click)="onSubmit()">Guardar</button>
+            <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2" [disabled]="!form.valid" (click)="onSubmit()">Editar</button>
+            <button *ngIf="canDelete && id" type="button" class="btn btn-danger mr-2" [disabled]="!id" (click)="delete()">Eliminar</button>
+        </div>
+    </ng-template>
+</form>
+<button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
+<button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>

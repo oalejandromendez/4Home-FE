@@ -43,6 +43,33 @@ const NavigationItems = [
         classes: 'nav-item',
       },
       {
+        id: 'reserve',
+        title: 'Reservar',
+        type: 'item',
+        url: '/scheduling/reserve',
+        icon: 'assets/img/menu/reserve.png',
+        classes: 'nav-item',
+        hidden: true
+      },
+      {
+        id: 'schedule',
+        title: 'Agendar',
+        type: 'item',
+        url: '/scheduling/schedule',
+        icon: 'assets/img/menu/schedule.png',
+        classes: 'nav-item',
+        hidden: false
+      },
+      {
+        id: 'availability',
+        title: 'Disponibilidad',
+        type: 'item',
+        url: '/admin/availability',
+        icon: 'assets/img/menu/availability.png',
+        classes: 'nav-item',
+        hidden: false
+      },
+      {
         id: 'customer',
         title: 'Clientes',
         type: 'item',
@@ -88,11 +115,11 @@ const NavigationItems = [
         hidden: true
       },
       {
-        id: 'position',
-        title: 'Cargos',
+        id: 'servicetype',
+        title: 'Tipo de Servicio',
         type: 'item',
-        url: '/admin/position',
-        icon: 'assets/img/menu/position.png',
+        url: '/admin/servicetype',
+        icon: 'assets/img/menu/service-type.png',
         classes: 'nav-item',
         hidden: true
       },
@@ -102,6 +129,24 @@ const NavigationItems = [
         type: 'item',
         url: '/admin/professional',
         icon: 'assets/img/menu/professionals.png',
+        classes: 'nav-item',
+        hidden: true
+      },
+      {
+        id: 'position',
+        title: 'Cargos',
+        type: 'item',
+        url: '/admin/position',
+        icon: 'assets/img/menu/position.png',
+        classes: 'nav-item',
+        hidden: true
+      },
+      {
+        id: 'holiday',
+        title: 'Festivos',
+        type: 'item',
+        url: '/admin/holiday',
+        icon: 'assets/img/menu/holiday.png',
         classes: 'nav-item',
         hidden: true
       },
@@ -148,11 +193,13 @@ export class NavigationItem {
           const roles           = resp.filter( (perm: any) => perm.name === "ACCEDER_ROLES");
           const professional    = resp.filter( (perm: any) => perm.name === "ACCEDER_PROFESIONALES");
           const position        = resp.filter( (perm: any) => perm.name === "ACCEDER_CARGOS");
+          const servicetype     = resp.filter( (perm: any) => perm.name === "ACCEDER_TIPO_SERVICIO");
           const workingday      = resp.filter( (perm: any) => perm.name === "ACCEDER_JORNADAS");
           const service         = resp.filter( (perm: any) => perm.name === "ACCEDER_SERVICIOS");
           const customertype    = resp.filter( (perm: any) => perm.name === "ACCEDER_TIPO_CLIENTE");
           const customer        = resp.filter( (perm: any) => perm.name === "ACCEDER_CLIENTES");
-
+          const holiday         = resp.filter( (perm: any) => perm.name === "ACCEDER_FESTIVOS");
+          const reserve         = resp.filter( (perm: any) => perm.name === "ACCEDER_RESERVAS");
 
           if(users.length > 0 && children.id === 'users') {
             children.hidden = false;
@@ -178,6 +225,12 @@ export class NavigationItem {
             children.hidden = true;
           }
 
+          if(servicetype.length > 0 && children.id === 'servicetype') {
+            children.hidden = false;
+          } else if (servicetype.length === 0 && children.id === 'servicetype') {
+            children.hidden = true;
+          }
+
           if(workingday.length > 0 && children.id === 'workingday') {
             children.hidden = false;
           } else if (workingday.length === 0 && children.id === 'workingday') {
@@ -199,6 +252,18 @@ export class NavigationItem {
           if(customer.length > 0 && children.id === 'customer') {
             children.hidden = false;
           } else if (customer.length === 0 && children.id === 'customer') {
+            children.hidden = true;
+          }
+
+          if(holiday.length > 0 && children.id === 'holiday') {
+            children.hidden = false;
+          } else if (holiday.length === 0 && children.id === 'holiday') {
+            children.hidden = true;
+          }
+
+          if(reserve.length > 0 && children.id === 'reserve') {
+            children.hidden = false;
+          } else if (reserve.length === 0 && children.id === 'reserve') {
             children.hidden = true;
           }
         });

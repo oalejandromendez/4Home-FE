@@ -15,22 +15,40 @@
                         <i class="feather icon-unlock auth-icon"></i>
                     </div>
                     <h3 class="mb-4">4HOME | Login</h3>
+
                     <div class="input-group mb-3">
                         <input class="form-control" type="email" placeholder="Correo" formControlName="email">
                     </div>
+
                     <div class="is-invalid mb-3" *ngIf="submitted && form.get('email').hasError('required')">
                         <span class="badge badge-danger">El correo es requerido</span>
                     </div>
+
                     <div class="is-invalid mb-3" *ngIf="form.get('email').hasError('pattern') && form.get('email').dirty">
                         <span class="badge badge-danger">El correo no es valido</span>
                     </div>
-                    <div class="input-group mb-3">
-                        <input class="form-control" [type]="showpassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password">
+
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input class="form-control" [type]="showpassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password" aria-describedby="passwordPrepend">
+                            <div class="input-group-prepend show-password" (click)="showpassword = !showpassword">
+                                <i *ngIf="showpassword" class="fa fa-eye" aria-hidden="true" id="passwordPrepend"></i>
+                                <i *ngIf="!showpassword" class="fa fa-eye-slash" aria-hidden="true" id="passwordPrepend"></i>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="is-invalid mb-3" *ngIf="form.get('password').hasError('pattern') && form.get('password').dirty">
-                        <span class="badge badge-danger">La contraseña no es valida</span>
+                        <span class="badge badge-danger badge-password">La contraseña debe tener:
+                          <br>1. Mínimo 1 número
+                          <br>2. Mínimo 1 letra mayuscula
+                          <br>3. Mínimo 1 letra minuscula
+                          <br>4. Mínimo 8 o más caracteres
+                        </span>
                     </div>
-                    <button type="submit" class="btn btn-primary mb-4">Login</button>
+                    <button type="submit" class="btn btn-primary mb-4">Iniciar Sesión</button>
+                    <p class="mb-2 text-muted">¿Se te olvidó tu contraseña? <a [routerLink]="['/auth/reset']">Restablecer</a></p>
+                    <p class="mb-0 text-muted">¿No tienes una cuenta? <a [routerLink]="['/auth/signup']">Registrarse</a></p>
                 </div>
             </form>
         </div>

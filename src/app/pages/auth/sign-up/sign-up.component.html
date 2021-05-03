@@ -1,0 +1,327 @@
+<app-loader>
+</app-loader>
+<div class="auth-wrapper">
+    <div class="auth-content container-singup">
+        <div class="auth-bg">
+            <span class="r"></span>
+            <span class="r s"></span>
+            <span class="r s"></span>
+            <span class="r"></span>
+        </div>
+        <div class="card">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="feather icon-user-plus auth-icon"></i>
+                    </div>
+                    <h3 class="mb-4">4HOME | Registro</h3>
+
+                    <div class="row text-left">
+
+                        <div class="col-md-9">
+
+                            <div class="row">
+
+                                <div class="col-md-4">
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Tipo de Cliente*</label>
+                                        <div class="align-self-center">
+                                            <ng-select [items]="customerTypes" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="customer_type" notFoundText="No se encontraron resultados"></ng-select>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('customer_type').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo de cliente es requerido</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Tipo de Documento*</label>
+                                        <div class="align-self-center">
+                                            <ng-select [items]="documentTypes" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="type_document" notFoundText="No se encontraron resultados"></ng-select>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('type_document').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo de documento es requerido</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Identificación*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text" class="form-control" formControlName="identification" maxlength="10">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('identification').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La identificación es requerida</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="form.get('identification').hasError('pattern') && form.get('identification').touched">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Digite unicamente números</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('identification').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La identificación supera el maximo de caracteres permitido</span>
+                                            </div>
+                                            <div class="mt-1" *ngIf="form.get('identification').status === 'PENDING' && !form.get('identification').pristine && form.get('identification').value != customer.identification">
+                                                <span class="badge badge-primary f-size-12 m-r-5">Verificando...</span>
+                                            </div>
+                                            <div class="mt-1" *ngIf="form.get('identification').status === 'VALID' && !form.get('identification').pristine && form.get('identification').value != customer.identification">
+                                                <span class="badge badge-success f-size-12 m-r-5">La identificación esta disponible!</span>
+                                            </div>
+                                            <div class="mt-1" *ngIf="form.get('identification').hasError('identification') && !form.get('identification').pristine && form.get('identification').value != customer.identification">
+                                                <span class="badge badge-danger f-size-12 m-r-5">Identificación ya registrada</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-4">
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Nombre*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text" class="form-control" formControlName="name" maxlength="50">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre es requerido</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre supera el maximo de caracteres permitido</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Apellido*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text" class="form-control" formControlName="lastname" maxlength="50">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('lastname').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El apellido es requerido</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('lastname').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El apellido supera el maximo de caracteres permitido</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Email*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text" class="form-control" formControlName="email" maxlength="50">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('email').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El email es requerido</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="form.get('email').hasError('pattern') && form.get('email').dirty">
+                                                <span class="badge badge-danger">El correo no es valido</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('email').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El email supera el maximo de caracteres permitido</span>
+                                            </div>
+                                            <div class="mt-1" *ngIf="form.get('email').status === 'PENDING' && !form.get('email').pristine && form.get('email').value != customer.email">
+                                                <span class="badge badge-primary f-size-12 m-r-5">Verificando...</span>
+                                            </div>
+                                            <div class="mt-1" *ngIf="form.get('email').status === 'VALID' && !form.get('email').pristine && form.get('email').value != customer.email">
+                                                <span class="badge badge-success f-size-12 m-r-5">El email esta disponible!</span>
+                                            </div>
+                                            <div class="mt-1" *ngIf="form.get('email').hasError('email') && !form.get('email').pristine && form.get('email').value != customer.email">
+                                                <span class="badge badge-danger f-size-12 m-r-5">Email no disponible</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-4">
+
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Contraseña*</label>
+                                        <div class="align-self-center">
+                                            <div class="input-group">
+                                                <input class="form-control" [type]="showpassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password" aria-describedby="passwordPrepend">
+                                                <div class="input-group-prepend show-password" (click)="showpassword = !showpassword">
+                                                    <i *ngIf="showpassword" class="fa fa-eye" aria-hidden="true" id="passwordPrepend"></i>
+                                                    <i *ngIf="!showpassword" class="fa fa-eye-slash" aria-hidden="true" id="passwordPrepend"></i>
+                                                </div>
+                                            </div>
+
+                                            <div class="is-invalid" *ngIf="submitted && form.get('password').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La contraseña es requerida</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('password').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La contraseña supera el maximo de caracteres permitido</span>
+                                            </div>
+                                            <div class="is-invalid mb-3" *ngIf="form.get('password').hasError('pattern') && form.get('password').dirty">
+                                                <span class="badge badge-danger badge-password">La contraseña debe tener:
+                                                  <br>1. Mínimo 1 número
+                                                  <br>2. Mínimo 1 letra mayuscula
+                                                  <br>3. Mínimo 1 letra minuscula
+                                                  <br>4. Mínimo 8 o más caracteres
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Confirmar Contraseña*</label>
+                                        <div class="align-self-center">
+                                            <div class="input-group">
+                                                <input class="form-control" [type]="showconfirmation ? 'text' : 'password'" placeholder="Confirmar Contraseña" formControlName="password_confirmation" aria-describedby="passwordConfirmationPrepend">
+                                                <div class="input-group-prepend show-password" (click)="showconfirmation = !showconfirmation">
+                                                    <i *ngIf="showconfirmation" class="fa fa-eye" aria-hidden="true" id="passwordConfirmationPrepend"></i>
+                                                    <i *ngIf="!showconfirmation" class="fa fa-eye-slash" aria-hidden="true" id="passwordConfirmationPrepend"></i>
+                                                </div>
+                                            </div>
+
+                                            <div class="is-invalid" *ngIf="submitted && form.get('password_confirmation').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La confirmación de la contraseña es requerida</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('password_confirmation').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La confirmación de la contraseña supera el maximo de caracteres permitido</span>
+                                            </div>
+                                            <div class="is-invalid mb-3" *ngIf="form.get('password_confirmation').touched && form.hasError('mismatchedPasswords') && form.get('password').valid">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Las constraseñas no coinciden</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label class="col-form-label">Telefono*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text " class="form-control " formControlName="phone" maxlength="8">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('phone').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El telefono es requerido</span>
+                                            </div>
+
+                                            <div class="is-invalid" *ngIf="form.get('phone').hasError('pattern') && form.get('phone').touched">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Digite unicamente números</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label class="col-form-label">Celular*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text " class="form-control " formControlName="mobile" maxlength="10">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('mobile').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El numero de celular es requerido</span>
+                                            </div>
+
+                                            <div class="is-invalid" *ngIf="form.get('mobile').hasError('pattern') && form.get('mobile').touched">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Digite unicamente números</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4">
+
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Nombre de contacto*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text" class="form-control" formControlName="contact_name" maxlength="250">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('contact_name').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre de contacto es requerido</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('contact_name').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre de contacto supera el maximo de caracteres permitido</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-4">
+
+                                    <div class='form-group'>
+                                        <label class="col-form-label">Dirección de facturación*</label>
+                                        <div class="align-self-center ">
+                                            <input type="text" class="form-control" formControlName="billing_address" maxlength="250">
+                                            <div class="is-invalid" *ngIf="submitted && form.get('billing_address').hasError('required')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección de facturación es requerido</span>
+                                            </div>
+                                            <div class="is-invalid" *ngIf="submitted && form.get('billing_address').hasError('maxlength')">
+                                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección de facturación supera el maximo de caracteres permitido</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-3" style="border-left: 3px solid #d0d0d0;">
+
+                            <div class="row mb-2 place-items-center">
+                                <div class="col-md-5 pr-0">
+                                    <h5 class="f-14 m-0">Direcciones</h5>
+                                </div>
+                                <div class="col-md-7" style="text-align: right;">
+                                    <img *ngIf="!addAddress && !editAddress" placement="top" ngbTooltip="Agregar Dirección" (click)="newAddress();" alt="Theme-Logo" class="img-fluid" src="assets/img/add_.png" style="width: 30px;">
+                                    <img *ngIf="addAddress && !editAddress" placement="top" ngbTooltip="Guardar" (click)="saveAddress();" alt="Theme-Logo" class="img-fluid mr-1" src="assets/img/save.png" style="width: 30px;">
+                                    <img *ngIf="!addAddress && editAddress" placement="top" ngbTooltip="Modificar" (click)="updateAddress();" alt="Theme-Logo" class="img-fluid mr-1" src="assets/img/update.png" style="width: 30px;">
+                                    <img *ngIf="!addAddress && editAddress" placement="top" ngbTooltip="Eliminar" (click)="removeAddress();" alt="Theme-Logo" class="img-fluid mr-1" src="assets/img/remove.png" style="width: 30px;">
+                                    <img *ngIf="addAddress || editAddress" placement="top" ngbTooltip="Cancelar" alt="Theme-Logo" (click)="cancelAddress();" class="img-fluid" src="assets/img/cancel.png" style="width: 30px;">
+                                </div>
+                            </div>
+
+                            <div *ngIf="addAddress || editAddress">
+                                <div class='form-group'>
+                                    <label class="col-form-label">Dirección*</label>
+                                    <div class="align-self-center ">
+                                        <input type="text" class="form-control" [(ngModel)]="address" [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <ul style="list-style-type: decimal;max-height: 330px;overflow: auto;">
+                                    <li formArrayName="addresses" *ngFor="let address of addressesArray.controls" style="cursor: pointer;" (click)="getAddress(address)">
+                                        <label class="f-14 addresses" [formGroupName]="address.value.index">{{ address.value.address }}</label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="text-center" *ngIf="addressesArray.controls.length === 0 && !addAddress">
+                                <label class="badge badge-danger f-12">Las direcciones son requeridas</label>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mb-4" [disabled]="!form.valid">Registrarse</button>
+                    <p class=" mb-2 text-muted ">¿Ya tienes una cuenta? <a [routerLink]="[ '/auth/login'] ">Inicar Sesión</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

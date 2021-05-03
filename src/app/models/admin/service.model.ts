@@ -3,6 +3,8 @@ export class ServiceModel {
   price: string;
   working_day: string;
   description: string;
+  type: number;
+  quantity: number;
   status: boolean;
 
   constructor() {

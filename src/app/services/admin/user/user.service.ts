@@ -19,6 +19,10 @@ export class UserService {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/user`);
   }
 
+  getById( id: string) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/user/${id}`);
+  }
+
   post( user: any) {
     const userData = {
       ...user

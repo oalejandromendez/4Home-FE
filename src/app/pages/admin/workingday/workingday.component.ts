@@ -7,6 +7,7 @@ import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
 import { Subject, Subscription } from 'rxjs';
 import { WorkingDayModel } from 'src/app/models/admin/workingday.model';
 import { DataTableLanguage } from 'src/app/models/common/datatable';
+import { ServicetypeService } from 'src/app/services/admin/servicetype/servicetype.service';
 import { UserService } from 'src/app/services/admin/user/user.service';
 import { WorkingdayService } from 'src/app/services/admin/workingday/workingday.service';
 import { LoaderService } from 'src/app/services/common/loader/loader.service';
@@ -31,6 +32,9 @@ export class WorkingdayComponent implements OnInit, OnDestroy {
   dtOptions: any = {};
   workingdays: any[];
   workingday: WorkingDayModel = new WorkingDayModel();
+
+  serviceTypes: Array<any> = [];
+
   submitted = false;
   form: FormGroup;
   id: any;
@@ -47,7 +51,8 @@ export class WorkingdayComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private language: DataTableLanguage,
     private modalService: NgbModal,
-    private toastyConfig: ToastyConfig
+    private toastyConfig: ToastyConfig,
+    private servicetypeService: ServicetypeService
   ) {
     this.loaderService.loading(true);
     this.loadForm();
@@ -57,10 +62,28 @@ export class WorkingdayComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadTable();
+    this.getServiceTypes();
   }
 
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
+  }
+
+  getServiceTypes() {
+    this.loaderService.loading(false);
+    this.servicetypeService.get().subscribe( (resp: any) => {
+      resp.data.filter( (serviceType: any) => serviceType.status === 1 ).map( (serviceType: any) => {
+        this.serviceTypes.push({ value: serviceType.id, label: serviceType.name } );
+        this.serviceTypes = this.serviceTypes.slice();
+      });
+      this.loaderService.loading(true);
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text:  'Ha ocurrido un error'
+      });
+    });
   }
 
   loadForm() {
@@ -68,6 +91,7 @@ export class WorkingdayComponent implements OnInit, OnDestroy {
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       init_hour: new FormControl('', [Validators.required]),
       end_hour: new FormControl('', [Validators.required]),
+      service_type: new FormControl('', [Validators.required]),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
     }, {validators: this.validateHours });
   }
@@ -291,6 +315,8 @@ export class WorkingdayComponent implements OnInit, OnDestroy {
 
         this.form.controls.init_hour.setValue(init_hour);
         this.form.controls.end_hour.setValue(end_hour);
+        this.form.controls.service_type.setValue(data.service_type.id);
+
         this.form.controls.status.enable();
         this.form.enable();
         this.openModal.nativeElement.click();
@@ -343,7 +369,7 @@ export class WorkingdayComponent implements OnInit, OnDestroy {
   }
 
   open(modal: any) {
-    this.modalService.open(modal);
+    this.modalService.open(modal, { windowClass: 'modal-workingday'});
   }
 
   close(modal: any) {

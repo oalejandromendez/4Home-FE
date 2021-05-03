@@ -64,7 +64,8 @@
         <div class="modal-body">
 
             <div class="row">
-                <div class="col-md-4">
+
+                <div class="col-md-6">
                     <div class='form-group'>
                         <label class="col-form-label">Nombre*</label>
                         <div class="align-self-center ">
@@ -78,7 +79,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-6">
                     <div class='form-group'>
                         <label class="col-form-label">Apellido*</label>
                         <div class="align-self-center ">
@@ -92,7 +94,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
                     <div class='form-group'>
                         <label class="col-form-label">Email*</label>
                         <div class="align-self-center ">
@@ -118,48 +124,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-
-                <div class="col-md-4">
-
-                    <div class='form-group'>
-                        <label class="col-form-label">Contraseña*</label>
-
-                        <div class="align-self-center">
-                            <input class="form-control" [type]="showpassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password">
-                            <div class="is-invalid" *ngIf="submitted && form.get('password').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La contraseña es requerida</span>
-                            </div>
-                            <div class="is-invalid" *ngIf="submitted && form.get('password').hasError('maxlength')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La contraseña supera el maximo de caracteres permitido</span>
-                            </div>
-                            <div class="is-invalid mb-3" *ngIf="form.get('password').hasError('pattern') && form.get('password').dirty">
-                                <span class="badge badge-danger">La contraseña no es valida</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="col-form-label">Direccion*</label>
-                        <div class="align-self-center ">
-                            <input type="text " class="form-control " formControlName="address" maxlength="120">
-
-                            <div class="is-invalid" *ngIf="submitted && form.get('address').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección es requerida</span>
-                            </div>
-
-                            <div class="is-invalid" *ngIf="submitted && form.get('address').hasError('maxlength')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección supera el maximo de caracteres permitido</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label class="col-form-label">Edad*</label>
                         <div class="align-self-center ">
@@ -176,11 +142,95 @@
                         </div>
                     </div>
                 </div>
+
+
             </div>
 
 
             <div class="row">
-                <div class="col-md-4">
+
+                <div class="col-md-6">
+
+                    <div class='form-group'>
+                        <label class="col-form-label">Contraseña*</label>
+                        <div class="align-self-center">
+                            <div class="input-group">
+                                <input class="form-control" [type]="showpassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password" aria-describedby="passwordPrepend">
+                                <div class="input-group-prepend show-password" (click)="showpassword = !showpassword">
+                                    <i *ngIf="showpassword" class="fa fa-eye" aria-hidden="true" id="passwordPrepend"></i>
+                                    <i *ngIf="!showpassword" class="fa fa-eye-slash" aria-hidden="true" id="passwordPrepend"></i>
+                                </div>
+                            </div>
+
+                            <div class="is-invalid" *ngIf="submitted && form.get('password').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La contraseña es requerida</span>
+                            </div>
+                            <div class="is-invalid" *ngIf="submitted && form.get('password').hasError('maxlength')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La contraseña supera el maximo de caracteres permitido</span>
+                            </div>
+                            <div class="is-invalid mb-3" *ngIf="form.get('password').hasError('pattern') && form.get('password').dirty">
+                                <span class="badge badge-danger badge-password">La contraseña debe tener:
+                              <br>1. Mínimo 1 número
+                              <br>2. Mínimo 1 letra mayuscula
+                              <br>3. Mínimo 1 letra minuscula
+                              <br>4. Mínimo 8 o más caracteres
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class='form-group'>
+                        <label class="col-form-label">Confirmar Contraseña*</label>
+                        <div class="align-self-center">
+                            <div class="input-group">
+                                <input class="form-control" [type]="showconfirmation ? 'text' : 'password'" placeholder="Confirmar Contraseña" formControlName="password_confirmation" aria-describedby="passwordConfirmationPrepend">
+                                <div class="input-group-prepend show-password" (click)="showconfirmation = !showconfirmation">
+                                    <i *ngIf="showconfirmation" class="fa fa-eye" aria-hidden="true" id="passwordConfirmationPrepend"></i>
+                                    <i *ngIf="!showconfirmation" class="fa fa-eye-slash" aria-hidden="true" id="passwordConfirmationPrepend"></i>
+                                </div>
+                            </div>
+
+                            <div class="is-invalid" *ngIf="submitted && form.get('password_confirmation').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La confirmación de la contraseña es requerida</span>
+                            </div>
+                            <div class="is-invalid" *ngIf="submitted && form.get('password_confirmation').hasError('maxlength')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La confirmación de la contraseña supera el maximo de caracteres permitido</span>
+                            </div>
+                            <div class="is-invalid mb-3" *ngIf="form.get('password_confirmation').touched && form.hasError('mismatchedPasswords') && form.get('password').valid">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Las constraseñas no coinciden</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label class="col-form-label">Direccion*</label>
+                        <div class="align-self-center ">
+                            <input type="text " class="form-control " formControlName="address" maxlength="120">
+
+                            <div class="is-invalid" *ngIf="submitted && form.get('address').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección es requerida</span>
+                            </div>
+
+                            <div class="is-invalid" *ngIf="submitted && form.get('address').hasError('maxlength')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección supera el maximo de caracteres permitido</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
 
                     <div class="form-group">
                         <label class="col-form-label">Telefono*</label>
@@ -196,9 +246,14 @@
 
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-4">
+                </div>
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
                     <div class='form-group'>
                         <label class="col-form-label">Roles*</label>
 
@@ -213,7 +268,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label class="col-form-label pb-0">Estado</label><br>
                         <div class="d-flex align-items-center">

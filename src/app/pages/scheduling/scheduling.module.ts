@@ -6,10 +6,11 @@ import { CustomertypeComponent } from './customertype/customertype.component';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { NgbDatepickerModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { CustomerComponent } from './customer/customer.component';
+import { ReserveComponent } from './reserve/reserve.component';
 
 
 @NgModule({
-  declarations: [CustomertypeComponent, CustomerComponent],
+  declarations: [CustomertypeComponent, CustomerComponent, ReserveComponent],
   imports: [
     CommonModule,
     SchedulingRoutingModule,

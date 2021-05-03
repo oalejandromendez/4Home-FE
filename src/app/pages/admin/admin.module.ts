@@ -12,9 +12,10 @@ import { PositionComponent } from './position/position.component';
 import { WorkingdayComponent } from './workingday/workingday.component';
 import { ServiceComponent } from './service/service.component';
 import { HolidayComponent } from './holiday/holiday.component';
+import { ServicetypeComponent } from './servicetype/servicetype.component';
 
 @NgModule({
-  declarations: [UsersComponent, RolesComponent, ProfessionalComponent, PositionComponent, WorkingdayComponent, ServiceComponent, HolidayComponent],
+  declarations: [UsersComponent, RolesComponent, ProfessionalComponent, PositionComponent, WorkingdayComponent, ServiceComponent, HolidayComponent, ServicetypeComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

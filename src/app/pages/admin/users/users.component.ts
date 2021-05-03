@@ -45,6 +45,8 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy  {
 
   rolArray: Array<any> = [];
 
+  showconfirmation = false;
+
   // ----------Pattern-----------
   emailPattern: any = /^[A-Za-z0-9._%+-]{3,}@[a-zA-Z]{3,}([.]{1}[a-zA-Z]{2,}|[.]{1}[a-zA-Z]{2,}[.]{1}[a-zA-Z]{2,})/;
   passwordPattern: any = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
@@ -86,9 +88,22 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy  {
       address: new FormControl('', [Validators.required, Validators.max(120)]),
       phone: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       password: new FormControl('',[Validators.required, Validators.minLength(8), Validators.maxLength(12), Validators.pattern(this.passwordPattern)]),
+      password_confirmation: new FormControl('', [Validators.required]),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
       roles: new FormControl(null, [Validators.required]),
-    });
+    }, { validators: this.matchingPasswords('password', 'password_confirmation') });
+  }
+
+  matchingPasswords(password: string, passwordconfirmation: string) {
+    return (group: FormGroup): { [key: string]: any } => {
+      const passwordT = group.controls[password];
+      const confirmPassword = group.controls[passwordconfirmation];
+      if (passwordT.value !== confirmPassword.value) {
+        return {
+          mismatchedPasswords: true
+        };
+      }
+    };
   }
 
   validateEmail(control: AbstractControl) {

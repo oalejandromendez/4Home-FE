@@ -42,4 +42,8 @@ export class CustomerService {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/customer/filter/identification/${value}`);
   }
 
+  find( filter: any) {
+    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/customer/find`, { ...filter });
+  }
+
 }

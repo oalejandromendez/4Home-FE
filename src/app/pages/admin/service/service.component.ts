@@ -43,6 +43,17 @@ export class ServiceComponent implements OnInit, OnDestroy {
   optionsTemplate: any;
   workingdays: Array<any> = [];
 
+  types: Array<any> = [
+    {
+      value: 1,
+      label: "Esporádico"
+    },
+    {
+      value: 2,
+      label: "Mensualidad"
+    }
+  ];
+
   constructor(
     private router: Router,
     private toastyService: ToastyService,
@@ -98,6 +109,8 @@ export class ServiceComponent implements OnInit, OnDestroy {
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       price: new FormControl('', [Validators.required, Validators.maxLength(10), Validators.pattern('^[0-9]*$')]),
       working_day: new FormControl('', [Validators.required]),
+      type: new FormControl(null, [Validators.required]),
+      quantity: new FormControl('', [Validators.required, Validators.max(6), Validators.pattern('^[0-9]*$') ]),
       description: new FormControl('', [Validators.maxLength(250)]),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
     });

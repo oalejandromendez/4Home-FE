@@ -511,3 +511,12 @@ button.btn.btn-danger.btn-sm.m-2.float-right.btn-dp.ng-star-inserted {
 textarea {
     resize: none;
 }
+
+.place-items-center {
+    place-items: center !important;
+}
+
+.card-primary {
+    border-radius: 10px;
+    border-left: 4px solid #04a9f5;
+}

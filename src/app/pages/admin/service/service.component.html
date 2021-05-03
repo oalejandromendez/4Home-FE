@@ -13,6 +13,7 @@
                             <tr>
                                 <th>id</th>
                                 <th>Nombre</th>
+                                <th>Tipo</th>
                                 <th>Precio</th>
                                 <th>Jornada</th>
                                 <th>Estado</th>
@@ -23,6 +24,8 @@
                             <tr *ngFor="let service of services; let index = index ">
                                 <td>{{ service.id }}</td>
                                 <td>{{ service.name }}</td>
+                                <td *ngIf="service.type === 1">Esporádico</td>
+                                <td *ngIf="service.type === 2">Mensualidad</td>
                                 <td>{{ service.price | currency }}</td>
                                 <td>{{ service.working_day.name }}</td>
                                 <td>
@@ -70,7 +73,7 @@
                         <label class="col-form-label">Nombre*</label>
 
                         <div class="p-0 pl-2 align-self-center ">
-                            <input type="text" class="form-control" formControlName="name" maxlength="50" autofocus>
+                            <input type="text" class="form-control" formControlName="name" maxlength="50">
                             <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('required')">
                                 <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre es requerido</span>
                             </div>
@@ -102,6 +105,48 @@
                 </div>
             </div>
 
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class='form-group'>
+                        <label class="col-form-label">Tipo*</label>
+                        <div class="align-self-center">
+                            <ng-select [items]="types" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="type" notFoundText="No se encontraron resultados"></ng-select>
+                            <div class="is-invalid" *ngIf="submitted && form.get('type').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo es requerida</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class='form-group'>
+                        <label class="col-form-label">Cantidad*</label>
+
+                        <div class="p-0 pl-2 align-self-center ">
+                            <input type="text" class="form-control" formControlName="quantity" maxlength="1" max="6">
+                            <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad es requerida</span>
+                            </div>
+                            <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('maxlength')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad supera el maximo de caracteres permitido</span>
+                            </div>
+                            <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('max')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad no es valida</span>
+                            </div>
+                            <div class="is-invalid" *ngIf="form.get('quantity').hasError('pattern') && form.get('quantity').touched">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Digite unicamente números</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
             <div class='form-group'>
                 <label class="col-form-label">Jornada*</label>
                 <div class="align-self-center">
@@ -115,7 +160,7 @@
             <div class="form-group">
                 <label class="col-form-label">Descripción</label>
                 <div class="align-self-center ">
-                    <textarea class="form-control" formControlName="description" maxlength="250" rows="4"></textarea>
+                    <textarea class="form-control" formControlName="description" maxlength="250" rows="2"></textarea>
                     <div class="is-invalid" *ngIf="submitted && form.get('description').hasError('maxlength')">
                         <span class="badge badge-danger f-size-12 mt-1 m-r-5">La descripción supera el maximo de caracteres permitido</span>
                     </div>

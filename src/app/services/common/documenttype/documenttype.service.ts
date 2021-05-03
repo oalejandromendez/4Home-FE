@@ -16,4 +16,8 @@ export class DocumentTypeService {
   get() {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/documenttype`);
   }
+
+  getWithoutAuthentication() {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/singup/documenttype`);
+  }
 }

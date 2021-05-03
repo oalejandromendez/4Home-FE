@@ -13,8 +13,15 @@ import { DashboardComponent } from 'src/app/pages/common/dashboard/dashboard.com
 import { ToastyModule } from 'ng2-toasty';
 import { DataTablesModule } from 'angular-datatables';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { AngularCalendarYearViewModule } from 'angular-calendar-year-view';
 
+import { FullCalendarModule } from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
+FullCalendarModule.registerPlugins([
+  dayGridPlugin,
+  interactionPlugin
+]);
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -31,8 +38,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ClickOutsideModule,
     DataTablesModule,
     NgSelectModule,
-    AngularCalendarYearViewModule,
-    ToastyModule.forRoot()
+    FullCalendarModule,
+    ToastyModule.forRoot(),
   ],
   exports: [
     CommonModule,
@@ -47,8 +54,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     DashboardComponent,
     ToastyModule,
     DataTablesModule,
+    FullCalendarModule,
     NgSelectModule,
-    AngularCalendarYearViewModule
+
   ],
   declarations: [
     SpinnerComponent,

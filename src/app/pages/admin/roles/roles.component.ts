@@ -187,6 +187,36 @@ export class RolesComponent implements OnInit, OnDestroy {
         return 'Modificar clientes';
       case 'ELIMINAR_CLIENTES':
         return 'Eliminar clientes';
+      case 'ACCEDER_FESTIVOS':
+        return 'Acceder al modulo de festivos';
+      case 'VER_FESTIVOS':
+        return 'Acceder a lista de festivos';
+      case 'CREAR_FESTIVOS':
+        return 'Crear festivos';
+      case 'MODIFICAR_FESTIVOS':
+        return 'Modificar festivos';
+      case 'ELIMINAR_FESTIVOS':
+        return 'Eliminar festivos';
+      case 'ACCEDER_RESERVAS':
+        return 'Acceder al modulo de reservas';
+      case 'VER_RESERVAS':
+        return 'Acceder a lista de reservas';
+      case 'CREAR_RESERVAS':
+        return 'Crear reservas';
+      case 'MODIFICAR_RESERVAS':
+        return 'Modificar reservas';
+      case 'ELIMINAR_RESERVAS':
+        return 'Eliminar reservas';
+      case 'ACCEDER_TIPO_SERVICIO':
+        return 'Acceder al modulo de tipo de servicios';
+      case 'VER_TIPO_SERVICIO':
+        return 'Acceder a lista de tipo de servicios';
+      case 'CREAR_TIPO_SERVICIO':
+        return 'Crear tipo de servicios';
+      case 'MODIFICAR_TIPO_SERVICIO':
+        return 'Modificar tipo de servicios';
+      case 'ELIMINAR_TIPO_SERVICIO':
+        return 'Eliminar tipo de servicios';
     }
   }
 

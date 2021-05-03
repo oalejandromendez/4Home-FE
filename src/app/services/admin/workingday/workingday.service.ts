@@ -29,4 +29,8 @@ export class WorkingdayService {
   delete( id: string) {
     return this.headers.delete(sessionStorage.getItem('token'), `${ this.url}/api/workingday/${id}`);
   }
+
+  findByServiceType( id: string) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/workingday/filter/servicetype/${id}`);
+  }
 }
