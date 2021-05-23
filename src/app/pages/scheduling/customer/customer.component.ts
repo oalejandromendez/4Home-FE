@@ -100,7 +100,7 @@ export class CustomerComponent implements OnInit, OnDestroy  {
       phone: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       mobile: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       password: new FormControl('',[Validators.required, Validators.minLength(8), Validators.maxLength(12), Validators.pattern(this.passwordPattern)]),
-      password_confirmation: new FormControl('', [Validators.required]),
+      password_confirmation: new FormControl(''),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
       contact_name: new FormControl('', [Validators.required, Validators.maxLength(250)]),
       billing_address: new FormControl('', [Validators.required, Validators.maxLength(250)]),
@@ -113,7 +113,10 @@ export class CustomerComponent implements OnInit, OnDestroy  {
     return (group: FormGroup): { [key: string]: any } => {
       const passwordT = group.controls[password];
       const confirmPassword = group.controls[passwordconfirmation];
-      if (passwordT.value !== confirmPassword.value) {
+      if(this.id) {
+        return null;
+      }
+      else if (passwordT.value !== confirmPassword.value) {
         return {
           mismatchedPasswords: true
         };

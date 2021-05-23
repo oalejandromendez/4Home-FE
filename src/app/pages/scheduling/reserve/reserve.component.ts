@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { NgbCalendar, NgbDate, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DataTableDirective } from 'angular-datatables';
@@ -17,6 +17,8 @@ import { ServiceService } from 'src/app/services/admin/service/service.service';
 import { CustomDatepickerI18n, I18n } from 'src/app/services/common/datepicker/datepicker.service';
 import { HolidayService } from 'src/app/services/admin/holiday/holiday.service';
 import { AuthService } from 'src/app/services/auth/auth.service'
+import { ReserveModel } from 'src/app/models/scheduling/reserve.mode';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-reserve',
@@ -47,6 +49,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
   submitted = false;
   form: FormGroup;
+  reserve: ReserveModel = new ReserveModel();
 
   serviceTypes: Array<any> = [];
   workingDays: Array<any> = [];
@@ -66,6 +69,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   ];
 
   id: any;
+  reserveEdit = null;
 
   canCreate = false;
   canSee = false;
@@ -86,6 +90,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   days: Array<any> = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
   addresses: Array<any> = [];
+  daysEdit: Array<any> = [];
 
   constructor(
     private userService: UserService,
@@ -104,7 +109,9 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     private calendar: NgbCalendar,
     private I18n: I18n,
     private holidayService: HolidayService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private ref: ChangeDetectorRef
     ) {
       this.loaderService.loading(true);
       this.getPermissions();
@@ -122,7 +129,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadTable();
     this.getDocumentsType();
     this.getServiceTypes();
-    this.getHolidays();
+    // this.getHolidays();
   }
 
   ngAfterViewInit() {
@@ -137,10 +144,8 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   initialValidation() {
     const auth = this.authService.authUser();
     if(auth) {
-      console.log('auth', auth);
       this.userService.getById(auth.id).subscribe( resp => {
-        console.log('resp', resp);
-        const roles = resp.roles.filter( (rol: any) => rol.name === 'CLIENTE'); 
+        const roles = resp.roles.filter( (rol: any) => rol.name === 'CLIENTE');
         if( roles.length > 0) {
           this.isCustomer = true;
           this.documentType = auth.type_document;
@@ -154,6 +159,123 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onSubmit() {
+
+    this.submitted = true;
+
+    if (!this.form.valid) { return; }
+
+    Swal.fire({
+      allowOutsideClick: false,
+      icon: 'info',
+      text:  'Espere...'
+    });
+
+    Swal.showLoading();
+
+    this.reserve = this.form.value;
+    this.reserve.user = this.customer.id;
+
+    const listDays = new Array();
+
+    this.daysArray.value.map( (day: any) => {
+
+      if(day.type === 1 ) {
+        const date = day.date;
+        listDays.push({
+          date: date.year + '-' + date.month + '-' + date.day
+        });
+      }
+
+      if(day.type === 2 && day.selected) {
+        listDays.push({
+          day: day.index++
+        });
+      }
+
+    });
+
+    this.reserve.days = listDays;
+
+    if (this.id) {
+
+      this.reserveService.put( this.reserve , this.id).subscribe( (data: any)  => {
+
+        const toastOptions: ToastOptions = {
+          title: '¡Proceso Exitoso!',
+          msg: 'La reserva se ha editado exitosamente',
+          showClose: false,
+          timeout: 3000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.success(toastOptions);
+        this.cancel();
+        this.closeModal.nativeElement.click();
+        this.rerender();
+        Swal.close();
+
+      }, (err) => {
+        Swal.close();
+
+        if (err.error.errors) {
+          let mensage = '';
+
+          Object.keys(err.error.errors).forEach( (data, index) => {
+            mensage += err.error.errors[data][0] + '<br>';
+          });
+
+          const toastOptions: ToastOptions = {
+            title: 'Error',
+            msg: mensage,
+            showClose: false,
+            timeout: 2000,
+            theme: 'bootstrap',
+          };
+          this.toastyService.error(toastOptions);
+        } else {
+          if (err.status === 401) {
+            this.router.navigateByUrl('/login');
+          }
+        }
+      });
+
+    } else {
+
+      this.reserveService.post( this.reserve ).subscribe( (data: any) => {
+        Swal.close();
+        const toastOptions: ToastOptions = {
+          title: '¡Proceso Exitoso!',
+          msg: 'La reserva se ha registrado exitosamente',
+          showClose: false,
+          timeout: 3000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.success(toastOptions);
+        this.cancel();
+        this.closeModal.nativeElement.click();
+        this.rerender();
+      }, (err) => {
+        Swal.close();
+        if (err.error.errors) {
+          let mensage = '';
+
+          Object.keys(err.error.errors).forEach( (data, index) => {
+            mensage += err.error.errors[data][0] + '<br>';
+          });
+          const toastOptions: ToastOptions = {
+            title: 'Error',
+            msg: mensage,
+            showClose: false,
+            timeout: 2000,
+            theme: 'bootstrap',
+          };
+          this.toastyService.error(toastOptions);
+        } else {
+          if (err.status === 401) {
+            this.router.navigateByUrl('/login');
+          }
+        }
+      });
+    }
 
   }
 
@@ -171,8 +293,8 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       resp.data.map( (holiday: any) => {
         const date = holiday.date.split('-');
         this.disabledDates.push({
-          year: +date[0], 
-          month: +date[1], 
+          year: +date[0],
+          month: +date[1],
           day: +date[2]
         });
       });
@@ -185,7 +307,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       working_day: new FormControl(null, [Validators.required]),
       type: new FormControl(null, [Validators.required]),
       service: new FormControl(null, [Validators.required]),
-      address: new FormControl(null, [Validators.required]),
+      customer_address: new FormControl(null, [Validators.required]),
       user: new FormControl(null),
       days: this.formBuilder.array([], {validators: this.minDaySelected })
     });
@@ -219,6 +341,9 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.form.get('service').valueChanges.subscribe( resp => {
       this.service = this.listServices.find( service => service.id === resp);
+      if(this.reserve) {
+        this.daysEdit = new Array();
+      }
       if(this.form.controls.type.value === 1) {
         this.loadDates();
       }
@@ -237,6 +362,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   resetDays() {
     this.quantity = null;
     this.price = null;
+    this.daysEdit = new Array();
     while (this.daysArray.length !== 0) {
       this.daysArray.removeAt(0)
     }
@@ -250,11 +376,12 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       this.quantity = this.service.quantity;
       this.price = this.quantity * this.service.price;
       this.days.map( day => {
+        const editDay = this.daysEdit.find( day => day.day === this.daysArray.controls.length);
         this.daysArray.push(
           this.formBuilder.group({
             index: new FormControl(this.daysArray.controls.length),
             day: new FormControl(day),
-            selected: new FormControl(false),
+            selected: new FormControl( editDay === undefined ? false : true),
             type: 2
           })
         )
@@ -269,35 +396,44 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.quantity = this.service.quantity;
       this.price = this.quantity * this.service.price;
-      for(var i = 0; i < this.quantity; i++ ) {
-        this.daysArray.push(
-          this.formBuilder.group({
-            index: new FormControl(this.daysArray.controls.length),
-            date: new FormControl(null, [Validators.required, this.validateDate.bind(this)]),
-            type: 1
-          })
-        )
+      if(this.daysEdit.length > 0) {
+        this.daysEdit.map( date => {
+          const reserve_date = date.date.split('-');
+          this.daysArray.push(
+            this.formBuilder.group({
+              index: new FormControl(this.daysArray.controls.length),
+              date: new FormControl({ year: +reserve_date[0], month: +reserve_date[1], day: +reserve_date[2]}, [Validators.required, this.validateDate.bind(this)]),
+              type: 1
+            })
+          );
+        });
+      } else {
+        for(var i = 0; i < this.quantity; i++ ) {
+          this.daysArray.push(
+            this.formBuilder.group({
+              index: new FormControl(this.daysArray.controls.length),
+              date: new FormControl(null, [Validators.required, this.validateDate.bind(this)]),
+              type: 1
+            })
+          )
+        }
       }
     }
   }
-  
+
   validateDate(control: AbstractControl) {
-    console.log('control', control);
     var exist = false;
-    if(this.daysArray.length > 0) {
+    if(this.daysArray.length > 0 && !this.form.pristine) {
       this.daysArray.controls.map( o => {
         if(o.value.date != null) {
-
           if(o.value.date.year === control.value.year &&
-            o.value.date.month === control.value.month && 
+            o.value.date.month === control.value.month &&
             o.value.date.day === control.value.day
             ) {
             exist = true;
-            console.log('existe');
           }
         }
       });
-
     }
     return exist ? { 'repeatedDate': true } : null;
   }
@@ -330,7 +466,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     this.workingdayService.findByServiceType(serviceType).subscribe( resp => {
       resp.data.filter( (workingDay: any) => workingDay.status === 1 ).map( (workingDay: any) => {
         this.workingDays.push({ value: workingDay.id, label: workingDay.name } );
-        this.workingDays = this.serviceTypes.slice();
+        this.workingDays = this.workingDays.slice();
       });
       this.loaderService.loading(false);
     }, error => {
@@ -379,7 +515,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       scrollCollapse: true,
       buttons: [
         {
-          className: 'btn-sm boton-excel wid-7',
+          className: 'btn-sm boton-excel wid-6',
           text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/añadir.png">',
           titleAttr: 'Nuevo Cliente',
           action(e: any) {
@@ -388,7 +524,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         },
         {
-            className: 'btn-sm boton-excel wid-7',
+            className: 'btn-sm boton-excel wid-6',
             text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/excel.png">',
             titleAttr: 'Exportar como Excel',
             extend: 'excel',
@@ -398,7 +534,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         },
         {
-          className: 'btn-sm boton-copiar wid-7',
+          className: 'btn-sm boton-copiar wid-6',
           text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/copiar.png">',
           titleAttr: 'Copiar',
           extend: 'copy',
@@ -408,7 +544,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         },
         {
-            className: 'btn-sm boton-imprimir wid-7',
+            className: 'btn-sm boton-imprimir wid-6',
             text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/print.png">',
             titleAttr: 'Imprimir',
             extend: 'print',
@@ -419,9 +555,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
         },
       ],
       columnDefs: [
-        { targets: 0, searchable: false, visible: false, className: 'notexport' },
-        { targets: 4,  className: 'text-center' },
-        { targets: 5,  className: 'wid-15 text-center' }
+        { targets: 0, searchable: false, visible: false, className: 'notexport' }
       ],
       order: [],
       language: that.language.getLanguage('es'),
@@ -438,19 +572,17 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   cancel() {
-    /*this.id = null;
-    this.form.controls.password.setValidators([Validators.required, Validators.minLength(8), Validators.maxLength(12), Validators.pattern(this.passwordPattern)]);
-    this.form.reset({status: true});
-    this.submitted = false;
-    this.customer = new UserModel();
-    this.form.controls.status.disable();
-    while (this.addressesArray.length !== 0) {
-      this.addressesArray.removeAt(0)
+    this.daysEdit = new Array();
+    this.id = null;
+    this.submitted = null;
+    this.reserve = new ReserveModel();
+    this.form.reset();
+    while (this.daysArray.length !== 0) {
+      this.daysArray.removeAt(0)
     }
-    this.cancelAddress();
     if(!this.canCreate) {
       this.form.disable();
-    }*/
+    }
   }
 
   search() {
@@ -470,19 +602,31 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
         identification: this.identification
       }
       this.customerService.find(filter).subscribe( resp => {
-        Swal.close();
         if(Object.keys(resp).length === 0) {
-          this.customer = null;
-          this.addresses = [];
-          const toastOptions: ToastOptions = {
-            title: 'Error',
-            msg: 'Cliente no encontrado',
-            showClose: false,
-            timeout: 5000,
-            theme: 'bootstrap',
-          };
-          this.toastyService.error(toastOptions);
+          if(this.customer) {
+            this.reservations = [];
+            this.rerender();
+          }
+          const that = this;
+          setTimeout(function() {
+            Swal.close();
+            that.customer = null;
+            that.addresses = [];
+            const toastOptions: ToastOptions = {
+              title: 'Error',
+              msg: 'Cliente no encontrado',
+              showClose: false,
+              timeout: 5000,
+              theme: 'bootstrap',
+            };
+            that.toastyService.error(toastOptions);
+          }, 500);
         } else {
+          if(this.reservations.length > 0) {
+            this.reservations = [];
+          }
+          Swal.close();
+          this.addresses = [];
           this.customer = resp;
           resp.customer_address.map( (address: any) => {
             this.addresses.push({ value: address.id, label: address.address } );
@@ -526,6 +670,71 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
         text:  'Ha ocurrido un error'
       });
     });
+  }
+
+  edit(id: any) {
+    if(id) {
+      this.id = id;
+      this.daysEdit = new Array();
+      const that = this;
+      const data = this.reservations.find( (reservation: any) => reservation.id === id);
+      this.reserve = data;
+      if (data) {
+        const promiseServiceType = async () => {
+          this.form.controls.service_type.setValue(data.service.working_day.service_type);
+          this.form.controls.working_day.setValue(data.service.working_day.id);
+          this.form.controls.type.setValue(data.type);
+          this.form.controls.service.setValue(data.service.id);
+          return true;
+        }
+        promiseServiceType().then( result => {
+          setTimeout(function() {
+            that.form.controls.customer_address.setValue(data.customer_address.id);
+            that.service = that.listServices.find( service => service.id === data.service.id);
+            that.daysEdit = data.service_day;
+            if(that.form.controls.type.value === 1) {
+              that.loadDates();
+            }
+            if(that.form.controls.type.value === 2) {
+              that.loadDays();
+            }
+            that.openModal.nativeElement.click();
+          }, 2000);
+        });
+      }
+    }
+  }
+
+  delete(id: any, index: any) {
+    if (id) {
+      Swal.fire({
+        title: 'Esta seguro?',
+        text:  'Usted no podra recuperar los datos eliminados',
+        icon: 'question',
+        showConfirmButton: true,
+        showCancelButton: false,
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Confirmar',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+          return new Promise<void>((resolve) => {
+            this.reserveService.delete(id).subscribe( data => {
+              this.reservations.splice(index, 1);
+              this.dtOptions = {};
+              this.loadTable();
+              this.rerender();
+              this.cancel();
+              Swal.fire('Proceso Exitoso!', 'Se ha eliminado la reserva exitosamente', 'success' );
+            }, (err: any) => {
+              Swal.fire('Error', err.error.message, 'error');
+            });
+            setTimeout(() => {
+              resolve();
+            }, 5000);
+          });
+        }
+      });
+    }
   }
 
   getPermissions() {

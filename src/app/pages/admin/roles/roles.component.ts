@@ -217,6 +217,12 @@ export class RolesComponent implements OnInit, OnDestroy {
         return 'Modificar tipo de servicios';
       case 'ELIMINAR_TIPO_SERVICIO':
         return 'Eliminar tipo de servicios';
+      case 'ACCEDER_AGENDAMIENTOS':
+        return 'Acceder al modulo de agendamientos';
+      case 'VER_AGENDAMIENTOS':
+        return 'Acceder a lista de agendamientos';
+      case 'MODIFICAR_AGENDAMIENTOS':
+        return 'Modificar agendamientos';
     }
   }
 

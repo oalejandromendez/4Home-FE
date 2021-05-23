@@ -1,6 +1,6 @@
 <div class="d-flex">
 
-    <div class="col-md-4">
+    <div class="col-md-3">
 
         <div class="card card-primary mb-2" style="margin-top: -15px;" *ngIf="!isCustomer">
 
@@ -83,7 +83,7 @@
     </div>
 
 
-    <div class="col-md-8" style="margin-top: -15px;border-left: 4px solid #d4d4d4;" *ngIf="customer">
+    <div class="col-md-9" style="margin-top: -15px;border-left: 4px solid #d4d4d4;" [hidden]="!customer">
 
         <div class="card user-profile-list mb-0">
             <div class="card-header">
@@ -97,8 +97,10 @@
                             <tr>
                                 <th>id</th>
                                 <th>Servicio</th>
-                                <th>Jornada</th>
                                 <th>Tipo</th>
+                                <th>Jornada</th>
+                                <th>Precio</th>
+                                <th>Dirección</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -106,21 +108,24 @@
                         <tbody *ngIf="reservations?.length !=0 ">
                             <tr *ngFor="let reservation of reservations; let index = index ">
                                 <td>{{ reservation.id }}</td>
-                                <td>{{ reservation.name }}</td>
-                                <td>{{ reservation.lastname }}</td>
-                                <td>{{ reservation.email }}</td>
+                                <td>{{ reservation.service.name }}</td>
+                                <td *ngIf="reservation.type === 1">Esporádico</td>
+                                <td *ngIf="reservation.type === 2">Mensualidad</td>
+                                <td>{{ reservation.service.working_day.name }}</td>
+                                <td>{{ (reservation.service.price * reservation.service.quantity) | currency }}</td>
+                                <td>{{ reservation.customer_address.address }}</td>
                                 <td>
-                                    <span *ngIf="reservation.status === 1" class="badge badge-success">ACTIVO</span>
-                                    <span *ngIf="reservation.status === 0" class="badge badge-danger">INACTIVO</span>
+                                    <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>
+                                    <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO</span>
                                 </td>
-                                <td>
-                                    <!--<button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
+                                <td class="wid-15">
+                                    <button type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
                                       <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
                                     </button>
 
-                                    <button *ngIf="canDelete" type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
+                                    <button type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
                                       <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
-                                    </button>-->
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -197,8 +202,8 @@
                     <div class='form-group'>
                         <label class="col-form-label">Dirección*</label>
                         <div class="align-self-center">
-                            <ng-select [items]="addresses" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione..." formControlName="address" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('address').hasError('required')">
+                            <ng-select [items]="addresses" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione..." formControlName="customer_address" notFoundText="No se encontraron resultados"></ng-select>
+                            <div class="is-invalid" *ngIf="submitted && form.get('customer_address').hasError('required')">
                                 <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección es requerida</span>
                             </div>
                         </div>

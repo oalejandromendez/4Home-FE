@@ -7,10 +7,11 @@ import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { NgbDatepickerModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { CustomerComponent } from './customer/customer.component';
 import { ReserveComponent } from './reserve/reserve.component';
+import { ScheduleComponent } from './schedule/schedule.component';
 
 
 @NgModule({
-  declarations: [CustomertypeComponent, CustomerComponent, ReserveComponent],
+  declarations: [CustomertypeComponent, CustomerComponent, ReserveComponent, ScheduleComponent],
   imports: [
     CommonModule,
     SchedulingRoutingModule,

@@ -1,0 +1,47 @@
+<div class="container">
+
+    <div class="col-md-2 p-0" *ngIf="reserveFilter">
+
+        <div class="card br-10 mb-3">
+            <div class="card-body body-search">
+                <div>
+                    <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/search.png">
+                    <input type="text" class="form-control input-search" placeholder="Buscar" [(ngModel)]="search" [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card" *ngFor="let reserve of reserves | filter:search">
+                <div class="card-body">
+                    <label> Cliente </label>
+                    <label>{{ reserve.user.name | titlecase }}</label>
+                    <label>{{ reserve.user.name | titlecase }} {{ reserve.user.lastname | titlecase }}</label>
+                    <label> Fecha creación</label>
+                    <label>{{ reserve.created_at | date }}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-2" *ngIf="scheduleFilter">
+
+    </div>
+
+    <div class="bottom">
+        <div class="row">
+            <div class="col-md-6 filter" [ngClass]="{active: reserveFilter}" (click)="changeReserve()">
+                <img alt="Theme-Logo" class="img-fluid wid-40" src="assets/img/schedule/reserve.png">
+                <br>
+                <label class="label-filter">Reservas</label>
+            </div>
+
+            <div class="col-md-6 filter" [ngClass]="{active: scheduleFilter}" (click)="changeSchedule()">
+                <img alt="Theme-Logo" class="img-fluid wid-40" src="assets/img/schedule/schedule.png">
+                <br>
+                <label class="label-filter">Agendamientos</label>
+            </div>
+        </div>
+    </div>
+</div>

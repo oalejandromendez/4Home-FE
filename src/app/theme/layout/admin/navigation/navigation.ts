@@ -58,7 +58,7 @@ const NavigationItems = [
         url: '/scheduling/schedule',
         icon: 'assets/img/menu/schedule.png',
         classes: 'nav-item',
-        hidden: false
+        hidden: true
       },
       {
         id: 'availability',
@@ -141,7 +141,7 @@ const NavigationItems = [
         classes: 'nav-item',
         hidden: true
       },
-      {
+      /*{
         id: 'holiday',
         title: 'Festivos',
         type: 'item',
@@ -149,7 +149,7 @@ const NavigationItems = [
         icon: 'assets/img/menu/holiday.png',
         classes: 'nav-item',
         hidden: true
-      },
+      },*/
       {
         id: 'users',
         title: 'Usuarios',
@@ -198,8 +198,10 @@ export class NavigationItem {
           const service         = resp.filter( (perm: any) => perm.name === "ACCEDER_SERVICIOS");
           const customertype    = resp.filter( (perm: any) => perm.name === "ACCEDER_TIPO_CLIENTE");
           const customer        = resp.filter( (perm: any) => perm.name === "ACCEDER_CLIENTES");
-          const holiday         = resp.filter( (perm: any) => perm.name === "ACCEDER_FESTIVOS");
+          // const holiday         = resp.filter( (perm: any) => perm.name === "ACCEDER_FESTIVOS");
           const reserve         = resp.filter( (perm: any) => perm.name === "ACCEDER_RESERVAS");
+          const schedule        = resp.filter( (perm: any) => perm.name === "ACCEDER_AGENDAMIENTOS");
+
 
           if(users.length > 0 && children.id === 'users') {
             children.hidden = false;
@@ -255,15 +257,21 @@ export class NavigationItem {
             children.hidden = true;
           }
 
-          if(holiday.length > 0 && children.id === 'holiday') {
+          /*if(holiday.length > 0 && children.id === 'holiday') {
             children.hidden = false;
           } else if (holiday.length === 0 && children.id === 'holiday') {
             children.hidden = true;
-          }
+          }*/
 
           if(reserve.length > 0 && children.id === 'reserve') {
             children.hidden = false;
           } else if (reserve.length === 0 && children.id === 'reserve') {
+            children.hidden = true;
+          }
+
+          if(schedule.length > 0 && children.id === 'schedule') {
+            children.hidden = false;
+          } else if (schedule.length === 0 && children.id === 'schedule') {
             children.hidden = true;
           }
         });

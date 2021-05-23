@@ -1,0 +1,52 @@
+.filter {
+    background-color: #dee2e6;
+    text-align-last: center;
+    border-radius: 10px;
+}
+
+.label-filter {
+    color: black;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.wid-40 {
+    width: 40px;
+}
+
+.active {
+    background: #03a9f48c;
+}
+
+.bottom {
+    position: fixed;
+    bottom: 0;
+    width: calc(100% - 225px);
+}
+
+.active .label-filter {
+    font-size: 16px;
+}
+
+.container {
+    margin-top: -20px;
+    margin-left: -10px;
+}
+
+.body-search {
+    padding: 10px;
+}
+
+.input-search {
+    height: 25px;
+    font-size: 12px;
+}
+
+.br-10 {
+    border-radius: 10px;
+}
+
+.wid-26 {
+    width: 26px;
+}

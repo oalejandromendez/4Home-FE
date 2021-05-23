@@ -17,6 +17,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -39,6 +40,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     DataTablesModule,
     NgSelectModule,
     FullCalendarModule,
+    Ng2SearchPipeModule,
     ToastyModule.forRoot(),
   ],
   exports: [
@@ -55,8 +57,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ToastyModule,
     DataTablesModule,
     FullCalendarModule,
+    Ng2SearchPipeModule,
     NgSelectModule,
-
   ],
   declarations: [
     SpinnerComponent,
