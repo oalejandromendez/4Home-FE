@@ -517,6 +517,52 @@ textarea {
 }
 
 .card-primary {
-    border-radius: 10px;
-    border-left: 4px solid #04a9f5;
+    border-radius: 10px !important;
+    border-left: 4px solid #04a9f5 !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.card-warning {
+  border-radius: 10px !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+.card-success {
+  border-radius: 10px !important;
+  border-left: 4px solid #28a745 !important;
+}
+
+.f-11 {
+  font-size: 11px;
+}
+
+.contentscroll::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #F5F5F5;
+}
+
+.contentscroll::-webkit-scrollbar {
+  width: 6px;
+  background-color: #F5F5F5;
+  height: 6px;
+}
+
+.contentscroll::-webkit-scrollbar-thumb {
+  background-color: #999;
+}
+
+.align-center {
+  align-self: center;
+}
+
+.br-10 {
+  border-radius: 10px;
+  border: 1px solid #d6d6d6;
+}
+
+.place-content-center {
+  place-content: center;
 }

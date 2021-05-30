@@ -26,8 +26,7 @@
                                 <td>{{ professional.name }}</td>
                                 <td>{{ professional.lastname }}</td>
                                 <td>
-                                    <span *ngIf="professional.status === 1" class="badge badge-success">ACTIVO</span>
-                                    <span *ngIf="professional.status === 0" class="badge badge-danger">INACTIVO</span>
+                                    <span class="badge badge-primary" [ngStyle]="{'background': professional.status.colour }">{{ professional.status.name }}</span>
                                 </td>
                                 <td>
                                     <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(professional.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
@@ -340,19 +339,15 @@
                 </div>
 
                 <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="col-form-label pb-0">Estado</label><br>
-                        <div class="d-flex align-items-center">
-                            <div class="switch switch-success d-inline m-r-10">
-                                <input type="checkbox" id="status" formControlName="status">
-                                <label for="status" class="cr cr-hw"></label>
-                            </div>
-                            <div>
-                                <span class="badge m-r-5 badge-success ml-2 mt-2" *ngIf="form.get('status').value">Activo</span>
-                                <span class="badge m-r-5 badge-danger ml-2 mt-2" *ngIf="!form.get('status').value">Inactivo</span>
-                            </div>
-                        </div>
-                    </div>
+                  <div class='form-group'>
+                      <label class="col-form-label">Estado*</label>
+                      <div class="align-self-center">
+                          <ng-select [items]="statuses" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="status" notFoundText="No se encontraron resultados"></ng-select>
+                          <div class="is-invalid" *ngIf="submitted && form.get('status').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El estado es requerido</span>
+                          </div>
+                      </div>
+                  </div>
                 </div>
 
 

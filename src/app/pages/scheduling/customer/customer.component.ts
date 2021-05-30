@@ -151,13 +151,13 @@ export class CustomerComponent implements OnInit, OnDestroy  {
   }
 
   getDocumentsType() {
-    this.loaderService.loading(false);
+    this.loaderService.loading(true);
     this.documentTypeService.get().subscribe( (resp: any) => {
       resp.map( (type: any) => {
         this.documentTypes.push({ value: String(type.id), label: type.name } );
         this.documentTypes = this.documentTypes.slice();
       });
-      this.loaderService.loading(true);
+      this.loaderService.loading(false);
     }, error => {
       Swal.fire({
         icon: 'error',
@@ -168,13 +168,13 @@ export class CustomerComponent implements OnInit, OnDestroy  {
   }
 
   getCustomerTypes() {
-    this.loaderService.loading(false);
+    this.loaderService.loading(true);
     this.customertypeService.get().subscribe( (resp: any) => {
       resp.data.map( (type: any) => {
         this.customerTypes.push({ value: String(type.id), label: type.name } );
         this.customerTypes = this.customerTypes.slice();
       });
-      this.loaderService.loading(true);
+      this.loaderService.loading(false);
     }, error => {
       Swal.fire({
         icon: 'error',

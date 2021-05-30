@@ -691,7 +691,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
           setTimeout(function() {
             that.form.controls.customer_address.setValue(data.customer_address.id);
             that.service = that.listServices.find( service => service.id === data.service.id);
-            that.daysEdit = data.service_day;
+            that.daysEdit = data.reserve_day;
             if(that.form.controls.type.value === 1) {
               that.loadDates();
             }

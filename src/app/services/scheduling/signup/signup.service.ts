@@ -29,4 +29,8 @@ export class SignupService {
     return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/singup`, { ...user });
   }
 
+  resetPassword( user: any ) {
+    return this.headers.patch(sessionStorage.getItem('token'), `${ this.url}/api/singup/resetpassword`, { ...user });
+  }
+
 }

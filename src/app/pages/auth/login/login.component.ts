@@ -49,7 +49,11 @@ export class LoginComponent implements OnInit {
     this.loaderService.loading(true);
     this.authUser = this.form.value;
     this.authService.login( this.authUser ).subscribe( resp => {
-      this.router.navigate(['/dashboard']);
+      if(resp.user.reset_password === 1) {
+        this.router.navigate(['/auth/changepassword']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     }, (err) => {
       this.loaderService.loading(false);
       Swal.fire({

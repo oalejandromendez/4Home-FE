@@ -1,47 +1,422 @@
-<div class="container">
+<form [formGroup]="form">
+  <div class="container row col-md-12 m-0 p-0">
+      <div class="col-md-3 pr-2 pl-2">
+          <div class="card br-10 mb-3">
+              <div class="card-body body-search">
+                  <div class="d-flex">
+                      <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/search.png">
+                      <input type="text" class="form-control input-search" placeholder="Buscar" [(ngModel)]="search" [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
+                  </div>
+              </div>
+          </div>
+          <div>
+              <div class="card">
+                <div class="card-header p-0 text-center">
+                  <div class="label-reserves">
+                    Reservas
+                    <span class="badge badge-warning">{{ (reserves | filter: search).length  }}</span>
+                    <img alt="Theme-Logo" (click)="refresh()" class="img-fluid mr-2 wid-26 ml-2" src="assets/img/schedule/refresh.png" [placement]="'top'" ngbTooltip="Refrescar" tooltipClass="tooltip-class">
+                  </div>
+                </div>
+                <div class="card-body body-list-reserves">
+                    <div class="list-reserve">
+                      <div class="card br-10 mb-1 cursor-pointer card-reserve" *ngFor="let reserve of reserves | filter:search" (click)="selectReserve(reserve)">
+                        <div class="card-body p-2">
+                          <div class="row text-center">
+                            <div class="row">
+                                <div class="col-md-12">
+                                  <div class="d-flex" [placement]="'left'" ngbTooltip="Cliente" tooltipClass="tooltip-class">
+                                    <div class="col-md-2">
+                                      <img class="img-reserve" src="assets/img/customer/user.png">
+                                    </div>
+                                    <label class="col-md-10 font-weight-bold f-12 text-left">{{ reserve.user.name | titlecase }} {{ reserve.user.lastname | titlecase }}</label>
+                                  </div>
+                                  <div class="d-flex" [placement]="'left'" ngbTooltip="Tipo de Servicio" tooltipClass="tooltip-class">
+                                    <div class="col-md-2">
+                                      <img class="img-reserve" src="assets/img/schedule/type.png">
+                                    </div>
+                                    <label class="col-md-10 font-weight-bold f-12 text-left" *ngIf="reserve.type === 1">Esporádico</label>
+                                    <label class="col-md-10 font-weight-bold f-12 text-left" *ngIf="reserve.type === 2">Mensualidad</label>
+                                  </div>
+                                  <div class="d-flex" [placement]="'left'" ngbTooltip="Fecha creación" tooltipClass="tooltip-class">
+                                    <div class="col-md-2">
+                                      <img class="img-reserve" src="assets/img/schedule/created_at.png">
+                                    </div>
+                                    <label class="col-md-10 font-weight-bold f-12 text-left">{{ reserve.created_at | date }}</label>
+                                  </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
 
-    <div class="col-md-2 p-0" *ngIf="reserveFilter">
+      <div class="col-md-3 pr-2 pl-2" *ngIf="reservation">
+
+        <div class="card card-primary mb-3" >
+
+          <div class="card-body pt-1 pb-1 card-customer">
+
+              <label class="label-customer">Información del cliente</label>
+
+              <div>
+                <span class="label-info">Identificación</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.identification }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Cliente</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.name | titlecase }} {{ reservation.user.lastname | titlecase }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Email</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.email }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Celular</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.mobile }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Teléfono</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.phone }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Nombre de Contacto</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.contact_name | titlecase }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Dirección de Facturación</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.user.billing_address }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Direcciones</span>
+                <br>
+                <div>
+                  <div *ngFor="let address of reservation.user.customer_address">
+                    <label class="font-weight-bold mb-0 label-address" >{{ address.address }}</label>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+        </div>
+
+        <div class="card card-primary mb-2">
+
+          <div class="card-body p-2 pl-4">
+
+            <label class="label-customer">Información de la reserva</label>
+
+            <div class="row">
+
+              <div class="col-md-6 p-0">
+                <div>
+                  <span class="label-info">Tipo de Servicio</span>
+                  <br>
+                  <label class="font-weight-bold label-info-customer" *ngIf="reservation.type === 1">Esporádico</label>
+                  <label class="font-weight-bold label-info-customer" *ngIf="reservation.type === 2">Mensualidad</label>
+                </div>
+              </div>
+
+              <div class="col-md-6 p-0">
+                <div>
+                  <span class="label-info">Servicio</span>
+                  <br>
+                  <label class="font-weight-bold label-info-customer">{{ reservation.service.name }}</label>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="row">
+
+              <div class="col-md-6 p-0">
+                <div>
+                  <span class="label-info">Cantidad</span>
+                  <br>
+                  <label class="font-weight-bold label-info-customer">{{ reservation.service.quantity }}</label>
+                </div>
+              </div>
+
+              <div class="col-md-6 p-0">
+                <div>
+                  <span class="label-info">Total</span>
+                  <br>
+                  <label class="font-weight-bold label-info-customer">{{ (reservation.service.quantity * reservation.service.price) | currency }}</label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-md-3 pr-2 pl-2" *ngIf="reservation">
+
+        <div class="card card-warning mb-3">
+
+          <div class="card-body pt-2 pb-2 card-days">
+            <div>
+              <label class="label-days mb-0">Días de la reserva</label>
+
+              <div class="mt-1 mb-3 " *ngIf="form.get('days').hasError('invalidQuantity') && !form.get('days').pristine">
+                <span class="badge m-r-5 badge-danger break-spaces">La cantidad de días seleccionados no corresponde con la cantidad de servicios</span>
+              </div>
+
+              <div formArrayName="days" *ngFor="let day of daysArray.controls; let i = index">
+                  <div class="form-group mb-0" [formGroupName]="day.value.index" *ngIf="day.value.type == 1">
+                      <label class="col-form-label f-11">Fecha Servicio {{ i + 1 }}*</label>
+                      <div class="input-group">
+                          <input class="form-control" formControlName="date" placeholder="YYYY-MM-DD" ngbDatepicker #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'" [footerTemplate]="footerTemplate" [markDisabled]="isDisabled">
+                          <div class="input-group-append bg-default" (click)="date.toggle()">
+                              <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+                          </div>
+                      </div>
+                      <div class="mt-1" *ngIf="day.get('date').hasError('required')">
+                          <span class="badge m-r-5 badge-danger break-spaces">La fecha es requerida</span>
+                      </div>
+                      <div class="mt-1" *ngIf="day.get('date').hasError('repeatedDate')">
+                          <span class="badge m-r-5 badge-danger break-spaces">La fecha seleccionada ya esta asociada a otro servicio</span>
+                      </div>
+                      <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled" let-focused="focused" let-selected="selected">
+                          <div class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted]="disabled">
+                              {{ date.day }}
+                          </div>
+                      </ng-template>
+                      <ng-template #footerTemplate>
+                          <hr class="my-0">
+                          <button class="btn btn-danger btn-sm m-2 float-right btn-dp break-spaces" (click)="date.close()">Cerrar</button>
+                      </ng-template>
+                  </div>
+                  <div class="form-group mb-0" [formGroupName]="day.value.index" *ngIf="day.value.type == 2">
+                      <div class="form-group">
+                          <div class="switch d-inline m-r-10">
+                              <input type="checkbox" id="{{day.value.day}}" formControlName="selected">
+                              <label for="{{day.value.day}}" class="cr"></label>
+                          </div>
+                          <label> {{ day.value.day }}</label>
+                      </div>
+                  </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="card card-warning br-10 mb-0">
+
+          <div class="card-body p-1 text-center">
+
+            <button type="buttom" class="btn btn-success btn-sm m-0" (click)="checkAvailability()" [disabled]="form.get('days').hasError('invalidQuantity') || !daysArray.valid" >Buscar Disponibilidad</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-md-3 pr-2 pl-2" *ngIf="validateAvailability">
 
         <div class="card br-10 mb-3">
-            <div class="card-body body-search">
-                <div>
-                    <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/search.png">
-                    <input type="text" class="form-control input-search" placeholder="Buscar" [(ngModel)]="search" [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
-                </div>
-            </div>
+          <div class="card-body body-search">
+              <div class="d-flex">
+                  <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/search.png">
+                  <input type="text" class="form-control input-search" placeholder="Buscar" [(ngModel)]="searchProfessional" [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
+              </div>
+          </div>
         </div>
-
         <div>
-            <div class="card" *ngFor="let reserve of reserves | filter:search">
-                <div class="card-body">
-                    <label> Cliente </label>
-                    <label>{{ reserve.user.name | titlecase }}</label>
-                    <label>{{ reserve.user.name | titlecase }} {{ reserve.user.lastname | titlecase }}</label>
-                    <label> Fecha creación</label>
-                    <label>{{ reserve.created_at | date }}</label>
+          <div class="card">
+
+            <div class="card-header p-0 text-center">
+              <div class="label-reserves">
+                Profesionales
+                <span class="badge badge-warning">{{ (professionals | filter: searchProfessional).length  }}</span>
+              </div>
+            </div>
+            <div class="card-body body-list-reserves">
+                <div class="list-reserve">
+                  <div class="card br-10 mb-1 cursor-pointer card-reserve" *ngFor="let professional of professionals | filter:searchProfessional" (click)="selectProfessionals(professional)">
+                    <div class="card-body p-2">
+                      <div class="row text-center">
+                        <div class="row">
+                            <div class="col-md-12">
+                              <div class="d-flex">
+
+                                <div class="d-flex col-md-7">
+                                  <div class="col-md-2">
+                                    <img class="img-reserve" src="assets/img/customer/id.png">
+                                  </div>
+                                  <label class="col-md-10 font-weight-bold f-12 text-left">{{ professional.identification }}</label>
+                                </div>
+
+                                <div class="d-flex col-md-4" *ngIf="professional.available === 1">
+                                  <label class="text-left badge badge-success mb-3">Disponible</label>
+                                </div>
+
+                                <div class="d-flex col-md-4" *ngIf="professional.available === 2">
+                                  <label class="text-left badge badge-danger mb-3">No disponible</label>
+                                </div>
+
+                              </div>
+                              <div class="d-flex">
+                                <div class="d-flex col-md-12">
+                                  <div class="col-md-2">
+                                    <img class="img-reserve" [src]="professional.photo" >
+                                  </div>
+                                  <label class="col-md-10 font-weight-bold f-12 text-left">{{ professional.name | titlecase }} {{ professional.lastname | titlecase }}</label>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
             </div>
+          </div>
         </div>
+      </div>
+  </div>
+
+
+  <ng-template #modalSchedule let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h5 class="modal-title">Agenda</h5>
+        <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
     </div>
+    <div class="modal-body p-2">
 
+      <div class="row">
 
-    <div class="col-md-2" *ngIf="scheduleFilter">
+        <div class="col-md-4" *ngIf="reservation && professional">
 
-    </div>
+          <div class="card card-success br-10">
 
-    <div class="bottom">
-        <div class="row">
-            <div class="col-md-6 filter" [ngClass]="{active: reserveFilter}" (click)="changeReserve()">
-                <img alt="Theme-Logo" class="img-fluid wid-40" src="assets/img/schedule/reserve.png">
+            <div class="card-body pt-2">
+
+              <div>
+                <div class="container-image">
+                  <img [src]="professional.photo" class="img-professional" />
+                </div>
+              </div>
+
+              <div class="text-center">
+                <span *ngIf="professional.available === 1" class="text-left badge badge-success mb-2 mt-2 f-14">Disponible</span>
+                <span *ngIf="professional.available === 2" class="text-left badge badge-danger mb-2 mt-2 f-14">No disponible</span>
+              </div>
+
+              <div>
+                <span class="label-info">Identificación</span>
                 <br>
-                <label class="label-filter">Reservas</label>
+                <label class="font-weight-bold label-info-customer">{{ professional.identification }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Profesional</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.name | titlecase }} {{ professional.lastname | titlecase }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Edad</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.age }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Cargo</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.position.name }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Email</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.email }}</label>
+              </div>
+
+              <div class='form-group mb-0'>
+                <label class="label-info">Supervisor*</label>
+                <div class="align-self-center">
+                    <ng-select [items]="supervisors" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="supervisor"  notFoundText="No se encontraron resultados"></ng-select>
+                </div>
+              </div>
+
             </div>
 
-            <div class="col-md-6 filter" [ngClass]="{active: scheduleFilter}" (click)="changeSchedule()">
-                <img alt="Theme-Logo" class="img-fluid wid-40" src="assets/img/schedule/schedule.png">
-                <br>
-                <label class="label-filter">Agendamientos</label>
-            </div>
+          </div>
+
         </div>
+
+        <div class="col-md-8">
+
+          <div class="card br-10 mb-0">
+
+            <div class="card-header p-0">
+
+              <div class="col-md-12 mt-2">
+
+                <span>Convenciones:</span>
+
+                <ul class="ul-conventions mb-2">
+                  <li class="mr-2">
+                    <span class="not-available"></span>
+                    <span class="conventions">No disponible</span>
+                  </li>
+                  <li class="mr-2">
+                    <span class="reservation-days"></span>
+                    <span class="conventions">Días de la reserva</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            <div class="card-body calendar">
+              <full-calendar #calendar deepChangeDetection="true" [options]="calendarOptions"></full-calendar>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary mr-2" (click)="d('Cross click')">Cancelar</button>
+        <button *ngIf="canEdit" type="submit" class="btn btn-success mr-2" [disabled]="!form.valid" (click)="onSubmit()">Agendar</button>
+    </div>
+  </ng-template>
+
+</form>
+
+<button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalSchedule)"></button>
+<button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalSchedule)"></button>
+
+<ng2-toasty [position]="'top-right'"></ng2-toasty>

@@ -56,4 +56,8 @@ export class UserService {
     };
     return this.headers.put(sessionStorage.getItem('token'), `${ this.url}/api/user/profile/${id}`, userData);
   }
+
+  changePassword( user: any ) {
+    return this.headers.patch(sessionStorage.getItem('token'), `${ this.url}/api/user/changepassword`, { ...user });
+  }
 }

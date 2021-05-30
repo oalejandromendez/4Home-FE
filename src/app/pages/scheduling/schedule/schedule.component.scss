@@ -1,3 +1,13 @@
+.filters {
+  border-style: solid;
+  border-top: 0;
+  border-bottom: 0px;
+  border-left: 0px;
+  padding-right: 10px;
+  margin-right: 0px;
+  border-color: #d6d3d6;
+}
+
 .filter {
     background-color: #dee2e6;
     text-align-last: center;
@@ -6,13 +16,13 @@
 
 .label-filter {
     color: black;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     margin-bottom: 0;
 }
 
-.wid-40 {
-    width: 40px;
+.wid-25 {
+  width: 25px;
 }
 
 .active {
@@ -22,31 +32,188 @@
 .bottom {
     position: fixed;
     bottom: 0;
-    width: calc(100% - 225px);
+    width: calc(100% - 110px);
 }
 
 .active .label-filter {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .container {
-    margin-top: -20px;
-    margin-left: -10px;
+  margin-top: -20px !important;
+  max-width: 100% !important;
 }
 
 .body-search {
-    padding: 10px;
+    padding: 10px !important;
 }
 
 .input-search {
     height: 25px;
-    font-size: 12px;
 }
 
 .br-10 {
     border-radius: 10px;
+    border: 1px solid #d6d6d6;
 }
 
 .wid-26 {
     width: 26px;
+}
+
+.label-reserves {
+  background-color: #1976d2;
+  color: white
+}
+
+.body-list-reserves {
+  padding: 5px !important;
+  background-color: #dee2e6;
+}
+
+.img-reserve {
+  width: 30px;
+  height: 30px;
+}
+
+.list-reserve {
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.card-reserve {
+  color: black;
+}
+
+.card-reserve:hover {
+  background: #03a9f4;
+  color: white;
+}
+
+.label-customer {
+  font-weight: bold;
+  color: black;
+  font-size: 14px;
+  margin-left: -15px;
+}
+
+.label-info {
+  font-size: 11px;
+  margin-bottom: 0;
+}
+
+.label-info-customer {
+  font-size: 12px;
+  color: black;
+  margin-bottom: 0px;
+}
+
+.label-address {
+  font-size: 12px;
+  color: black;
+}
+
+.custom-day.text-muted {
+  background: #c1c1c1;
+  color: white !important;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.ngb-dp-day {
+  font-size: 14px;
+}
+
+.custom-day {
+  padding: 5px;
+}
+
+.ngb-dp-day:hover {
+  background: #04a9f5;
+  font-weight: bold;
+  color: white;
+  border-radius: 10px;
+}
+
+.content-days {
+  place-content: center;
+  height: 430px;
+  overflow: auto;
+}
+
+.custom-day.bg-primary {
+  background: #04a9f5 !important;
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+}
+
+.label-days {
+  font-weight: bold;
+  color: black;
+  font-size: 14px;
+}
+
+.img-professional {
+  width: 45%;
+  margin: 10px;
+}
+
+.container-image {
+  background-color: #d6d6d6;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  -moz-text-align-last: center;
+  text-align-last: center;
+  margin: 0px 15px;
+  border-radius: 10px;
+}
+
+.calendar {
+  max-height: calc(100vh - 190px);
+  overflow: auto;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 30px !important;
+}
+
+.card-customer {
+  height: calc(100vh - 230px);
+  overflow: auto;
+}
+
+.card-days {
+  height: calc(100vh - 140px);
+  overflow: auto;
+}
+
+.modal-schedule .modal-dialog {
+  max-width: 75%;
+  width: 75%;
+  margin-top: 10px;
+}
+
+.conventions {
+  margin-left: 5px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.not-available {
+  background-color: #f44336;
+  padding: 0px 10px;
+}
+
+.reservation-days {
+  background-color: #03a9f4;
+  padding: 0px 10px;
+}
+
+.ul-conventions {
+  list-style: none;
+  padding-left: 15px;
+  margin-top: 5px;
+  display: flex;
 }

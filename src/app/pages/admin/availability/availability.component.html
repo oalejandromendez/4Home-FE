@@ -1,0 +1,174 @@
+
+<div class="row col-md-12 container-availability">
+
+  <div class="col-md-3">
+
+    <div class="card br-10 mb-3">
+      <div class="card-body body-search">
+          <div class="d-flex">
+              <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/search.png">
+              <input type="text" class="form-control input-search" placeholder="Buscar" [(ngModel)]="search" [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
+          </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-header p-0 text-center">
+          <div class="label-reserves">
+            Profesionales
+            <span class="badge badge-warning">{{ (professionals | filter: search).length  }}</span>
+          </div>
+        </div>
+        <div class="card-body body-list-reserves">
+            <div class="list-reserve">
+              <div class="card br-10 mb-1 cursor-pointer card-reserve" *ngFor="let professional of professionals | filter:search" (click)="selectProfessionals(professional)">
+                <div class="card-body p-2">
+                  <div class="row text-center">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <div class="d-flex">
+
+                            <div class="d-flex col-md-7">
+                              <div class="col-md-2">
+                                <img class="img-reserve" src="assets/img/customer/id.png">
+                              </div>
+                              <label class="col-md-10 font-weight-bold f-12 text-left">{{ professional.identification }}</label>
+                            </div>
+                          </div>
+                          <div class="d-flex">
+                            <div class="d-flex col-md-12">
+                              <div class="col-md-2">
+                                <img class="img-reserve" [src]="professional.photo" >
+                              </div>
+                              <label class="col-md-10 font-weight-bold f-12 text-left">{{ professional.name | titlecase }} {{ professional.lastname | titlecase }}</label>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3" *ngIf="professional">
+
+    <div class="card card-success br-10">
+
+      <div class="card-body pt-2">
+
+        <div>
+          <div class="container-image">
+            <img [src]="professional.photo" class="img-professional" />
+          </div>
+        </div>
+
+        <div class="text-center">
+          <span class="badge badge-primary" [ngStyle]="{'background': professional.status.colour }">{{ professional.status.name }}</span>
+        </div>
+
+        <div class="body-info">
+          <div>
+            <span class="label-info">Identificación</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.identification }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Profesional</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.name | titlecase }} {{ professional.lastname | titlecase }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Edad</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.age }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Teléfono</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.phone }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Teléfono de contacto</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.phone_contact }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Cargo</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.position.name }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Salario</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.salary | currency }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Email</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.email }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Dirección</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.address }}</label>
+          </div>
+
+          <div>
+            <span class="label-info">Fecha de admisión</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.admission_date }}</label>
+          </div>
+
+          <div *ngIf="professional.retirement_date">
+            <span class="label-info">Fecha de retiro</span>
+            <br>
+            <label class="font-weight-bold label-info-customer">{{ professional.retirement_date }}</label>
+          </div>
+        </div>
+
+
+        <div class="row col-md-12">
+
+          <div class="col-md-6">
+
+            <button type="buttom" class="btn btn-warning btn-sm m-0" (click)="selectSchedule()" >Agenda</button>
+
+          </div>
+          <div class="col-md-6">
+
+            <button type="buttom" class="btn btn-success btn-sm m-0" >Historial</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-6" *ngIf="professional">
+
+    <div class="card br-10 mb-0" *ngIf="schedule">
+      <div class="card-body calendar">
+        <full-calendar #calendar deepChangeDetection="true" [options]="calendarOptions"></full-calendar>
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -18,6 +18,10 @@ export class ProfessionalService {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/professional`);
   }
 
+  getId(id: string) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/professional/${id}`);
+  }
+
   post( professional: ProfessionalModel) {
     return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/professional`, { ...professional });
   }
@@ -37,4 +41,9 @@ export class ProfessionalService {
   validateEmail(value: string) {
     return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/professional/filter/email`, {email: value});
   }
+
+  checkAvailability(filter: any) {
+    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/professional/filter/availability`, { ...filter });
+  }
+
 }

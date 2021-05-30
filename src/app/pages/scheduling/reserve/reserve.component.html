@@ -116,14 +116,14 @@
                                 <td>{{ reservation.customer_address.address }}</td>
                                 <td>
                                     <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>
-                                    <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO</span>
+                                    <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
                                 </td>
                                 <td class="wid-15">
-                                    <button type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
+                                    <button type="button" *ngIf="reservation.status === 1" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
                                       <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
                                     </button>
 
-                                    <button type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
+                                    <button type="button" *ngIf="reservation.status === 1" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
                                       <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
                                     </button>
                                 </td>

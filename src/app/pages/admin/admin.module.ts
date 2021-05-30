@@ -13,9 +13,12 @@ import { WorkingdayComponent } from './workingday/workingday.component';
 import { ServiceComponent } from './service/service.component';
 import { HolidayComponent } from './holiday/holiday.component';
 import { ServicetypeComponent } from './servicetype/servicetype.component';
+import { AvailabilityComponent } from './availability/availability.component';
+import { StatusComponent } from './status/status.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
-  declarations: [UsersComponent, RolesComponent, ProfessionalComponent, PositionComponent, WorkingdayComponent, ServiceComponent, HolidayComponent, ServicetypeComponent],
+  declarations: [UsersComponent, RolesComponent, ProfessionalComponent, PositionComponent, WorkingdayComponent, ServiceComponent, HolidayComponent, ServicetypeComponent, AvailabilityComponent, StatusComponent, ProfileComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

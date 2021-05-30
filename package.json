@@ -47,6 +47,7 @@
         "ng2-currency-mask": "^11.0.0",
         "ng2-search-filter": "^0.5.1",
         "ng2-toasty": "^4.0.3",
+        "ngx-color-picker": "^11.0.0",
         "ngx-perfect-scrollbar": "^6.3.1",
         "node-sass": "^4.10.0",
         "raphael": "^2.3.0",

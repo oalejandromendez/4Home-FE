@@ -67,7 +67,7 @@ const NavigationItems = [
         url: '/admin/availability',
         icon: 'assets/img/menu/availability.png',
         classes: 'nav-item',
-        hidden: false
+        hidden: true
       },
       {
         id: 'customer',
@@ -129,6 +129,15 @@ const NavigationItems = [
         type: 'item',
         url: '/admin/professional',
         icon: 'assets/img/menu/professionals.png',
+        classes: 'nav-item',
+        hidden: true
+      },
+      {
+        id: 'status',
+        title: 'Estados',
+        type: 'item',
+        url: '/admin/status',
+        icon: 'assets/img/menu/status.png',
         classes: 'nav-item',
         hidden: true
       },
@@ -201,6 +210,8 @@ export class NavigationItem {
           // const holiday         = resp.filter( (perm: any) => perm.name === "ACCEDER_FESTIVOS");
           const reserve         = resp.filter( (perm: any) => perm.name === "ACCEDER_RESERVAS");
           const schedule        = resp.filter( (perm: any) => perm.name === "ACCEDER_AGENDAMIENTOS");
+          const availability    = resp.filter( (perm: any) => perm.name === "ACCEDER_DISPONIBILIDAD");
+          const status          = resp.filter( (perm: any) => perm.name === "ACCEDER_ESTADOS");
 
 
           if(users.length > 0 && children.id === 'users') {
@@ -272,6 +283,18 @@ export class NavigationItem {
           if(schedule.length > 0 && children.id === 'schedule') {
             children.hidden = false;
           } else if (schedule.length === 0 && children.id === 'schedule') {
+            children.hidden = true;
+          }
+
+          if(availability.length > 0 && children.id === 'availability') {
+            children.hidden = false;
+          } else if (availability.length === 0 && children.id === 'availability') {
+            children.hidden = true;
+          }
+
+          if(status.length > 0 && children.id === 'status') {
+            children.hidden = false;
+          } else if (status.length === 0 && children.id === 'status') {
             children.hidden = true;
           }
         });

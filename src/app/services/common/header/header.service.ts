@@ -27,6 +27,15 @@ export class HeaderService {
     return this.http.post(url, data, {headers});
   }
 
+  patch(token: string, url: string, data: any ): Observable<any>  {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
+      'X-Requested-With': 'XMLHttpRequest'
+    });
+    return this.http.patch(url, data, {headers});
+  }
+
   put(token: string, url: string, data: any ): Observable<any>  {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

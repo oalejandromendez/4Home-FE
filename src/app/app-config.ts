@@ -2,7 +2,7 @@ export class DattaConfig {
   public static config = {
     layout: 'vertical', // vertical, horizontal
     'pre-layout': null, // null, layout-2, layout-2-2, layout-3, layout-4, layout-4-2, layout-6, layout-8
-    'collapse-menu': false,
+    'collapse-menu': true,
     'layout-type': 'menu-dark', // menu-dark, menu-light, dark
     'nav-icon-color': false,
     'header-back-color': 'header-default', // header-default, header-blue, header-red, header-purple, header-lightblue, header-dark

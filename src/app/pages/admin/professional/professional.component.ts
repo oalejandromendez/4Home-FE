@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 import { CustomDatepickerI18n, I18n } from 'src/app/services/common/datepicker/datepicker.service';
 import { DocumentTypeService } from 'src/app/services/common/documenttype/documenttype.service';
 import { PositionService } from 'src/app/services/admin/position/position.service';
+import { StatusService } from 'src/app/services/admin/status/status.service';
 
 @Component({
   selector: 'app-professional',
@@ -55,6 +56,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   cardImageBase64 = null;
   documentTypes: Array<any> = [];
   positions: Array<any> = [];
+  statuses: Array<any> = [];
   today = this.calendar.getToday();
   now: Date = new Date();
   optionsTemplate: any;
@@ -72,7 +74,8 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     private calendar: NgbCalendar,
     private I18n: I18n,
     private documentTypeService: DocumentTypeService,
-    private positionService: PositionService
+    private positionService: PositionService,
+    private statusService: StatusService
   ) {
     this.loaderService.loading(true);
     this.loadForm();
@@ -96,6 +99,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     this.loadTable();
     this.getDocumentsType();
     this.getPositions();
+    this.getStatuses();
   }
 
   ngOnDestroy(): void {
@@ -108,13 +112,30 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   getDocumentsType() {
-    this.loaderService.loading(false);
+    this.loaderService.loading(true);
     this.documentTypeService.get().subscribe( (resp: any) => {
       resp.map( (type: any) => {
         this.documentTypes.push({ value: String(type.id), label: type.name } );
         this.documentTypes = this.documentTypes.slice();
       });
-      this.loaderService.loading(true);
+      this.loaderService.loading(false);
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text:  'Ha ocurrido un error'
+      });
+    });
+  }
+
+  getStatuses() {
+    this.loaderService.loading(true);
+    this.statusService.get().subscribe( (resp: any) => {
+      resp.filter( (status: any) => status.status === 1 ).map( (status: any) => {
+        this.statuses.push({ value: String(status.id), label: status.name } );
+        this.statuses = this.statuses.slice();
+      });
+      this.loaderService.loading(false);
     }, error => {
       Swal.fire({
         icon: 'error',
@@ -125,13 +146,13 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   getPositions() {
-    this.loaderService.loading(false);
+    this.loaderService.loading(true);
     this.positionService.get().subscribe( (resp: any) => {
       resp.filter( (position: any) => position.status === 1 ).map( (position: any) => {
         this.positions.push({ value: String(position.id), label: position.name } );
         this.positions = this.positions.slice();
       });
-      this.loaderService.loading(true);
+      this.loaderService.loading(false);
     }, error => {
       Swal.fire({
         icon: 'error',
@@ -155,7 +176,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       phone_contact: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       salary: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       photo: new FormControl(''),
-      status: new FormControl({value: true, disabled: true}, [Validators.required]),
+      status: new FormControl(null, [Validators.required]),
       admission_date: new FormControl(this.now, [Validators.required]),
       retirement_date: new FormControl('')
     }, {validators: this.ValidateDates});
@@ -363,7 +384,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           theme: 'bootstrap',
         };
         this.toastyService.success(toastOptions);
-        this.form.reset({status: true});
+        this.form.reset();
         this.submitted = false;
         this.closeModal.nativeElement.click();
         this.rerender();
@@ -422,10 +443,9 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
   cancel() {
     this.id = null;
-    this.form.reset();
     this.submitted = false;
     this.professional = new ProfessionalModel();
-    this.form.reset({status: true});
+    this.form.reset();
     this.cardImageBase64 = null;
     if(!this.canCreate) {
       this.form.disable();
@@ -504,7 +524,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         theme: 'bootstrap',
       };
       this.toastyService.error(toastOptions);
-      this.loaderService.loading(true);
+      this.loaderService.loading(false);
     });
   }
 
