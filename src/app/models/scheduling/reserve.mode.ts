@@ -1,5 +1,6 @@
 export class ReserveModel {
   id: string;
+  reference: string;
   user: string;
   customer_address: string;
   service: string;

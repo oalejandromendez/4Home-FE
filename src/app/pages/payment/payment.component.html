@@ -1,0 +1,234 @@
+<div class="container-payment" *ngIf="reservationPayment">
+
+  <h5 class="title-payment">Pago de Servicio</h5>
+
+  <div>
+
+    <label class="danger">Recuerda que actualmente cuentas con un tiempo limite de <strong class="font-weight-bold">{{ reservationPayment.limit }}</strong> para pagar tu servicio.</label>
+
+    <div class="d-flex">
+
+      <div class="col-md-3">
+
+        <div class="card card-primary br-10 mb-2">
+
+          <div class="card-header p-2">
+            <label class="label-reservation mb-0">Información de la reserva</label>
+          </div>
+
+          <div class="card-body p-2">
+
+            <div class="col-md-12 p-0">
+              <div>
+                  <span class="f-12">Referencia</span>
+                  <br>
+                  <label class="font-weight-bold info-reservation">#{{ reservationPayment.reference  }}</label>
+              </div>
+            </div>
+
+            <div class="col-md-12 p-0">
+              <div>
+                  <span class="f-12">Tipo de Servicio</span>
+                  <br>
+                  <label class="font-weight-bold info-reservation" *ngIf="reservationPayment.type === 1">Esporádico</label>
+                  <label class="font-weight-bold info-reservation" *ngIf="reservationPayment.type === 2">Mensualidad</label>
+              </div>
+            </div>
+
+            <div class="col-md-12 p-0">
+              <div>
+                  <span class="f-12">Servicio</span>
+                  <br>
+                  <label class="font-weight-bold info-reservation">{{ reservationPayment.service.name }}</label>
+              </div>
+            </div>
+
+            <div class="col-md-12 p-0">
+              <div>
+                  <span class="f-12">Jornada</span>
+                  <br>
+                  <label class="font-weight-bold info-reservation">{{ reservationPayment.service.working_day.name }}</label>
+              </div>
+            </div>
+
+            <div class="col-md-12 p-0">
+              <div>
+                  <span class="f-12">Dirección a prestar el servicio</span>
+                  <br>
+                  <label class="font-weight-bold info-reservation">{{ reservationPayment.customer_address.address }}</label>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="card card-primary br-10 mb-0">
+
+          <div class="card-header p-2 mb-2">
+            <span class="label-reservation mb-0">Detalle de los servicios:</span>
+          </div>
+
+          <div class="card-body p-2" *ngIf="reservationPayment.type === 1">
+
+            <div class="col-md-12 p-0" *ngFor="let day of reservationPayment.days; let i = index">
+              <div>
+                  <span class="f-12">Fecha del servicio #{{ i + 1 }}:</span>
+                  <br>
+                  <label class="font-weight-bold info-reservation">{{ day.date }}</label>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="card-body p-2" *ngIf="reservationPayment.type === 2">
+            <span class="f-12">Días:</span>
+            <div class="col-md-12 p-0" *ngFor="let day of reservationPayment.days; let i = index">
+              <div>
+                  <label class="font-weight-bold info-reservation">{{ day }}</label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-md-3 filters">
+
+        <div class="card card-warning br-10 mb-0">
+
+          <div class="card-body pt-2">
+
+            <div>
+              <div class="container-image-payment">
+                <img [src]="reservationPayment.professional.photo" class="img-professional-payment" />
+              </div>
+            </div>
+
+            <div class="body-info">
+              <div>
+                <span class="f-12">Identificación</span>
+                <br>
+                <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.identification }}</label>
+              </div>
+
+              <div>
+                <span class="f-12">Profesional</span>
+                <br>
+                <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.name | titlecase }} {{ reservationPayment.professional.lastname | titlecase }}</label>
+              </div>
+
+              <div>
+                <span class="f-12">Edad</span>
+                <br>
+                <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.age }}</label>
+              </div>
+
+              <div>
+                <span class="f-12">Teléfono</span>
+                <br>
+                <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.phone }}</label>
+              </div>
+
+              <div>
+                <span class="f-12">Teléfono de contacto</span>
+                <br>
+                <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.phone_contact }}</label>
+              </div>
+
+              <div>
+                <span class="f-12">Email</span>
+                <br>
+                <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.email }}</label>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <form class="col-md-6" ngNoForm name="payuform" method="POST" action="https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu" novalidate>
+        <div>
+          <div class="card card-invoice">
+            <div class="card-body card-success br-10 mb-0 card-body-invoice">
+              <img alt="Theme-Logo" class="img-fluid mr-2" src="assets/img/payment/invoice.png">
+              <label class="label-payment mb-0 mt-3">
+                Total a pagar: {{ (reservationPayment.service.price * reservationPayment.service.quantity) | currency }}
+              </label>
+
+              <div>
+                <input name="merchantId"    hidden  [(ngModel)]="payment.merchantId" >
+                <input name="accountId"     hidden  [(ngModel)]="payment.accountId">
+                <input name="description"   hidden  [(ngModel)]="payment.description" >
+                <input name="referenceCode" hidden  [(ngModel)]="payment.referenceCode">
+                <input name="amount"        hidden  [(ngModel)]="payment.amount">
+                <input name="tax"           hidden  [(ngModel)]="payment.tax">
+                <input name="taxReturnBase" hidden  [(ngModel)]="payment.taxReturnBase">
+                <input name="currency"      hidden  [(ngModel)]="payment.currency">
+                <input name="signature"     hidden  [(ngModel)]="payment.signature">
+                <input name="test"          hidden  [(ngModel)]="payment.test">
+                <input name="responseUrl"   hidden  value="http://localhost:4200/finance/response" >
+                <input name="confirmationUrl" hidden  value="http://localhost/4Home/public/api/payment/confirmation" >
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class='form-group mb-0'>
+                      <label class="col-form-label">Número de documento*</label>
+                      <div class="p-0 pl-2 align-self-center ">
+                          <input type="text" class="form-control" [(ngModel)]="payment.payerDocument" maxlength="10">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class='form-group mb-0'>
+                      <label class="col-form-label">Nombre del pagador*</label>
+                      <div class="p-0 pl-2 align-self-center ">
+                          <input type="text" class="form-control" [(ngModel)]="payment.buyerFullName" maxlength="250">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class='form-group mb-0'>
+                      <label class="col-form-label">Correo*</label>
+                      <div class="p-0 pl-2 align-self-center ">
+                          <input type="text" class="form-control" [(ngModel)]="payment.buyerEmail" maxlength="250">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class='form-group mb-0'>
+                      <label class="col-form-label">Teléfono*</label>
+                      <div class="p-0 pl-2 align-self-center ">
+                          <input type="text" class="form-control" [(ngModel)]="payment.telephone" maxlength="10">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="btn-payment mt-3">
+
+                <button type="submit" class="btn btn-outline-primary btn-lg btn-block btn-reserve">
+                  <img alt="Theme-Logo" class="img-fluid mr-2" src="assets/img/payment/logo-payu.png">Pagar
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+

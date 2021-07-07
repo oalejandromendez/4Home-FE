@@ -1,0 +1,52 @@
+.container-payment {
+  margin-top: -25px;
+}
+
+.title-payment {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.danger {
+  color: red;
+}
+
+.container-image-payment {
+  background-color: #d6d6d6;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  -moz-text-align-last: center;
+  text-align-last: center;
+  margin: 0px 15px;
+  border-radius: 10px;
+}
+
+.img-professional-payment {
+  width: 65%;
+  margin: 10px;
+}
+
+.label-payment {
+  color: #000000;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.card-invoice {
+  text-align: -webkit-center;
+}
+
+.card-body-invoice {
+  display: grid;
+}
+
+.btn-payment {
+  width: 40%;
+  place-self: center;
+}
+
+.btn-reserve:hover {
+  color: #000 !important;
+  background-color: #e8e8e8;
+  border-color: #04a9f5;
+}

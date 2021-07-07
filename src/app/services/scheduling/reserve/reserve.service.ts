@@ -24,6 +24,10 @@ export class ReserveService {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/customer/${idCustomer}`);
   }
 
+  getByReference(reference: any) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/reference/${reference}`);
+  }
+
   post( reserve: ReserveModel) {
     return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/reserve`, { ...reserve });
   }

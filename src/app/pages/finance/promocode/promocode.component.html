@@ -1,0 +1,148 @@
+<div class="d-flex">
+
+  <div class="col-md-12">
+      <div class="card user-profile-list mb-0" style="margin-top: -15px;">
+          <div class="card-header">
+              <h4>Lista de Códigos</h4>
+          </div>
+
+          <div class="card-body">
+            <div *ngIf="canSee" lass="dt-responsive table-responsive ">
+              <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger " class="display row-border hover table-striped " style="width:100% ">
+                <thead>
+                  <tr>
+                    <th>id</th>
+                    <th>Código</th>
+                    <th>Porcentaje de descuento</th>
+                    <th>Fecha de expiración</th>
+                    <th>Número de veces a utilizar</th>
+                    <th>De un solo uso</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="promocodes?.length !=0 ">
+                  <tr *ngFor="let promocode of promocodes; let index = index ">
+                    <td>{{ promocode.id }}</td>
+                    <td>{{ promocode.code }}</td>
+                    <td>{{ promocode.reward }}</td>
+                    <td>{{ promocode.expires_at | date }}</td>
+                    <td>{{ promocode.quantity }}</td>
+                    <td>
+                      <span *ngIf="promocode.is_disposable" class="badge badge-success">ACTIVO</span>
+                      <span *ngIf="!promocode.is_disposable" class="badge badge-danger">INACTIVO</span>
+                    </td>
+                    <td>
+                      <button *ngIf="canDelete" type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(promocode.code, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
+                        <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+              <div *ngIf="!canSee" class="text-align-center">
+                  <label class="badge badge-info f-20">NO TIENE PERMISO PARA VER LA LISTA DE CÓDIGOS</label>
+              </div>
+          </div>
+
+      </div>
+  </div>
+</div>
+<ng2-toasty [position]="'top-right'"></ng2-toasty>
+
+<form [formGroup]="form">
+  <ng-template #modalForm let-c="close" let-d="dismiss">
+      <div class="modal-header">
+          <h5 *ngIf="!id" class="modal-title">Nuevo Código</h5>
+          <h5 *ngIf="id" class="modal-title">Modificar Código</h5>
+          <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class='form-group'>
+              <label class="col-form-label">Cantidad de códigos*</label>
+              <div class="p-0 pl-2 align-self-center ">
+                <input type="text" class="form-control" formControlName="amount" max="200" min="1">
+                <div class="is-invalid" *ngIf="submitted && form.get('amount').hasError('required')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad de códigos es requerido</span>
+                </div>
+                <div class="is-invalid" *ngIf="submitted && form.get('amount').hasError('max')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad de códigos supero el máximo permitido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class='form-group'>
+              <label class="col-form-label">Porcentaje de descuento*</label>
+              <div class="p-0 pl-2 align-self-center ">
+                <input type="text" class="form-control" formControlName="reward" max="100" min="1">
+                <div class="is-invalid" *ngIf="submitted && form.get('reward').hasError('required')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">El porcentaje de descuento es requerido</span>
+                </div>
+                <div class="is-invalid" *ngIf="submitted && form.get('reward').hasError('max')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">El porcentaje de descuento supero el máximo permitido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class='form-group'>
+              <label class="col-form-label">Días de Validez*</label>
+              <div class="p-0 pl-2 align-self-center ">
+                <input type="text" class="form-control" formControlName="expires" max="365" min="1">
+                <div class="is-invalid" *ngIf="submitted && form.get('expires').hasError('required')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">Los días de validez son requeridos</span>
+                </div>
+                <div class="is-invalid" *ngIf="submitted && form.get('expires').hasError('max')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">Los días de validez superan el máximo permitido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class='form-group'>
+              <label class="col-form-label">Cantidad de veces a usar*</label>
+              <div class="p-0 pl-2 align-self-center ">
+                <input type="text" class="form-control" formControlName="quantity" max="500" min="1">
+                <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('required')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad de veces a usar es requerido</span>
+                </div>
+                <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('max')">
+                    <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad de veces a usar supera el máximo permitido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-form-label pb-0">De un solo uso</label><br>
+          <div class="d-flex align-items-center">
+            <div class="switch switch-success d-inline m-r-10">
+                <input type="checkbox" id="disposable" formControlName="disposable">
+                <label for="disposable" class="cr cr-hw"></label>
+            </div>
+            <div>
+                <span class="badge m-r-5 badge-success ml-2 mt-2" *ngIf="form.get('disposable').value">Activo</span>
+                <span class="badge m-r-5 badge-danger ml-2 mt-2" *ngIf="!form.get('disposable').value">Inactivo</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')" (click)="cancel();">Cancelar</button>
+          <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" [disabled]="!form.valid" (click)="onSubmit()">Guardar</button>
+      </div>
+  </ng-template>
+</form>
+<button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
+<button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>

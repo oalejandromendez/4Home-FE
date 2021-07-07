@@ -45,6 +45,7 @@ export class AvailabilityComponent implements OnInit {
           reservesDates.map( (reserve: any) => {
             reserve.reserve_day.map( (day: any) => {
               this.schedules.push({
+                title: reserve.service.working_day.name,
                 start: day.date,
                 color: '#f44336',
                 allDay: true
@@ -70,6 +71,7 @@ export class AvailabilityComponent implements OnInit {
                 const exists = days.find( (d: any) => d.day === day);
                 if(exists) {
                   this.schedules.push({
+                    title: reserve.service.working_day.name,
                     start: new Date(now),
                     color: '#f44336',
                     allDay: true
@@ -87,7 +89,7 @@ export class AvailabilityComponent implements OnInit {
       this.calendarOptions = {
         plugins: [ listPlugin, timeGridPlugin, dayGridPlugin ],
         locale: esLocale,
-        height: 420,
+        height: 520,
         initialView: 'dayGridMonth',
         timeZone: 'America/Bogota',
         events: this.schedules,

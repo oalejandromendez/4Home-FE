@@ -44,7 +44,7 @@ const NavigationItems = [
       },
       {
         id: 'reserve',
-        title: 'Reservar',
+        title: 'Pre-Agendar',
         type: 'item',
         url: '/scheduling/reserve',
         icon: 'assets/img/menu/reserve.png',
@@ -150,6 +150,15 @@ const NavigationItems = [
         classes: 'nav-item',
         hidden: true
       },
+      {
+        id: 'promocode',
+        title: 'Códigos Promocionales',
+        type: 'item',
+        url: '/finance/promocode',
+        icon: 'assets/img/menu/promo-code.png',
+        classes: 'nav-item',
+        hidden: true
+      },
       /*{
         id: 'holiday',
         title: 'Festivos',
@@ -212,6 +221,7 @@ export class NavigationItem {
           const schedule        = resp.filter( (perm: any) => perm.name === "ACCEDER_AGENDAMIENTOS");
           const availability    = resp.filter( (perm: any) => perm.name === "ACCEDER_DISPONIBILIDAD");
           const status          = resp.filter( (perm: any) => perm.name === "ACCEDER_ESTADOS");
+          const promocode       = resp.filter( (perm: any) => perm.name === "ACCEDER_CODIGOS_PROMOCIONALES");
 
 
           if(users.length > 0 && children.id === 'users') {
@@ -295,6 +305,12 @@ export class NavigationItem {
           if(status.length > 0 && children.id === 'status') {
             children.hidden = false;
           } else if (status.length === 0 && children.id === 'status') {
+            children.hidden = true;
+          }
+
+          if(promocode.length > 0 && children.id === 'promocode') {
+            children.hidden = false;
+          } else if (promocode.length === 0 && children.id === 'promocode') {
             children.hidden = true;
           }
         });

@@ -96,6 +96,7 @@
                         <thead>
                             <tr>
                                 <th>id</th>
+                                <th>Referencia</th>
                                 <th>Servicio</th>
                                 <th>Tipo</th>
                                 <th>Jornada</th>
@@ -108,6 +109,7 @@
                         <tbody *ngIf="reservations?.length !=0 ">
                             <tr *ngFor="let reservation of reservations; let index = index ">
                                 <td>{{ reservation.id }}</td>
+                                <th>{{ reservation.reference }}</th>
                                 <td>{{ reservation.service.name }}</td>
                                 <td *ngIf="reservation.type === 1">Esporádico</td>
                                 <td *ngIf="reservation.type === 2">Mensualidad</td>
@@ -117,8 +119,10 @@
                                 <td>
                                     <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>
                                     <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+                                    <span *ngIf="reservation.status === 3" class="badge badge-success">PAGO APROBADO</span>
+                                    <span *ngIf="reservation.status === 4" class="badge badge-danger">PAGO RECHAZADO</span>
                                 </td>
-                                <td class="wid-15">
+                                <td class="wid-15 text-center">
                                     <button type="button" *ngIf="reservation.status === 1" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
                                       <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
                                     </button>
@@ -126,6 +130,15 @@
                                     <button type="button" *ngIf="reservation.status === 1" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
                                       <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
                                     </button>
+
+                                    <button type="button" *ngIf="reservation.status === 2" class="btn btn-icon btn-delete btn-datatable btn-payu" (click)="payments(reservation.id)" [placement]="'bottom'" ngbTooltip="Pagos" tooltipClass="tooltip-class" container="body">
+                                      <img class="img-payu" src="assets/img/payu.png">
+                                    </button>
+
+                                    <button type="button" *ngIf="reservation.status === 4" class="btn btn-icon btn-delete btn-datatable btn-payu" (click)="payments(reservation.id)" [placement]="'bottom'" ngbTooltip="Pagos" tooltipClass="tooltip-class" container="body">
+                                      <img class="img-payu" src="assets/img/payu.png">
+                                    </button>
+
                                 </td>
                             </tr>
                         </tbody>
@@ -148,7 +161,7 @@
     <ng-template #modalForm let-c="close" let-d="dismiss">
         <div class="modal-header">
             <h5 *ngIf="!id" class="modal-title">Nueva Reserva</h5>
-            <h5 *ngIf="id" class="modal-title">Modificar Reserva</h5>
+            <h5 *ngIf="id" class="modal-title">Modificar Reserva <span class="info-reference">{{ reserve.reference }}</span></h5>
             <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -280,3 +293,434 @@
 </form>
 <button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
 <button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>
+
+<!--<ng-template #modalPayments let-c="close" let-d="dismiss">
+  <form [formGroup]="formPayment">
+      <div class="modal-header">
+          <h5 class="modal-title">Pago de Servicio</h5>
+          <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body pt-1">
+
+          <label class="danger">Recuerda que actualmente cuentas con un tiempo limite de <strong class="font-weight-bold">{{ reservationPayment.limit }}</strong> para pagar tu servicio.</label>
+
+          <div class="row">
+
+              <div class="col-md-3">
+
+                  <div class="card card-primary br-10 mb-2">
+
+                    <div class="card-header p-2">
+                      <label class="label-reservation mb-0">Información de la reserva</label>
+                    </div>
+
+                    <div class="card-body p-2">
+
+                      <div class="col-md-12 p-0">
+                        <div>
+                            <span class="f-12">Referencia</span>
+                            <br>
+                            <label class="font-weight-bold info-reservation">#{{ reservationPayment.reference  }}</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-12 p-0">
+                        <div>
+                            <span class="f-12">Tipo de Servicio</span>
+                            <br>
+                            <label class="font-weight-bold info-reservation" *ngIf="reservationPayment.type === 1">Esporádico</label>
+                            <label class="font-weight-bold info-reservation" *ngIf="reservationPayment.type === 2">Mensualidad</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-12 p-0">
+                        <div>
+                            <span class="f-12">Servicio</span>
+                            <br>
+                            <label class="font-weight-bold info-reservation">{{ reservationPayment.service.name }}</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-12 p-0">
+                        <div>
+                            <span class="f-12">Jornada</span>
+                            <br>
+                            <label class="font-weight-bold info-reservation">{{ reservationPayment.service.working_day.name }}</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-12 p-0">
+                        <div>
+                            <span class="f-12">Dirección a prestar el servicio</span>
+                            <br>
+                            <label class="font-weight-bold info-reservation">{{ reservationPayment.customer_address.address }}</label>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div class="card card-primary br-10 mb-0">
+
+                    <div class="card-header p-2 mb-2">
+                      <span class="label-reservation mb-0">Detalle de los servicios:</span>
+                    </div>
+
+                    <div class="card-body p-2" *ngIf="reservationPayment.type === 1">
+
+                      <div class="col-md-12 p-0" *ngFor="let day of reservationPayment.days; let i = index">
+                        <div>
+                            <span class="f-12">Fecha del servicio #{{ i + 1 }}:</span>
+                            <br>
+                            <label class="font-weight-bold info-reservation">{{ day.date }}</label>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div class="card-body p-2" *ngIf="reservationPayment.type === 2">
+                      <span class="f-12">Días:</span>
+                      <div class="col-md-12 p-0" *ngFor="let day of reservationPayment.days; let i = index">
+                        <div>
+                            <label class="font-weight-bold info-reservation">{{ day }}</label>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+              </div>
+
+              <div class="col-md-3 filters">
+
+                <div class="card card-success br-10 mb-0">
+
+                  <div class="card-body pt-2 body-professional-reserve">
+
+                    <div>
+                      <div class="container-image-reserve">
+                        <img [src]="reservationPayment.professional.photo" class="img-professional-reserve" />
+                      </div>
+                    </div>
+
+                    <div class="body-info">
+                      <div>
+                        <span class="f-12">Identificación</span>
+                        <br>
+                        <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.identification }}</label>
+                      </div>
+
+                      <div>
+                        <span class="f-12">Profesional</span>
+                        <br>
+                        <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.name | titlecase }} {{ reservationPayment.professional.lastname | titlecase }}</label>
+                      </div>
+
+                      <div>
+                        <span class="f-12">Edad</span>
+                        <br>
+                        <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.age }}</label>
+                      </div>
+
+                      <div>
+                        <span class="f-12">Teléfono</span>
+                        <br>
+                        <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.phone }}</label>
+                      </div>
+
+                      <div>
+                        <span class="f-12">Teléfono de contacto</span>
+                        <br>
+                        <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.phone_contact }}</label>
+                      </div>
+
+                      <div>
+                        <span class="f-12">Email</span>
+                        <br>
+                        <label class="font-weight-bold info-reservation">{{ reservationPayment.professional.email }}</label>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6">
+
+                <label class="label-payment mb-0">
+                  Total a pagar: {{ (reservationPayment.service.price * reservationPayment.service.quantity) | currency }}
+                </label>
+
+                <ngb-tabset type="pills" [orientation]="currentOrientation" (tabChange)="changePaymentMethod($event)">
+                  <ngb-tab title="Tarjeta de Credito" [id]="1">
+                    <ng-template ngbTabContent>
+
+                      <div class="row text-center">
+                          <div class="col-md-2">
+                              <img class="img-cards" src="assets/img/reserve/visa.png" (click)="selectCard('VISA')" [ngClass]="{'credit-card-active': formPayment.get('card').value === 'VISA'}">
+                          </div>
+                          <div class="col-md-2">
+                              <img class="img-cards"  src="assets/img/reserve/american-express.png" (click)="selectCard('AMEX')" [ngClass]="{'credit-card-active': formPayment.get('card').value === 'AMEX'}">
+                          </div>
+                          <div class="col-md-2">
+                              <img class="img-mastercard" src="assets/img/reserve/mastercard.png" (click)="selectCard('MASTERCARD')" [ngClass]="{'credit-card-active': formPayment.get('card').value === 'MASTERCARD'}">
+                          </div>
+                          <div class="col-md-2">
+                            <img class="img-cards" src="assets/img/reserve/diners.png" (click)="selectCard('DINERS')" [ngClass]="{'credit-card-active': formPayment.get('card').value === 'DINERS'}">
+                          </div>
+                          <div class="col-md-2">
+                            <img class="codensa" src="assets/img/reserve/codensa.png" (click)="selectCard('CODENSA')" [ngClass]="{'credit-card-active': formPayment.get('card').value === 'CODENSA'}">
+                          </div>
+                      </div>
+
+                      <div class="row form-mastercard">
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Nombre en la tarjeta*</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="name">
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('name').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre del titular es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Documento de identificación*</label>
+                          <div class="row col-md-8 pr-0">
+                            <div class="col-sm-5">
+                              <ng-select class="select-mastercard" formControlName="type_document" [items]="documentPayment" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." notFoundText="No se encontraron resultados"></ng-select>
+                              <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('type_document').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo de documento es requerido</span>
+                              </div>
+                            </div>
+                            <div class="col-sm-7 p-0">
+                              <input type="text" class="form-control input-mastercard" formControlName="identification" maxlength="10">
+                              <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('identification').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de identificación es requerido</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Número de tarjeta *</label>
+                          <div class="col-sm-8">
+                            <input class="form-control input-mastercard" formControlName="cardNumber" type="tel" autocomplete="cc-number" ccNumber maxlength="20">
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('cardNumber').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de la tarjeta es requerido</span>
+                            </div>
+                            <div class="is-invalid" *ngIf="formPayment.get('cardNumber').touched && formPayment.get('cardNumber').hasError('ccNumber')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de la tarjeta no es valido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Código de seguridad *</label>
+                          <div class="col-sm-8">
+                            <input class="form-control input-mastercard" formControlName="securityCode" type="tel" autocomplete="off" ccCvc minlength="1" maxlength="4">
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('securityCode').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de seguridad es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Fecha de vencimiento*</label>
+                          <div class="row col-md-8 pr-0">
+                            <div class="col-sm-6 pr-0">
+                              <ng-select class="payment" formControlName="month" [items]="dueDate" indLabel="label" bindValue="value" [clearable]="false" placeholder="-Mes-" notFoundText="No se encontraron resultados"></ng-select>
+                              <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('month').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El mes es requerido</span>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 pr-0">
+                              <ng-select class="payment" formControlName="year" [items]="years" indLabel="label" bindValue="value" [clearable]="false" placeholder="-Año-" notFoundText="No se encontraron resultados"></ng-select>
+                              <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('year').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El año es requerido</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Cuotas *</label>
+                          <div class="col-sm-8">
+                            <ng-select class="payment" formControlName="dues" [items]="dues" indLabel="label" bindValue="value" [clearable]="false" placeholder="-Seleccione-" notFoundText="No se encontraron resultados"></ng-select>
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('year').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de cuotas es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Teléfono Celular *</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="phone" maxlength="10">
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('phone').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de teléfono es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </ng-template>
+                  </ngb-tab>
+                  <ngb-tab title="PSE" [id]="2">
+                    <ng-template ngbTabContent>
+
+                      <div class="row form-mastercard">
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Banco*</label>
+                          <div class="col-sm-8">
+                            <ng-select class="payment" formControlName="bank" [items]="banks" indLabel="label" bindValue="value"  placeholder="-A continuación seleccione su banco-"  [clearable]="false" notFoundText="No se encontraron resultados"></ng-select>
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('bank').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El banco es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Nombre del titular*</label>
+                          <div class="col-sm-8">
+                            <input type="text" formControlName="name" class="form-control input-mastercard">
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('name').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre del titular es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Tipo de persona*</label>
+                          <div class="col-sm-8">
+                            <ng-select class="payment" formControlName="kindPerson" [items]="kindPerson" indLabel="label" bindValue="value" [clearable]="false" placeholder="-Seleccione-" notFoundText="No se encontraron resultados"></ng-select>
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('kindPerson').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo de persona es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Documento de identificación*</label>
+                          <div class="row col-md-8 pr-0">
+                            <div class="col-sm-5">
+                              <ng-select class="select-mastercard" formControlName="type_document" [items]="documentPayment" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." notFoundText="No se encontraron resultados"></ng-select>
+                              <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('type_document').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo de documento es requerido</span>
+                              </div>
+                            </div>
+                            <div class="col-sm-7 p-0">
+                              <input type="text" class="form-control input-mastercard" formControlName="identification" maxlength="10">
+                              <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('identification').hasError('required')">
+                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de identificación es requerido</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Teléfono Celular *</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="phone" maxlength="10">
+                            <div class="is-invalid" *ngIf="submittedPayment && formPayment.get('phone').hasError('required')">
+                              <span class="badge badge-danger f-size-12 mt-1 m-r-5">El número de teléfono es requerido</span>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </ng-template>
+                  </ngb-tab>
+                  <ngb-tab title="Efecty" [id]="3">
+                    <ng-template ngbTabContent>
+
+                      <div class="row form-mastercard">
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Nombre*</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="name">
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Documento de identificación*</label>
+                          <div class="row col-md-8 pr-0">
+                            <div class="col-sm-5">
+                              <ng-select class="select-mastercard" formControlName="type_document" [items]="documentTypes" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." notFoundText="No se encontraron resultados"></ng-select>
+                            </div>
+                            <div class="col-sm-7 p-0">
+                              <input type="text" class="form-control input-mastercard" formControlName="identification">
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Teléfono Celular *</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="phone">
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </ng-template>
+                  </ngb-tab>
+                  <ngb-tab title="Baloto" [id]="4">
+                    <ng-template ngbTabContent>
+                      <div class="row form-mastercard">
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Nombre*</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="name">
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Documento de identificación*</label>
+                          <div class="row col-md-8 pr-0">
+                            <div class="col-sm-5">
+                              <ng-select class="select-mastercard" formControlName="type_document"  [items]="documentTypes" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." notFoundText="No se encontraron resultados"></ng-select>
+                            </div>
+                            <div class="col-sm-7 p-0">
+                              <input type="text" class="form-control input-mastercard" formControlName="identification">
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group row wid-100">
+                          <label class="col-sm-4 col-form-label label-mastercard">Teléfono Celular *</label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control input-mastercard" formControlName="phone">
+                          </div>
+                        </div>
+
+                      </div>
+                    </ng-template>
+                  </ngb-tab>
+
+                </ngb-tabset>
+
+              </div>
+          </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary mr-2" (click)="d('Cross click')">Cancelar</button>
+        <button type="button" class="btn btn-success mr-2" [disabled]="!formPayment.valid" (click)="doPayment()">Pagar</button>
+    </div>
+  </form>
+</ng-template>
+
+<button #openModalPayment type="button" class="btn btn-primary hidden" (click)="openPayment(modalPayments)"></button>
+<button #closeModalPayment type="button" class="close basic-close" aria-label="Close" (click)="closePayment(modalPayments)"></button>-->

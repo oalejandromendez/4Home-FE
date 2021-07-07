@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './guards/auth/auth.guard';
 import { DashboardComponent } from './pages/common/dashboard/dashboard.component';
+import { PaymentComponent } from './pages/payment/payment.component';
 import { AdminComponent } from './theme/layout/admin/admin.component'
 
 
@@ -28,6 +29,10 @@ const routes: Routes = [
         path: 'scheduling',
         loadChildren: () => import('./pages/scheduling/scheduling.module').then(module => module.SchedulingModule)
       },
+      {
+        path: 'finance',
+        loadChildren: () => import('./pages/finance/finance.module').then(module => module.FinanceModule)
+      },
     ]
   },
   {
@@ -39,6 +44,17 @@ const routes: Routes = [
       }
     ]
   },
+  {
+    path: '',
+    component: AdminComponent,
+    children: [
+      {
+        path: 'payment/:reserve',
+        component: PaymentComponent,
+      },
+    ]
+  },
+
 ];
 
 @NgModule({

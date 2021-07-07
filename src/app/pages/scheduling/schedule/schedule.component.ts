@@ -64,7 +64,6 @@ export class ScheduleComponent implements OnInit {
   schedules: Array<any> = [];
   schedule: Array<any> = [];
 
-
   canSee = false;
   canEdit = false;
 
@@ -229,13 +228,13 @@ export class ScheduleComponent implements OnInit {
     this.schedule = new Array();
     if(this.professional) {
       if(this.professional.reserve) {
-
         const reservesDates = this.professional.reserve.filter( (reserve: any) => reserve.type === 1);
 
         if(reservesDates.length > 0) {
           reservesDates.map( (reserve: any) => {
             reserve.reserve_day.map( (day: any) => {
               this.schedule.push({
+                title: reserve.service.working_day.name,
                 start: day.date,
                 color: '#f44336',
                 allDay: true
@@ -263,6 +262,7 @@ export class ScheduleComponent implements OnInit {
                 const exists = days.find( (d: any) => d.day === day);
                 if(exists) {
                   this.schedule.push({
+                    title: reserve.service.working_day.name,
                     start: new Date(now),
                     color: '#f44336',
                     allDay: true
@@ -275,11 +275,13 @@ export class ScheduleComponent implements OnInit {
         }
       }
     }
+
     const dates = this.daysArray.value.filter( (day: any) => day.type === 1);
     if(dates.length > 0) {
       dates.map( (day: any) => {
         const date = day.date;
         this.schedule.push({
+          title: this.reservation.service.working_day.name,
           start: new Date(date.year + '-' + date.month + '-' + date.day),
           color: '#03a9f4',
           allDay: true
@@ -301,6 +303,7 @@ export class ScheduleComponent implements OnInit {
         const exists = days.find( (d: any) => d.index === day);
         if(exists) {
           this.schedule.push({
+            title: this.reservation.service.working_day.name,
             start: new Date(now),
             color: '#03a9f4',
             allDay: true

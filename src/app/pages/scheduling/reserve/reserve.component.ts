@@ -19,6 +19,9 @@ import { HolidayService } from 'src/app/services/admin/holiday/holiday.service';
 import { AuthService } from 'src/app/services/auth/auth.service'
 import { ReserveModel } from 'src/app/models/scheduling/reserve.mode';
 import { Router } from '@angular/router';
+import { PaymentService } from 'src/app/services/scheduling/payment/payment.service';
+import { PaymentModel } from 'src/app/models/scheduling/payment.model';
+import { CreditCardValidators } from 'angular-cc-library';
 
 @Component({
   selector: 'app-reserve',
@@ -31,6 +34,9 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('openModal') openModal: ElementRef;
   @ViewChild('closeModal') closeModal: ElementRef;
+
+  @ViewChild('openModalPayment') openModalPayment: ElementRef;
+  @ViewChild('closeModalPayment') closeModalPayment: ElementRef;
 
   @ViewChild(DataTableDirective, {static: false})
   dtElement: DataTableDirective;
@@ -49,6 +55,10 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
   submitted = false;
   form: FormGroup;
+
+  submittedPayment = false;
+  formPayment: FormGroup;
+
   reserve: ReserveModel = new ReserveModel();
 
   serviceTypes: Array<any> = [];
@@ -67,6 +77,24 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       label: "Mensualidad"
     }
   ];
+
+  dueDate: Array<any> = [];
+  years: Array<any> = [];
+  dues: Array<any> = [];
+  banks: Array<any> = [];
+
+  kindPerson: Array<any> = [
+    {
+      value: 1,
+      label: "Natural"
+    },
+    {
+      value: 2,
+      label: "Jurídica"
+    }
+  ];
+
+  payment: PaymentModel = new PaymentModel();
 
   id: any;
   reserveEdit = null;
@@ -92,6 +120,36 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   addresses: Array<any> = [];
   daysEdit: Array<any> = [];
 
+  reservationPayment = null;
+  currentOrientation = 'horizontal';
+
+  documentPayment: Array<any> = [
+    {
+      value: 'CC',
+      label: "CC (Cédula de ciudadanía)"
+    },
+    {
+      value: 'CE',
+      label: "CE (Cédula de extranjería)"
+    },
+    {
+      value: 'NIT',
+      label: "NIT (Número de Identificación Tributario)"
+    },
+    {
+      value: 'PP',
+      label: "PP (Pasaporte)"
+    },
+    {
+      value: 'IDC',
+      label: "IDC (Identificador único de cliente)"
+    },
+    {
+      value: 'DE',
+      label: "DE (Documento de identificación extranjero)"
+    },
+  ];
+
   constructor(
     private userService: UserService,
     private loaderService: LoaderService,
@@ -111,11 +169,17 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     private holidayService: HolidayService,
     private authService: AuthService,
     private router: Router,
-    private ref: ChangeDetectorRef
-    ) {
+    private ref: ChangeDetectorRef,
+    private paymentService: PaymentService
+    )
+    {
       this.loaderService.loading(true);
       this.getPermissions();
       this.loadForm();
+      this.loadYears();
+      this.loadDues();
+      this.loadDueDates();
+      this.getBanks();
 
       config.minDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1 , day: this.now.getDate() + 2};
       config.maxDate = {year: 2200, month: 12, day: 31};
@@ -129,7 +193,6 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadTable();
     this.getDocumentsType();
     this.getServiceTypes();
-    // this.getHolidays();
   }
 
   ngAfterViewInit() {
@@ -139,6 +202,152 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
+  }
+
+  doPayment() {
+
+    // console.log('this.formPayment', this.formPayment);
+
+    // return false;
+
+    this.submittedPayment = true;
+
+    if (!this.formPayment.valid) { return; }
+
+    Swal.fire({
+      allowOutsideClick: false,
+      icon: 'info',
+      text:  'Espere...'
+    });
+
+    Swal.showLoading();
+
+    this.payment = this.formPayment.value;
+
+    /*this.payment.reserve = this.reservationPayment.id;
+    this.payment.total = String(this.reservationPayment.service.price * this.reservationPayment.service.quantity);
+    this.payment.reference = this.reservationPayment.reference;
+    this.payment.email = this.reservationPayment.user.email;
+    this.payment.expirationDate = this.formPayment.value.month < 10 ? "20" + this.formPayment.value.year + "/" + "0" + this.formPayment.value.month : "20" + this.formPayment.value.year + "/" + this.formPayment.value.month;
+    */
+    this.paymentService.post(this.payment).subscribe( (resp: any) => {
+
+      if(resp.status === 'APPROVED') {
+        const toastOptions: ToastOptions = {
+          title: '¡Proceso Exitoso!',
+          msg: 'El pago se ha efectuado exitosamente',
+          showClose: false,
+          timeout: 3000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.success(toastOptions);
+      }
+
+      if(resp.status === 'DECLINED') {
+        const toastOptions: ToastOptions = {
+          title: 'Error',
+          msg: 'La transacción fue rechazada',
+          showClose: false,
+          timeout: 3000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.error(toastOptions);
+      }
+
+      if(resp.status === 'EXPIRED') {
+        const toastOptions: ToastOptions = {
+          title: 'Error',
+          msg: 'La transacción ha expirado',
+          showClose: false,
+          timeout: 3000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.error(toastOptions);
+      }
+
+      if(resp.status === 'PENDING') {
+        const toastOptions: ToastOptions = {
+          title: '¡Proceso Exitoso!',
+          msg: 'La transacción esta pendiente',
+          showClose: false,
+          timeout: 3000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.warning(toastOptions);
+      }
+
+      this.cancel();
+      this.rerender();
+      Swal.close();
+      this.formPayment.reset();
+      this.reservationPayment = null;
+      this.closeModalPayment.nativeElement.click();
+
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text:  'Ha ocurrido un error'
+      });
+    });
+  }
+
+  getBanks() {
+    this.loaderService.loading(true);
+    this.paymentService.banksList().subscribe( (resp: any) => {
+      if(resp.code === 'SUCCESS') {
+        resp.banks.map( (bank: any) => {
+          if(bank.pseCode !== '0') {
+            this.banks.push({ value: bank.pseCode, label: bank.description } );
+            this.banks = this.banks.slice();
+          }
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:  'Ha ocurrido un error'
+        });
+      }
+      this.loaderService.loading(false);
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text:  'Ha ocurrido un error'
+      });
+    });
+  }
+
+  loadDueDates() {
+    for(let i = 1; i < 13 ; i++ ) {
+      this.dueDate.push({
+        value: i,
+        label: i
+      });
+    }
+  }
+
+  loadDues() {
+    for(let i = 1; i < 49 ; i++ ) {
+      this.dues.push({
+        value: i,
+        label: i
+      });
+    }
+  }
+
+  loadYears() {
+    const now = new Date();
+    let year = now.getFullYear();
+    for(let i = 1; i < 10 ; i++ ) {
+      var yearList = year;
+      this.years.push({
+        value: yearList.toString().slice(-2),
+        label: yearList.toString().slice(-2)
+      });
+      year++;
+    }
   }
 
   initialValidation() {
@@ -462,21 +671,23 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getWorkingDays(serviceType: string) {
-    this.loaderService.loading(true);
-    this.workingdayService.findByServiceType(serviceType).subscribe( resp => {
-      resp.data.filter( (workingDay: any) => workingDay.status === 1 ).map( (workingDay: any) => {
-        this.workingDays.push({ value: workingDay.id, label: workingDay.name } );
-        this.workingDays = this.workingDays.slice();
+    if(serviceType) {
+      this.loaderService.loading(true);
+      this.workingdayService.findByServiceType(serviceType).subscribe( resp => {
+        resp.data.filter( (workingDay: any) => workingDay.status === 1 ).map( (workingDay: any) => {
+          this.workingDays.push({ value: workingDay.id, label: workingDay.name } );
+          this.workingDays = this.workingDays.slice();
+        });
+        this.loaderService.loading(false);
+      }, error => {
+        this.loaderService.loading(false);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text:  'Ha ocurrido un error'
+        });
       });
-      this.loaderService.loading(false);
-    }, error => {
-      this.loaderService.loading(false);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text:  'Ha ocurrido un error'
-      });
-    });
+    }
   }
 
   rerender(): void {
@@ -571,11 +782,20 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     this.modalService.dismissAll(modal);
   }
 
+  openPayment(modal: any) {
+    this.modalService.open(modal, { windowClass: 'modal-payment'});
+  }
+
+  closePayment(modal: any) {
+    this.modalService.dismissAll(modal);
+  }
+
   cancel() {
     this.daysEdit = new Array();
     this.id = null;
     this.submitted = null;
     this.reserve = new ReserveModel();
+    this.reservationPayment = null;
     this.form.reset();
     while (this.daysArray.length !== 0) {
       this.daysArray.removeAt(0)
@@ -583,6 +803,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     if(!this.canCreate) {
       this.form.disable();
     }
+    this.submittedPayment = null;
   }
 
   search() {
@@ -735,6 +956,61 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
     }
+  }
+
+  payments(id: any) {
+    const data = this.reservations.find( (reservation: any) => reservation.id === id);
+    if(data) {
+      this.router.navigate(['/payment/' + btoa(data.reference)]);
+    }
+  }
+
+  /*loadFormPayment() {
+    this.formPayment = new FormGroup({
+      type: new FormControl(1, [Validators.required]),
+      card: new FormControl('', [Validators.required]),
+      name: new FormControl('', [Validators.required]),
+      type_document: new FormControl(null, [Validators.required]),
+      identification: new FormControl('', [Validators.required, Validators.maxLength(10)]),
+      cardNumber: new FormControl('', [Validators.required, Validators.maxLength(20), CreditCardValidators.validateCCNumber]),
+      securityCode: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(4)]),
+      month: new FormControl(null, [Validators.required]),
+      year: new FormControl(null, [Validators.required]),
+      dues: new FormControl(null, [Validators.required]),
+      phone: new FormControl('', [Validators.required, Validators.maxLength(10)]),
+      bank: new FormControl(null),
+      kindPerson: new FormControl(null)
+    });
+  }*/
+
+  selectCard(card: string) {
+    this.formPayment.controls.card.setValue(card);
+  }
+
+  changePaymentMethod(type: any) {
+    this.submittedPayment = null;
+    this.formPayment.controls.card.clearValidators();
+    this.formPayment.controls.cardNumber.clearValidators();
+    this.formPayment.controls.securityCode.clearValidators();
+    this.formPayment.controls.month.clearValidators();
+    this.formPayment.controls.year.clearValidators();
+    this.formPayment.controls.dues.clearValidators();
+    this.formPayment.controls.bank.clearValidators();
+    this.formPayment.controls.kindPerson.clearValidators();
+    if(type.nextId === 1) {
+      this.formPayment.controls.card.setValidators([Validators.required]);
+      this.formPayment.controls.cardNumber.setValidators([Validators.required, Validators.maxLength(20), CreditCardValidators.validateCCNumber]);
+      this.formPayment.controls.securityCode.setValidators([Validators.required, Validators.minLength(3), Validators.maxLength(4)]);
+      this.formPayment.controls.month.setValidators([Validators.required]);
+      this.formPayment.controls.year.setValidators([Validators.required]);
+      this.formPayment.controls.dues.setValidators([Validators.required]);
+    }
+    if(type.nextId === 2) {
+      this.formPayment.controls.bank.setValidators([Validators.required]);
+      this.formPayment.controls.kindPerson.setValidators([Validators.required]);
+    }
+    this.formPayment.reset();
+    this.formPayment.controls.type.setValue(type.nextId);
   }
 
   getPermissions() {

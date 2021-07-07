@@ -24,6 +24,7 @@ import { ConfigurationComponent } from './theme/layout/admin/configuration/confi
 import { HttpClientModule } from '@angular/common/http';
 import { DataTableLanguage } from './models/common/datatable';
 import { ToastyService } from 'ng2-toasty';
+import { PaymentComponent } from './pages/payment/payment.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { ToastyService } from 'ng2-toasty';
     NavLeftComponent,
     NavSearchComponent,
     NavRightComponent,
-    ConfigurationComponent
+    ConfigurationComponent,
+    PaymentComponent
   ],
   imports: [
     BrowserAnimationsModule,

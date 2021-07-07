@@ -1,0 +1,128 @@
+
+<div class="center-response">
+  <div class="card col-md-6">
+
+    <div class="card-body">
+
+      <div class="text-center">
+        <img *ngIf="transactionState === '4'" class="wid-15  mb-3" src="assets/img/payment/aprobado.png">
+        <img *ngIf="transactionState === '6'" class="wid-15  mb-3" src="assets/img/payment/rechazado.png">
+        <img *ngIf="transactionState === '104'" class="wid-15  mb-3" src="assets/img/payment/rechazado.png">
+        <img *ngIf="transactionState === '5'" class="wid-15  mb-3" src="assets/img/payment/rechazado.png">
+        <img *ngIf="transactionState === '7'" class="wid-15  mb-3" src="assets/img/payment/warning.png">
+      </div>
+
+      <div class="center-response">
+        <table class="display row-border hover table-striped " style="width:100% ">
+
+          <tbody>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response">Estado de la transacción:</span>
+              </td>
+              <td class="col-md-6">
+                <span *ngIf="transactionState === '4'" class="badge badge-success f-14">Aprobada</span>
+                <span *ngIf="transactionState === '6'" class="badge badge-error f-14">Rechazada</span>
+                <span *ngIf="transactionState === '104'" class="badge badge-error f-14">Error</span>
+                <span *ngIf="transactionState === '5'" class="badge badge-error f-14">Expirada</span>
+                <span *ngIf="transactionState === '7'" class="badge badge-warning f-14">Pendiente</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response"> Transacción #: </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ transactionId }}</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response"> Fecha de pago:  </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ processingDate }}</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response"> Referencia: </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ referenceCode }}</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response"> Descripción:  </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ description }}</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response"> Autorización / CUS:  </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ cus }}</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="col-md-6">
+                <span class="label-response"> Método de pago:  </span>
+              </td>
+              <td class="col-md-6">
+                <span *ngIf="polPaymentMethodType === '2'">Tarjetas de credito</span>
+                <span *ngIf="polPaymentMethodType === '4'">PSE</span>
+                <span *ngIf="polPaymentMethodType === '5'">Débitos ACH</span>
+                <span *ngIf="polPaymentMethodType === '6'">Tarjetas débito</span>
+                <span *ngIf="polPaymentMethodType === '7'">Pago en efectivo</span>
+                <span *ngIf="polPaymentMethodType === '8'">Pago Referenciado</span>
+                <span *ngIf="polPaymentMethodType === '10'">Pago en bancos</span>
+                <span *ngIf="polPaymentMethodType === '14'">Transferencias bancarias en SPEI</span>
+              </td>
+            </tr>
+
+            <tr *ngIf="polPaymentMethodType === '4'">
+              <td class="col-md-6">
+                <span class="label-response"> Banco: </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ pseBank }}</span>
+              </td>
+            </tr>
+
+            <tr *ngIf="polPaymentMethodType === '2'">
+              <td class="col-md-6">
+                <span class="label-response"> Medio de pago: </span>
+              </td>
+              <td class="col-md-6">
+                <span>{{ lapPaymentMethod }}</span>
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+      </div>
+
+      <div class="center-response mt-5">
+
+        <button type="button" class="btn btn-outline-primary btn-lg" routerLink="/scheduling/reserve">
+          Volver
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+

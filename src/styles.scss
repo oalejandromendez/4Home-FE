@@ -566,3 +566,12 @@ textarea {
 .place-content-center {
   place-content: center;
 }
+
+.fc-h-event .fc-event-title {
+  white-space: break-spaces !important;
+  font-size: 10px !important;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}

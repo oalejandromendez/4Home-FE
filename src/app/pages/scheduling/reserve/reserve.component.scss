@@ -62,3 +62,159 @@
     padding: 5px;
     color: #007bff;
 }
+
+.btn-payu {
+  width: 37px !important;
+  height: 37px !important;
+  padding: 0px !important;
+}
+
+.img-payu {
+  width: auto;
+  margin: 0;
+}
+
+.label-reservation {
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+}
+
+.info-reservation {
+  font-size: 12px;
+  color: black;
+  margin-bottom: 0;
+}
+
+
+.container-image-reserve {
+  background-color: #d6d6d6;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  -moz-text-align-last: center;
+  text-align-last: center;
+  margin: 0px 15px;
+  border-radius: 10px;
+}
+
+.img-professional-reserve {
+  width: 65%;
+  margin: 10px;
+}
+
+
+.body-professional-reserve {
+  height: calc(100vh - 236px);
+}
+
+.filters {
+  border-style: solid;
+  border-top: 0;
+  border-bottom: 0px;
+  border-left: 0px;
+  padding-right: 10px;
+  margin-right: 0px;
+  border-color: #d6d3d6;
+}
+
+.modal-payment .modal-dialog {
+  max-width: 85%;
+  width: 85%;
+  margin-top: 10px;
+}
+
+.img-cards {
+  width: 90%;
+  border-radius: 10px;
+  border: 1px solid #7ecde5;
+  padding: 0px 10px;
+}
+
+.img-mastercard {
+  width: 80%;
+  border-radius: 10px;
+  border: 1px solid #7ecde5;
+}
+
+.codensa {
+  width: 90%;
+}
+
+
+.tab-content {
+  padding: 10px 15px;
+}
+
+.credit-card {
+  font-weight: bold;
+  color: black;
+  font-size: 16px;
+}
+
+.form-mastercard {
+  margin-top: 10px;
+  place-content: center;
+  padding: 0;
+  margin: 10px 0px;
+}
+
+.label-mastercard {
+  font-size: 11px;
+  color: black;
+  font-weight: bold;
+  padding: 5px;
+  text-align: right;
+}
+
+.wid-100 {
+  width: 100%;
+}
+
+.input-mastercard {
+  padding: 0 10px;
+}
+
+ng-select.select-mastercard.ng-select.ng-select-single .ng-select-container {
+  height: 43px !important;
+  min-height: 23px !important;
+  height: 23px !important;
+  font-size: 11px;
+}
+
+ng-select.select-mastercard .ng-dropdown-panel {
+  width: auto !important;
+}
+
+.img-pse {
+  width: 25%;
+  border: 1px solid #04a9f5;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.label-payment {
+  color: #000000;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+ng-select.payment.ng-select.ng-select-single .ng-select-container {
+  height: 43px !important;
+  min-height: 23px !important;
+  height: 23px !important;
+  font-size: 11px;
+}
+
+.info-reference {
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 1px;
+  background: #007bff;
+  color: white;
+  padding: 0px 10px;
+  border-radius: 10px;
+}
+
+.credit-card-active {
+  background: #7ecde5;
+}

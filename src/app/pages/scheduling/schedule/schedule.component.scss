@@ -25,10 +25,6 @@
   width: 25px;
 }
 
-.active {
-    background: #03a9f48c;
-}
-
 .bottom {
     position: fixed;
     bottom: 0;
@@ -216,4 +212,12 @@
   padding-left: 15px;
   margin-top: 5px;
   display: flex;
+}
+
+.info-reference-schedule {
+  font-weight: bold;
+  color: white;
+  background: #2196f3;
+  padding: 0 10px;
+  border-radius: 5px;
 }
