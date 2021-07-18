@@ -8,9 +8,11 @@ import { NgbDatepickerModule, NgbTabsetModule, NgbTooltipModule } from '@ng-boot
 import { CustomerComponent } from './customer/customer.component';
 import { ReserveComponent } from './reserve/reserve.component';
 import { ScheduleComponent } from './schedule/schedule.component';
+import { RescheduleComponent } from './reschedule/reschedule.component';
+import { HistoryComponent } from './history/history.component';
 
 @NgModule({
-  declarations: [CustomertypeComponent, CustomerComponent, ReserveComponent, ScheduleComponent],
+  declarations: [CustomertypeComponent, CustomerComponent, ReserveComponent, ScheduleComponent, RescheduleComponent, HistoryComponent],
   imports: [
     CommonModule,
     SchedulingRoutingModule,

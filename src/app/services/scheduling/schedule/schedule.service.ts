@@ -23,4 +23,8 @@ export class ScheduleService {
   post( reserve: ReserveModel) {
     return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/schedule`, { ...reserve });
   }
+
+  reschedule( reserve: ReserveModel) {
+    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/reschedule`, { ...reserve });
+  }
 }

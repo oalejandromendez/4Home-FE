@@ -4,10 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentModel } from 'src/app/models/scheduling/payment.model';
 import { ReserveService } from 'src/app/services/scheduling/reserve/reserve.service';
 import { environment } from 'src/environments/environment';
-import Swal from 'sweetalert2';
 import {Md5} from "md5-typescript";
-import { PaymentService } from 'src/app/services/scheduling/payment/payment.service';
-import { ToastOptions } from 'ng2-toasty';
+import { PromocodeService } from 'src/app/services/finance/promocode/promocode.service';
+import Swal from 'sweetalert2';
+import { ToastOptions, ToastyService } from 'ng2-toasty';
 
 @Component({
   selector: 'app-payment',
@@ -21,16 +21,24 @@ export class PaymentComponent implements OnInit {
   reserve = this.route.snapshot.paramMap.get('reserve');
   reservationPayment = null;
   days: Array<any> = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-  submitted = false;
-  form: FormGroup;
-
   payment: PaymentModel = new PaymentModel();
+  urlPayu = environment.payu;
+  responseUrl = environment.responseUrl;
+  confirmationUrl = environment.confirmationUrl;
+  promocode = null;
+  infoPromocode = null;
+  isValidPromocode = false;
+  subtotal = 0;
+  discount = 0;
+  total = 0;
+  canPay = false;
 
   constructor(
     private route: ActivatedRoute,
     private reserveService: ReserveService,
-    private paymentService: PaymentService,
-    private router: Router
+    private promocodeService: PromocodeService,
+    private router: Router,
+    private toastyService: ToastyService
     ) {
 
     }
@@ -41,10 +49,10 @@ export class PaymentComponent implements OnInit {
 
   loadInformationPayment() {
     const amount = String(this.reservationPayment.service.price * this.reservationPayment.service.quantity);
-    const reference = new Date().getTime() + this.reservationPayment.reference;
+    const reference = new Date().getTime().toString().slice(-5) + this.reservationPayment.reference;
     this.payment.merchantId = environment.merchantId;
     this.payment.accountId = environment.accountId;
-    this.payment.description = 'Compra de servicios 4Home S.A.S';
+    this.payment.description = 'Compra de servicios 4Home S.A.S. Servicio con referencia #'  + this.reservationPayment.reference;
     this.payment.referenceCode = reference
     this.payment.amount = amount
     this.payment.tax = '0';
@@ -52,6 +60,10 @@ export class PaymentComponent implements OnInit {
     this.payment.currency = 'COP',
     this.payment.signature = Md5.init(environment.apiKey + '~' + environment.merchantId + '~' + reference + '~' + amount + '~COP');
     this.payment.test = '1';
+    this.payment.extra1 = this.reservationPayment.reference;
+    this.payment.extra2 = this.reservationPayment.id;
+    this.subtotal = this.reservationPayment.service.price * this.reservationPayment.service.quantity;
+    this.total = this.reservationPayment.service.price * this.reservationPayment.service.quantity;
   }
 
   loadReserve() {
@@ -65,6 +77,7 @@ export class PaymentComponent implements OnInit {
           const diffInMs =  Date.parse(comparation_date.toString()) - Date.parse(now.toString());
           let diffHrs = Math.floor((diffInMs % 86400000) / 3600000);
           let diffMins = Math.round(((diffInMs % 86400000) % 3600000) / 60000);
+          this.canPay = diffHrs > 0 ? true : false;
           this.reservationPayment.limit = diffHrs + " horas " + diffMins + " minutos ";
           if(this.reservationPayment.type === 1 ) {
             this.reservationPayment.days = this.reservationPayment.reserve_day;
@@ -72,28 +85,13 @@ export class PaymentComponent implements OnInit {
           if(this.reservationPayment.type === 2 ) {
             this.reservationPayment.days = this.reservationPayment.reserve_day.map( (day: any) => this.days[day.day]);
           }
-          this.loadFormPayment();
           this.loadInformationPayment();
         }
       });
     }
   }
 
-  loadFormPayment() {
-    this.form = new FormGroup({
-      buyerEmail: new FormControl('', [Validators.required, Validators.pattern(this.emailPattern)]),
-      buyerFullName: new FormControl('', [Validators.required]),
-      payerDocument: new FormControl('', [Validators.required]),
-      telephone: new FormControl('', [Validators.required, Validators.maxLength(10)])
-    });
-  }
-
-
-  onSubmit() {
-
-    this.submitted = true;
-
-    if (!this.form.valid) { return; }
+  validatePromocode() {
 
     Swal.fire({
       allowOutsideClick: false,
@@ -103,26 +101,44 @@ export class PaymentComponent implements OnInit {
 
     Swal.showLoading();
 
+    this.promocodeService.check(this.promocode).subscribe( resp => {
 
-    // this.router.navigateByUrl
-
-    return false;
-    // responseUrl: string;
-    // confirmationUrl: string;
-
-    this.paymentService.payment( this.payment ).subscribe( (data: any) => {
       Swal.close();
 
+      if(resp) {
+        this.isValidPromocode = true;
+        this.infoPromocode = resp;
+        this.payment.extra3 = resp.code;
+        this.discount = (this.subtotal * this.infoPromocode.reward) / 100;
+        this.total = this.subtotal - this.discount;
+        this.payment.amount = String(this.total);
+        this.payment.signature = Md5.init(environment.apiKey + '~' + environment.merchantId + '~' + this.payment.referenceCode + '~' + String(this.total) + '~COP');
+
+        const toastOptions: ToastOptions = {
+          title: 'Felicidades',
+          msg: 'El descuento se ha aplicado a tu compra',
+          showClose: false,
+          timeout: 2000,
+          theme: 'bootstrap',
+        };
+
+        this.toastyService.success(toastOptions);
+
+      } else {
+        const toastOptions: ToastOptions = {
+          title: 'Error',
+          msg: 'El cupón no es valido',
+          showClose: false,
+          timeout: 2000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.error(toastOptions);
+      }
     }, (err) => {
       Swal.close();
-      if (err.error.errors) {
-        let mensage = '';
-      } else {
-        if (err.status === 401) {
-          this.router.navigateByUrl('/login');
-        }
+      if (err.status === 401) {
+        this.router.navigateByUrl('/login');
       }
-    })
-
+    });
   }
 }

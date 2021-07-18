@@ -1,0 +1,258 @@
+
+<div class="d-flex" style="margin-top: -20px;">
+
+  <div class="col-md-3 ">
+
+    <div class="card card-primary">
+
+      <div class="card-header">
+        <span class="label-service-report">Reporte Detallado de Servicios</span>
+      </div>
+
+      <div class="card-body pt-2 pb-2">
+
+        <div class='form-group mb-2'>
+          <label class="col-form-label f-12 pb-0"># de Referencia*</label>
+          <div class="align-self-center">
+            <input type="text" class="form-control input-reserve" [(ngModel)]="reserve">
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button type="button" class="btn btn-primary btn-search btn-sm" (click)="search()" [disabled]="!reserve">Buscar</button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-3" *ngIf="reservation">
+
+    <div class="card card-primary br-10 mb-2">
+
+      <div class="card-header p-2">
+        <label class="label-service-r mb-0">Información de la reserva</label>
+      </div>
+
+      <div class="card-body p-2">
+
+        <div class="col-md-12 p-0">
+          <div>
+              <span class="f-12">Estado</span>
+              <br>
+              <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>
+              <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+              <span *ngIf="reservation.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
+              <span *ngIf="reservation.status === 4" class="badge badge-success">PAGO APROBADO</span>
+              <span *ngIf="reservation.status === 9" class="badge badge-primary">REPROGRAMADA</span>
+              <span *ngIf="reservation.status === 10" class="badge badge-primary">TERMINADO</span>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0">
+          <div>
+              <span class="f-12">Referencia</span>
+              <br>
+              <label class="font-weight-bold info-service-r">#{{ reservation.reference  }}</label>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0">
+          <div>
+              <span class="f-12">Tipo de Servicio</span>
+              <br>
+              <label class="font-weight-bold info-service-r" *ngIf="reservation.type === 1">Esporádico</label>
+              <label class="font-weight-bold info-service-r" *ngIf="reservation.type === 2">Mensualidad</label>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0">
+          <div>
+              <span class="f-12">Servicio</span>
+              <br>
+              <label class="font-weight-bold info-service-r">{{ reservation.service.name }}</label>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0">
+          <div>
+              <span class="f-12">Jornada</span>
+              <br>
+              <label class="font-weight-bold info-service-r">{{ reservation.service.working_day.name }}</label>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0">
+          <div>
+              <span class="f-12">Dirección a prestar el servicio</span>
+              <br>
+              <label class="font-weight-bold info-service-r">{{ reservation.customer_address.address }}</label>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="card card-primary br-10 mb-0">
+
+      <div class="card-header p-2 mb-2">
+        <span class="label-service-r mb-0">Detalle de los servicios:</span>
+      </div>
+
+      <div class="card-body p-2" *ngIf="reservation.type === 1">
+
+        <div class="col-md-12 p-0" *ngFor="let day of reservation.days; let i = index">
+          <div>
+              <span class="f-12">Fecha del servicio #{{ i + 1 }}:</span>
+              <br>
+              <label class="font-weight-bold info-service-r">{{ day.date }}</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card-body p-2" *ngIf="reservation.type === 2">
+        <span class="f-12">Días:</span>
+        <div class="col-md-12 p-0" *ngFor="let day of reservation.days; let i = index">
+          <div>
+              <label class="font-weight-bold info-service-r">{{ day }}</label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-3" *ngIf="reservation">
+
+    <div class="card card-warning br-10 mb-0">
+
+      <div class="card-header p-2">
+        <label class="label-service-r mb-0">Información del Profesional</label>
+      </div>
+
+      <div class="card-body pt-2">
+
+        <div>
+          <div class="container-image-report">
+            <img [src]="reservation.professional.photo" class="img-professional-report" />
+          </div>
+        </div>
+
+        <div class="body-info">
+          <div>
+            <span class="f-12">Identificación</span>
+            <br>
+            <label class="font-weight-bold info-service-r">{{ reservation.professional.identification }}</label>
+          </div>
+
+          <div>
+            <span class="f-12">Profesional</span>
+            <br>
+            <label class="font-weight-bold info-service-r">{{ reservation.professional.name | titlecase }} {{ reservation.professional.lastname | titlecase }}</label>
+          </div>
+
+          <div>
+            <span class="f-12">Edad</span>
+            <br>
+            <label class="font-weight-bold info-service-r">{{ reservation.professional.age }}</label>
+          </div>
+
+          <div>
+            <span class="f-12">Teléfono</span>
+            <br>
+            <label class="font-weight-bold info-service-r">{{ reservation.professional.phone }}</label>
+          </div>
+
+          <div>
+            <span class="f-12">Teléfono de contacto</span>
+            <br>
+            <label class="font-weight-bold info-service-r">{{ reservation.professional.phone_contact }}</label>
+          </div>
+
+          <div>
+            <span class="f-12">Email</span>
+            <br>
+            <label class="font-weight-bold info-service-r">{{ reservation.professional.email }}</label>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-3" *ngIf="reservation">
+
+    <div class="card card-primary mb-3" >
+
+      <div class="card-header p-2">
+        <label class="label-service-r mb-0">Información del cliente</label>
+      </div>
+
+      <div class="card-body pt-1 pb-1 card-service-report">
+
+          <div>
+            <span class="label-report">Identificación</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.identification }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Cliente</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.name | titlecase }} {{ reservation.user.lastname | titlecase }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Email</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.email }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Celular</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.mobile }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Teléfono</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.phone }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Nombre de Contacto</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.contact_name | titlecase }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Dirección de Facturación</span>
+            <br>
+            <label class="font-weight-bold label-info-report">{{ reservation.user.billing_address }}</label>
+          </div>
+
+          <div>
+            <span class="label-report">Direcciones</span>
+            <br>
+            <div>
+              <div *ngFor="let address of reservation.user.customer_address">
+                <label class="font-weight-bold mb-0 label-address-report" >{{ address.address }}</label>
+              </div>
+            </div>
+          </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

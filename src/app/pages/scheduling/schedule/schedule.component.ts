@@ -64,6 +64,27 @@ export class ScheduleComponent implements OnInit {
   schedules: Array<any> = [];
   schedule: Array<any> = [];
 
+  states: Array<any> = [
+    {
+      value: 1,
+      label: "Pre-Agendamientos"
+    },
+    {
+      value: 2,
+      label: "Agendamientos sin pago"
+    },
+    {
+      value: 3,
+      label: "Pagos vencidos"
+    },
+    {
+      value: 9,
+      label: "Reprogramaciones"
+    }
+  ];
+
+  state = 1;
+
   canSee = false;
   canEdit = false;
 
@@ -97,11 +118,13 @@ export class ScheduleComponent implements OnInit {
   }
 
   checkAvailability() {
+
+
     this.loaderService.loading(true);
     const listDays = new Array();
     const days = JSON.parse(JSON.stringify(this.daysArray.value));
     days.map( (day: any) => {
-      if(day.type === 1 ) {
+      if(day.type === 1 && !day.disabled) {
         const date = day.date;
         listDays.push({
           date: date.year + '-' + date.month + '-' + date.day
@@ -276,7 +299,7 @@ export class ScheduleComponent implements OnInit {
       }
     }
 
-    const dates = this.daysArray.value.filter( (day: any) => day.type === 1);
+    const dates = this.daysArray.value.filter( (day: any) => day.type === 1 && !day.disabled);
     if(dates.length > 0) {
       dates.map( (day: any) => {
         const date = day.date;
@@ -398,7 +421,7 @@ export class ScheduleComponent implements OnInit {
 
   getReserves() {
     this.loaderService.loading(true);
-    this.reserveService.get().subscribe( resp => {
+    this.reserveService.getByStatus(this.state).subscribe( resp => {
       this.reserves = resp;
       this.loaderService.loading(false);
     }, error => {
@@ -428,12 +451,16 @@ export class ScheduleComponent implements OnInit {
     }
     this.reservation.reserve_day.map( (date: any) => {
       const reserve_date = date.date.split('-');
+      const validate = new Date(+reserve_date[0], +reserve_date[1]-1, +reserve_date[2]);
+      const now = new Date();
+      now.setHours(0,0,0,0);
       this.daysArray.push(
         this.formBuilder.group({
           index: new FormControl(this.daysArray.controls.length),
           date: new FormControl({ year: +reserve_date[0], month: +reserve_date[1], day: +reserve_date[2]}, [Validators.required, this.validateDate.bind(this)]),
-          type: 1
-        })
+          type: 1,
+          disabled: validate < now ? true : false
+        }, {validators: Validators.compose([this.ValidateDisabledDate])})
       );
     });
   }
@@ -455,8 +482,23 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
+  ValidateDisabledDate: ValidatorFn = (formG: FormGroup) => {
+    let date = formG.get('date').value;
+    let disabled = formG.get('disabled').value;
+    let dateLimit: string;
+    const now  = new Date();
+    if (date) {
+      date = date.year + '-' + (date.month < 10 ? '0' + date.month : date.month ) + '-' + (date.day < 10 ? '0' + date.day : date.day) ;
+      dateLimit = now.getFullYear() + '-' + ( (now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1) ) + '-' + (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
+    }
+    return disabled === false ? date !== null ?  date > dateLimit ? null : { invalidDate: true } : null : null;
+  }
+
   validateDate(control: AbstractControl) {
     var exist = false;
+    const date = new Date(+control.value.year, +control.value.month-1, +control.value.day);
+    const validate = new Date();
+    validate.setDate( validate.getDate() + 1);
     if(this.daysArray.length > 0 && !this.form.pristine) {
       this.daysArray.controls.map( o => {
         if(o.value.date != null) {

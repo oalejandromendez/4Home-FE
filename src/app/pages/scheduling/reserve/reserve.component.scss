@@ -218,3 +218,15 @@ ng-select.payment.ng-select.ng-select-single .ng-select-container {
 .credit-card-active {
   background: #7ecde5;
 }
+
+.document-reserve.ng-select-single .ng-select-container {
+  min-height: 25px !important;
+  height: 25px !important;
+  font-size: 12px;
+}
+
+.input-reserve {
+  height: 10px;
+  font-size: 12px;
+  padding: 10px 5px;
+}

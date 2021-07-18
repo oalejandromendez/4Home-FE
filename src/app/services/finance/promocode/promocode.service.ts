@@ -26,4 +26,8 @@ export class PromocodeService {
     return this.headers.patch(sessionStorage.getItem('token'), `${ this.url}/api/promocodes/disable`, { code });
   }
 
+  check( code: string ) {
+    return this.headers.patch(sessionStorage.getItem('token'), `${ this.url}/api/promocodes/check`, { code });
+  }
+
 }

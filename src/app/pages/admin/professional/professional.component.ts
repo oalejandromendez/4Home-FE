@@ -422,7 +422,8 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         this.form.patchValue(data);
         this.form.controls.type_document.setValue(String(data.type_document));
         this.cardImageBase64 = data.photo;
-        this.form.controls.position.setValue(String(data.position));
+        this.form.controls.position.setValue(String(data.position.id));
+        this.form.controls.status.setValue(String(data.status.id));
         let admission_date = null;
         if(data.admission_date) {
           admission_date = data.admission_date.split('-');
@@ -433,9 +434,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           retirement_date = data.retirement_date.split('-');
           this.form.controls.retirement_date.setValue({ year: +retirement_date[0], month: +retirement_date[1], day: +retirement_date[2]});
         }
-        this.form.controls.status.enable();
         this.form.enable();
-
         this.openModal.nativeElement.click();
       }
     }

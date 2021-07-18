@@ -17,6 +17,9 @@ export class PaymentModel {
   telephone: string;
   responseUrl: string;
   confirmationUrl: string;
+  extra1: string;
+  extra2: string;
+  extra3: string;
 
   constructor() {
     this.merchantId = environment.merchantId;

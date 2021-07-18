@@ -24,6 +24,14 @@ export class ReserveService {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/customer/${idCustomer}`);
   }
 
+  getByStatus(status: number) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/status/${status}`);
+  }
+
+  getScheduleByCustomer(idCustomer: any) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/schedule/customer/${idCustomer}`);
+  }
+
   getByReference(reference: any) {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/reference/${reference}`);
   }

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import {jsPDF} from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-response',
@@ -8,6 +9,8 @@ import { switchMap } from 'rxjs/operators';
   styleUrls: ['./response.component.scss']
 })
 export class ResponseComponent implements OnInit {
+
+  @ViewChild('pdfTable', {static: false}) pdfTable: ElementRef;
 
   processingDate = '';
   transactionState = '';
@@ -18,6 +21,7 @@ export class ResponseComponent implements OnInit {
   cus = '';
   pseBank = '';
   lapPaymentMethod = '';
+  extra1 = '';
 
   constructor(
     private activatedRoute: ActivatedRoute
@@ -33,10 +37,26 @@ export class ResponseComponent implements OnInit {
       this.cus = params.get('cus');
       this.pseBank = params.get('pseBank');
       this.lapPaymentMethod = params.get('lapPaymentMethod');
+      this.extra1 = params.get('extra1');
     });
   }
 
   ngOnInit(): void {
   }
+
+  public download() {
+    const pdfTable = this.pdfTable.nativeElement;
+    html2canvas(pdfTable).then(canvas => {
+      let fileWidth = 110;
+      let fileHeight = canvas.height * fileWidth / canvas.width;
+      const FILEURI = canvas.toDataURL('image/png');
+      let PDF = new jsPDF('p', 'mm', 'a4');
+      PDF.setFontSize(8);
+      PDF.text(new Date().toString(), 120, 290);
+      let position = 10;
+      PDF.addImage(FILEURI, 'PNG', 50, position, fileWidth, fileHeight)
+      PDF.save(this.extra1+'.pdf');
+    });
+    }
 
 }

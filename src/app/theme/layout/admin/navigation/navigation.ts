@@ -44,7 +44,7 @@ const NavigationItems = [
       },
       {
         id: 'reserve',
-        title: 'Pre-Agendar',
+        title: 'Pre-Agendar y Pagar',
         type: 'item',
         url: '/scheduling/reserve',
         icon: 'assets/img/menu/reserve.png',
@@ -59,6 +59,24 @@ const NavigationItems = [
         icon: 'assets/img/menu/schedule.png',
         classes: 'nav-item',
         hidden: true
+      },
+      {
+        id: 'reschedule',
+        title: 'Reprogramar',
+        type: 'item',
+        url: '/scheduling/reschedule',
+        icon: 'assets/img/menu/reschedule.png',
+        classes: 'nav-item',
+        hidden: true
+      },
+      {
+        id: 'paymentHistory',
+        title: 'Historial de Pagos',
+        type: 'item',
+        url: '/scheduling/history',
+        icon: 'assets/img/menu/payment-history.png',
+        classes: 'nav-item',
+        hidden: false
       },
       {
         id: 'availability',
@@ -185,7 +203,80 @@ const NavigationItems = [
         icon: 'assets/img/menu/roles.png',
         classes: 'nav-item',
         hidden: true
-      }
+      },
+      {
+        id: 'report',
+        title: 'Reportes',
+        type: 'collapse',
+        icon: 'assets/img/menu/report.png',
+        hidden: false,
+        children: [
+          {
+            id: 'scheduler',
+            title: 'Agenda',
+            type: 'item',
+            url: '/report/shedule',
+            icon: 'assets/img/menu/scheduler.png',
+            hidden: false
+          },
+          {
+            id: 'overdue',
+            title: 'Pagos vencidos',
+            type: 'item',
+            url: '/report/expiration',
+            icon: 'assets/img/menu/overdue.png',
+            hidden: false
+          },
+          {
+            id: 'servicesr',
+            title: 'Historial de Servicios',
+            type: 'item',
+            url: '/report/history',
+            icon: 'assets/img/menu/servicesr.png',
+            hidden: false
+          },
+          {
+            id: 'pendingPayments',
+            title: 'Pagos Pendientes',
+            type: 'item',
+            url: '/report/pending',
+            icon: 'assets/img/menu/pendingPayments.png',
+            hidden: false
+          },
+          {
+            id: 'servicesProfessional',
+            title: 'Servicios por profesional',
+            type: 'item',
+            url: '/report/professional',
+            icon: 'assets/img/menu/report-professional.png',
+            hidden: false
+          },
+          {
+            id: 'historyPayments',
+            title: 'Historial de pagos',
+            type: 'item',
+            url: '/report/payment',
+            icon: 'assets/img/menu/history.png',
+            hidden: false
+          },
+          {
+            id: 'servicer',
+            title: 'Servicio',
+            type: 'item',
+            url: '/report/service',
+            icon: 'assets/img/menu/service-report.png',
+            hidden: false
+          },
+          {
+            id: 'log',
+            title: 'Registro de Actividades',
+            type: 'item',
+            url: '/report/log',
+            icon: 'assets/img/menu/log.png',
+            hidden: false
+          }
+        ]
+      },
     ]
   }
 ];
@@ -222,6 +313,8 @@ export class NavigationItem {
           const availability    = resp.filter( (perm: any) => perm.name === "ACCEDER_DISPONIBILIDAD");
           const status          = resp.filter( (perm: any) => perm.name === "ACCEDER_ESTADOS");
           const promocode       = resp.filter( (perm: any) => perm.name === "ACCEDER_CODIGOS_PROMOCIONALES");
+          const reschedule      = resp.filter( (perm: any) => perm.name === "ACCEDER_REPROGRAMACIONES");
+
 
 
           if(users.length > 0 && children.id === 'users') {
@@ -311,6 +404,12 @@ export class NavigationItem {
           if(promocode.length > 0 && children.id === 'promocode') {
             children.hidden = false;
           } else if (promocode.length === 0 && children.id === 'promocode') {
+            children.hidden = true;
+          }
+
+          if(reschedule.length > 0 && children.id === 'reschedule') {
+            children.hidden = false;
+          } else if (reschedule.length === 0 && children.id === 'reschedule') {
             children.hidden = true;
           }
         });

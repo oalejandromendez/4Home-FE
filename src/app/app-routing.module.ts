@@ -5,7 +5,6 @@ import { DashboardComponent } from './pages/common/dashboard/dashboard.component
 import { PaymentComponent } from './pages/payment/payment.component';
 import { AdminComponent } from './theme/layout/admin/admin.component'
 
-
 const routes: Routes = [
   {
     path: '',
@@ -32,6 +31,10 @@ const routes: Routes = [
       {
         path: 'finance',
         loadChildren: () => import('./pages/finance/finance.module').then(module => module.FinanceModule)
+      },
+      {
+        path: 'report',
+        loadChildren: () => import('./pages/report/report.module').then(module => module.ReportModule)
       },
     ]
   },

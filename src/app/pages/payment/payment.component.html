@@ -4,7 +4,8 @@
 
   <div>
 
-    <label class="danger">Recuerda que actualmente cuentas con un tiempo limite de <strong class="font-weight-bold">{{ reservationPayment.limit }}</strong> para pagar tu servicio.</label>
+    <label class="danger" *ngIf="canPay">Recuerda que actualmente cuentas con un tiempo limite de <strong class="font-weight-bold">{{ reservationPayment.limit }}</strong> para pagar tu servicio.</label>
+    <label class="danger" *ngIf="!canPay">No puedes pagar el servicio, el pago ya se encuentra vencido.</label>
 
     <div class="d-flex">
 
@@ -94,7 +95,7 @@
 
       </div>
 
-      <div class="col-md-3 filters">
+      <div class="col-md-3">
 
         <div class="card card-warning br-10 mb-0">
 
@@ -151,13 +152,26 @@
 
       </div>
 
-      <form class="col-md-6" ngNoForm name="payuform" method="POST" action="https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu" novalidate>
+      <form class="col-md-6" ngNoForm name="payuform" method="POST" action="{{ urlPayu }}" novalidate>
         <div>
           <div class="card card-invoice">
             <div class="card-body card-success br-10 mb-0 card-body-invoice">
-              <img alt="Theme-Logo" class="img-fluid mr-2" src="assets/img/payment/invoice.png">
-              <label class="label-payment mb-0 mt-3">
-                Total a pagar: {{ (reservationPayment.service.price * reservationPayment.service.quantity) | currency }}
+              <img alt="Theme-Logo" class="img-fluid mr-2 width-11" src="assets/img/payment/invoice.png">
+
+              <label class="label-payment mb-0 mt-3" *ngIf="!isValidPromocode && !infoPromocode">
+                Total a pagar: {{ (total) | currency }}
+              </label>
+
+              <label class="label-subtotal mb-0 mt-3" *ngIf="isValidPromocode && infoPromocode">
+                Total servicio: {{ (subtotal) | currency }}
+              </label>
+
+              <label class="label-discount mb-0" *ngIf="isValidPromocode && infoPromocode">
+                Descuento: {{ discount | currency }}
+              </label>
+
+              <label class="label-payment mb-0" *ngIf="isValidPromocode && infoPromocode">
+                Total a pagar: {{ (total) | currency }}
               </label>
 
               <div>
@@ -171,8 +185,11 @@
                 <input name="currency"      hidden  [(ngModel)]="payment.currency">
                 <input name="signature"     hidden  [(ngModel)]="payment.signature">
                 <input name="test"          hidden  [(ngModel)]="payment.test">
-                <input name="responseUrl"   hidden  value="http://localhost:4200/finance/response" >
-                <input name="confirmationUrl" hidden  value="http://localhost/4Home/public/api/payment/confirmation" >
+                <input name="extra1"        hidden  [(ngModel)]="payment.extra1">
+                <input name="extra2"        hidden  [(ngModel)]="payment.extra2">
+                <input name="extra3"        hidden  [(ngModel)]="payment.extra3">
+                <input name="responseUrl"   hidden  value="{{ responseUrl }}" >
+                <input name="confirmationUrl" hidden  value="{{ confirmationUrl }}" >
 
                 <div class="row">
                   <div class="col-md-6">
@@ -211,11 +228,28 @@
                     </div>
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-md-9">
+                    <div class='form-group mb-0'>
+                      <label class="col-form-label">Cupón de descuento</label>
+                      <div class="p-0 pl-2 align-self-center ">
+                        <input type="text" class="form-control" [(ngModel)]="promocode" maxlength="9" [disabled]="isValidPromocode">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 button-validate" >
+                    <button type="button" class="btn btn-outline-primary" (click)="validatePromocode();" [disabled]="!promocode || isValidPromocode" >
+                      Validar
+                    </button>
+                  </div>
+                </div>
+
               </div>
 
               <div class="btn-payment mt-3">
 
-                <button type="submit" class="btn btn-outline-primary btn-lg btn-block btn-reserve">
+                <button type="submit" class="btn btn-outline-primary btn-lg btn-block btn-reserve" [disabled]="!canPay || !payment.payerDocument || !payment.buyerFullName || !payment.buyerEmail || !payment.telephone" >
                   <img alt="Theme-Logo" class="img-fluid mr-2" src="assets/img/payment/logo-payu.png">Pagar
                 </button>
 
@@ -231,4 +265,4 @@
 
 </div>
 
-
+<ng2-toasty [position]="'top-right'"></ng2-toasty>

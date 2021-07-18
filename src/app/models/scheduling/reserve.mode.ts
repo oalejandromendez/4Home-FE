@@ -9,6 +9,7 @@ export class ReserveModel {
   days: any;
   professional: string;
   supervisor: string;
+  payment: any;
 
   constructor() {
       this.id = '';

@@ -6,6 +6,8 @@ export const environment = {
   production: false,
   host: 'http://localhost/4Home/public',
   payu: 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu',
+  responseUrl: 'http://localhost:4200/finance/response',
+  confirmationUrl: 'http://localhost/4Home/public/api/payment/confirmation',
   apiLogin: 'pRRXKOl8ikMmt9u',
   apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
   accountId: '512321',

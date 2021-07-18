@@ -1,7 +1,9 @@
 export const environment = {
   production: true,
-  host: 'http://localhost/4Home/public',
+  host: 'https://4homeapi.inkdigital.co',
   payu: 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu',
+  responseUrl: 'http://localhost:4200/finance/response',
+  confirmationUrl: 'https://4homeapi.inkdigital.co/api/payment/confirmation',
   apiLogin: 'pRRXKOl8ikMmt9u',
   apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
   accountId: '512321',

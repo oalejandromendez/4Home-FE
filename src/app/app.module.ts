@@ -25,6 +25,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { DataTableLanguage } from './models/common/datatable';
 import { ToastyService } from 'ng2-toasty';
 import { PaymentComponent } from './pages/payment/payment.component';
+import { LOCALE_ID } from '@angular/core';
+import localeEs from '@angular/common/locales/es';
+import { registerLocaleData } from '@angular/common';
+
+registerLocaleData(localeEs);
+
 
 @NgModule({
   declarations: [
@@ -56,7 +62,7 @@ import { PaymentComponent } from './pages/payment/payment.component';
     NgbTabsetModule,
     HttpClientModule
   ],
-  providers: [NavigationItem, DataTableLanguage, ToastyService],
+  providers: [NavigationItem, DataTableLanguage, ToastyService, { provide: LOCALE_ID, useValue: 'es' }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

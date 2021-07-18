@@ -1,0 +1,39 @@
+<div class="card" style="margin-top: -20px;">
+
+  <div class="card-header">
+    <span class="label-report-pending">Reporte de pagos pendientes</span>
+  </div>
+
+  <div class="card-body">
+    <div class="dt-responsive table-responsive mt-2">
+      <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="display row-border hover table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Referencia</th>
+                <th>Tipo</th>
+                <th>Profesional</th>
+                <th>Cliente</th>
+                <th>Dirección</th>
+            </tr>
+        </thead>
+        <tbody *ngIf="reserves?.length != 0">
+            <tr *ngFor="let reserve of reserves; let index = index">
+                <td>{{ reserve.id }}</td>
+                <td>{{ reserve.reference }}</td>
+                <td>
+                  <span *ngIf="reserve.type === 1" class="badge badge-primary f-12">Esporadico</span>
+                  <span *ngIf="reserve.type === 2" class="badge badge-warning f-12">Mensualidad</span>
+                </td>
+                <td>{{ reserve.professional.name }} {{ reserve.professional.lastname }}</td>
+                <td>{{ reserve.user.name }} {{ reserve.user.lastname }}</td>
+                <td>{{ reserve.customer_address.address }}</td>
+            </tr>
+            <tr *ngIf="reserves?.length === 0">
+              <td colspan="5" class="no-data-available">No existen datos registrados</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

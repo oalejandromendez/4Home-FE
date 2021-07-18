@@ -575,3 +575,8 @@ textarea {
 .font-weight-bold {
   font-weight: bold;
 }
+
+
+.pcoded-navbar.navbar-collapsed:hover .pcoded-inner-navbar app-nav-item > li > a > .pcoded-mtext, .pcoded-navbar.navbar-collapsed:hover .pcoded-inner-navbar > app-nav-group > app-nav-collapse > li > a > .pcoded-mtext {
+  white-space: break-spaces !important;
+}
