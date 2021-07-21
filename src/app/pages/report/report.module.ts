@@ -11,10 +11,11 @@ import { PendingReportComponent } from './pending-report/pending-report.componen
 import { ProfessionalReportComponent } from './professional-report/professional-report.component';
 import { PaymentReportComponent } from './payment-report/payment-report.component';
 import { ServiceReportComponent } from './service-report/service-report.component';
+import { ActivityComponent } from './activity/activity.component';
 
 
 @NgModule({
-  declarations: [ScheduleReportComponent, ExpirationComponent, HistoryReportComponent, PendingReportComponent, ProfessionalReportComponent, PaymentReportComponent, ServiceReportComponent],
+  declarations: [ScheduleReportComponent, ExpirationComponent, HistoryReportComponent, PendingReportComponent, ProfessionalReportComponent, PaymentReportComponent, ServiceReportComponent, ActivityComponent],
   imports: [
     CommonModule,
     ReportRoutingModule,

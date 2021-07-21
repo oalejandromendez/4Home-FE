@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ActivityComponent } from './activity/activity.component';
 import { ExpirationComponent } from './expiration/expiration.component';
 import { HistoryReportComponent } from './history-report/history-report.component';
 import { PaymentReportComponent } from './payment-report/payment-report.component';
@@ -40,6 +41,10 @@ const routes: Routes = [
       {
         path: 'service',
         component: ServiceReportComponent,
+      },
+      {
+        path: 'activity',
+        component: ActivityComponent,
       }
     ]
   }

@@ -1,0 +1,156 @@
+<div class="d-flex" *ngIf="widgets">
+
+  <div class="col-md-2 col-xl-2">
+    <div class="card bg-c-yellow bitcoin-wallet br-10">
+      <div>
+        <div class="card-block p-2">
+          <h5 class="text-white mb-2 f-14">Servicios pendientes de pago</h5>
+          <h2 class="text-white mb-2 f-24">{{ widgets.pending }}</h2>
+          <h2>
+            <i class="fas fa-clock f-30 text-white"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2 col-xl-2">
+    <div class="card theme-bg bitcoin-wallet br-10">
+      <div>
+        <div class="card-block p-2">
+          <h5 class="text-white mb-2 f-14">Servicios en Pre-Agendamiento</h5>
+          <h2 class="text-white mb-2 f-24">{{ widgets.schedule }}</h2>
+          <h2>
+            <i class="fas fa-history f-30 text-white"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2 col-xl-2">
+    <div class="card bg-c-red bitcoin-wallet br-10">
+      <div>
+        <div class="card-block p-2">
+          <h5 class="text-white mb-2 f-14">Servicios con pago vencido</h5>
+          <h2 class="text-white mb-2 f-24">{{ widgets.expiration }}</h2>
+          <h2>
+            <i class="fas fa-window-close f-30 text-white"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2 col-xl-2">
+    <div class="card bg-c-yellow bitcoin-wallet br-10">
+      <div>
+        <div class="card-block p-2">
+          <h5 class="text-white mb-2 f-14">Servicios en reprogramación</h5>
+          <h2 class="text-white mb-2 f-24">{{ widgets.reschedule }}</h2>
+          <h2>
+            <i class="fas fa-redo f-30 text-white"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2 col-xl-2">
+    <div class="card theme-bg2 bitcoin-wallet br-10">
+      <div>
+        <div class="card-block p-2">
+          <h5 class="text-white mb-2 f-14">Servicios con pago aprobado</h5>
+          <h2 class="text-white mb-2 f-24">{{ widgets.services }}</h2>
+          <h2>
+            <i class="fas fa-money-check-alt f-30 text-white"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2 col-xl-2">
+    <div class="card bg-c-blue bitcoin-wallet br-10">
+      <div>
+        <div class="card-block p-2">
+          <h5 class="text-white mb-2 f-14">Total clientes registrados</h5>
+          <h2 class="text-white mb-2 f-24">{{ widgets.customers }}</h2>
+          <h2>
+            <i class="fas fa-users f-30 text-white"></i>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="d-flex">
+
+  <div class="col-md-6">
+
+    <div class="card br-10 p-2">
+
+      <h2 class="f-14" style="font-weight: bold;">Reservas X Clase de Servicio</h2>
+
+      <span #labelService class="d-block f-24 f-w-600 text-center" style="color: black;"></span>
+      <div #serviceChart>
+          <chart #baseServiceChart id="service_chart" [type]="'pie'" [data]="serviceChartData" [options]="serviceChartOptions"></chart>
+      </div>
+      <div #legendService class="chart-legend row justify-content-center m-t-15"></div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-6">
+
+    <div class="card br-10 p-2">
+
+      <h2 class="f-14" style="font-weight: bold;">Reservas X Tipo de Servicio</h2>
+
+      <span #labelServiceType class="d-block f-24 f-w-600 text-center" style="color: black;"></span>
+      <div #serviceTypeChart>
+          <chart #baseServiceTypeChart id="serviceType_chart" [type]="'doughnut'" [data]="serviceTypeChartData" [options]="serviceTypeChartOptions"></chart>
+      </div>
+      <div #legendServiceType class="chart-legend row justify-content-center m-t-15"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="d-flex">
+
+  <div class="col-md-6">
+
+    <div class="card br-10 p-2">
+
+      <h2 class="f-14" style="font-weight: bold;">Cliente X Tipo de Cliente</h2>
+
+      <div #customerChart>
+        <chart id="customer_chart" [type]="'bar'" [data]="customerChartData" [options]="customerChartOption"></chart>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-6">
+
+    <div class="card br-10 p-2">
+
+      <h2 class="f-14" style="font-weight: bold;">Reservas X Jornada</h2>
+
+      <div #workingChart>
+        <chart id="working_chart" [type]="'bar'" [data]="workingChartData" [options]="workingChartOption"></chart>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

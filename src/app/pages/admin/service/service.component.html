@@ -26,7 +26,7 @@
                                 <td>{{ service.name }}</td>
                                 <td *ngIf="service.type === 1">Esporádico</td>
                                 <td *ngIf="service.type === 2">Mensualidad</td>
-                                <td>{{ service.price | currency }}</td>
+                                <td>${{ service.price | currency: '' : '' : '1.0-0' }}</td>
                                 <td>{{ service.working_day.name }}</td>
                                 <td>
                                     <span *ngIf="service.status === 1" class="badge badge-success">ACTIVO</span>

@@ -21,6 +21,8 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CreditCardDirectivesModule } from 'angular-cc-library';
+import { DashboardAdminComponent } from 'src/app/pages/common/dashboard-admin/dashboard-admin.component';
+import { ChartModule } from 'angular2-chartjs';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -47,7 +49,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ColorPickerModule,
     ToastyModule.forRoot(),
     NgbModule,
-    CreditCardDirectivesModule
+    CreditCardDirectivesModule,
+    ChartModule
   ],
   exports: [
     CommonModule,
@@ -67,12 +70,15 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ColorPickerModule,
     NgSelectModule,
     NgbModule,
-    CreditCardDirectivesModule
+    CreditCardDirectivesModule,
+    DashboardAdminComponent,
+    ChartModule
   ],
   declarations: [
     SpinnerComponent,
     LoaderComponent,
-    DashboardComponent
+    DashboardComponent,
+    DashboardAdminComponent
   ],
   providers: [
     {

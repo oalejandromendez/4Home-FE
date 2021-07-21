@@ -32,4 +32,8 @@ export class ReportService {
   professional( filter: any) {
     return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/report/professional`, { ...filter });
   }
+
+  activity(filter: any ) {
+    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/activitylog`, { ...filter });
+  }
 }

@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import { DEFAULT_CURRENCY_CODE, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './theme/shared/shared.module';
@@ -29,7 +29,7 @@ import { LOCALE_ID } from '@angular/core';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
 
-registerLocaleData(localeEs);
+registerLocaleData(localeEs, 'es-CO');
 
 
 @NgModule({
@@ -62,7 +62,9 @@ registerLocaleData(localeEs);
     NgbTabsetModule,
     HttpClientModule
   ],
-  providers: [NavigationItem, DataTableLanguage, ToastyService, { provide: LOCALE_ID, useValue: 'es' }],
+  providers: [NavigationItem, DataTableLanguage, ToastyService,
+    { provide: LOCALE_ID, useValue: 'es-CO' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: ''}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

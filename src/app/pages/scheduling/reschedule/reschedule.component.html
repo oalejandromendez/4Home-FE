@@ -111,11 +111,11 @@
                             <td *ngIf="reservation.type === 1">Esporádico</td>
                             <td *ngIf="reservation.type === 2">Mensualidad</td>
                             <td>{{ reservation.service.working_day.name }}</td>
-                            <td>{{ (reservation.service.price * reservation.service.quantity) | currency }}</td>
+                            <td>${{ (reservation.service.price * reservation.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
                             <th>
                               <ng-container *ngFor="let payment of reservation.payment">
                                 <div *ngIf="payment.state_pol === '4'" class="div-pay-reschedule">
-                                  <label class="f-10 mb-0">{{ payment.transaction_date}}:</label><span class="badge badge-warning">{{payment.value | currency}}</span>
+                                  <label class="f-10 mb-0">{{ payment.transaction_date}}:</label><span class="badge badge-warning">${{payment.value | currency: '' : '' : '1.0-0'}}</span>
                                 </div>
                               </ng-container>
                             </th>
@@ -202,7 +202,7 @@
                       </div>
                   </div>
 
-                  <label class="total-reschedule" *ngIf="price">Total pagado: {{ price | currency}}</label>
+                  <label class="total-reschedule" *ngIf="price">Total pagado: ${{ price | currency: '' : '' : '1.0-0'}}</label>
 
               </div>
 

@@ -159,19 +159,19 @@
               <img alt="Theme-Logo" class="img-fluid mr-2 width-11" src="assets/img/payment/invoice.png">
 
               <label class="label-payment mb-0 mt-3" *ngIf="!isValidPromocode && !infoPromocode">
-                Total a pagar: {{ (total) | currency }}
+                Total a pagar: ${{ (total) | currency: '' : '' : '1.0-0' }}
               </label>
 
               <label class="label-subtotal mb-0 mt-3" *ngIf="isValidPromocode && infoPromocode">
-                Total servicio: {{ (subtotal) | currency }}
+                Total servicio: ${{ (subtotal) | currency: '' : '' : '1.0-0' }}
               </label>
 
               <label class="label-discount mb-0" *ngIf="isValidPromocode && infoPromocode">
-                Descuento: {{ discount | currency }}
+                Descuento: ${{ discount | currency: '' : '' : '1.0-0' }}
               </label>
 
               <label class="label-payment mb-0" *ngIf="isValidPromocode && infoPromocode">
-                Total a pagar: {{ (total) | currency }}
+                Total a pagar: ${{ (total) | currency: '' : '' : '1.0-0' }}
               </label>
 
               <div>

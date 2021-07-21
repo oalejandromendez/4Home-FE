@@ -271,7 +271,7 @@ const NavigationItems = [
             id: 'log',
             title: 'Registro de Actividades',
             type: 'item',
-            url: '/report/log',
+            url: '/report/activity',
             icon: 'assets/img/menu/log.png',
             hidden: false
           }

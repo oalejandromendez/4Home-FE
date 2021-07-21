@@ -131,7 +131,7 @@
                     <td>{{ reserve.id }}</td>
                     <td>{{ reserve.reference }}</td>
                     <td>{{ reserve.reference_sale }}</td>
-                    <td>{{ reserve.value | currency }}</td>
+                    <td>${{ reserve.value | currency: '' : '' : '1.0-0' }}</td>
                     <td>{{ reserve.authorization_code }}</td>
                     <td>{{ reserve.transaction_date }}</td>
                     <td>

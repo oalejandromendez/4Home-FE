@@ -203,7 +203,7 @@
                 <div>
                   <span class="label-info">Total</span>
                   <br>
-                  <label class="font-weight-bold label-info-customer">{{ (reservation.service.quantity * reservation.service.price) | currency }}</label>
+                  <label class="font-weight-bold label-info-customer">${{ (reservation.service.quantity * reservation.service.price) | currency: '' : '' : '1.0-0' }}</label>
                 </div>
               </div>
             </div>

@@ -6,7 +6,7 @@
 
           <div class="card-header">
 
-            <span class="label-history">Historial de Pagos</span>
+            <span class="label-report-activity">Registro de Actividades</span>
 
           </div>
 
@@ -28,7 +28,7 @@
                 <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
               </div>
               <div class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('init').pristine">
-                <span class="badge m-r-5 badge-danger">La fecha de consulta no puede ser mayor a la fecha actual</span>
+                <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
               </div>
             </div>
 
@@ -51,10 +51,9 @@
                   <span class="badge m-r-5 badge-danger">La fecha final debe ser mayor a la fecha de inicio</span>
               </div>
               <div class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('end').pristine">
-                  <span class="badge m-r-5 badge-danger">La fecha de consulta no puede ser mayor a la fecha actual</span>
+                  <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
               </div>
             </div>
-
 
             <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected" let-disabled="disabled" let-focused="focused">
               <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
@@ -110,32 +109,48 @@
             <thead>
                 <tr>
                     <th>id</th>
-                    <th>Referencia Servicio</th>
-                    <th>Referencia de Pago</th>
-                    <th>Valor Pagago</th>
-                    <th>Código de Autorización</th>
-                    <th>Fecha de pago</th>
-                    <th>Estado</th>
+                    <th>Tipo</th>
+                    <th>Configuración</th>
+                    <th>Id</th>
+                    <th>Reponsable</th>
+                    <th>Antes</th>
+                    <th>Despues</th>
+                    <th>Fecha</th>
                 </tr>
             </thead>
-            <tbody *ngIf="audits?.length != 0">
-                <tr *ngFor="let audit of audits; let index = index">
-                    <td>{{ audit.id }}</td>
-                    <td>{{ audit.reference }}</td>
-                    <td>{{ audit.reference_sale }}</td>
-                    <td>${{ audit.value | currency: '' : '' : '1.0-0' }}</td>
-                    <td>{{ audit.authorization_code }}</td>
-                    <td>{{ audit.transaction_date }}</td>
+            <tbody *ngIf="activities?.length != 0">
+                <tr *ngFor="let activity of activities; let index = index">
+                    <td>{{ activity.id }}</td>
                     <td>
-                      <span *ngIf="audit.state_pol === '4'" class="badge badge-success f-14">Aprobada</span>
-                      <span *ngIf="audit.state_pol === '6'" class="badge badge-danger f-14">Rechazada</span>
-                      <span *ngIf="audit.state_pol === '104'" class="badge badge-danger f-14">Error</span>
-                      <span *ngIf="audit.state_pol === '5'" class="badge badge-danger f-14">Expirada</span>
-                      <span *ngIf="audit.state_pol === '7'" class="badge badge-warning f-14">Pendiente</span>
+                      <span class="badge badge-primary" *ngIf="activity.description === 'created'">Creación</span>
+                      <span class="badge badge-warning" *ngIf="activity.description === 'updated'">Modificación</span>
+                      <span class="badge badge-danger" *ngIf="activity.description === 'deleted'">Eliminación</span>
                     </td>
+                    <td>
+                      <span *ngIf="activity.modelo === 'Holiday'">Festivos</span>
+                      <span *ngIf="activity.modelo === 'Position'">Cargos</span>
+                      <span *ngIf="activity.modelo === 'Professional'">Profesionales</span>
+                      <span *ngIf="activity.modelo === 'Service'">Servicios</span>
+                      <span *ngIf="activity.modelo === 'ServiceType'">Tipo de Servicio</span>
+                      <span *ngIf="activity.modelo === 'Status'">Estados</span>
+                      <span *ngIf="activity.modelo === 'WorkingDay'">Jornadas</span>
+                      <span *ngIf="activity.modelo === 'DocumentType'">Tipo de Documento</span>
+                      <span *ngIf="activity.modelo === 'Payment'">Pagos</span>
+                      <span *ngIf="activity.modelo === 'CustomerAddress'">Direcciones de Cliente</span>
+                      <span *ngIf="activity.modelo === 'CustomerType'">Tipo de Cliente</span>
+                      <span *ngIf="activity.modelo === 'Reserve'">Reservas</span>
+                      <span *ngIf="activity.modelo === 'ReserveDay'">Días de la Reserva</span>
+                      <span *ngIf="activity.modelo === 'User'">Usuarios/Clientes</span>
+                      <span *ngIf="activity.modelo === 'Role'">Roles</span>
+                    </td>
+                    <td>{{ activity.subject_id }}</td>
+                    <td>{{ activity.causer.name }} {{ activity.causer.lastname }}</td>
+                    <td style="width: 30px;white-space: break-spaces;">{{ activity.properties.old | json }}</td>
+                    <td style="width: 30px;white-space: break-spaces;">{{ activity.properties.attributes | json }}</td>
+                    <td>{{ activity.created_at | date }}</td>
                 </tr>
-                <tr *ngIf="audits?.length === 0">
-                  <td colspan="6" class="no-data-available">No existen pagos registrados</td>
+                <tr *ngIf="activities?.length === 0">
+                  <td colspan="7" class="no-data-available">No existen datos</td>
                 </tr>
             </tbody>
           </table>
