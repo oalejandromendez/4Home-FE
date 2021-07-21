@@ -23,10 +23,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CreditCardDirectivesModule } from 'angular-cc-library';
 import { DashboardAdminComponent } from 'src/app/pages/common/dashboard-admin/dashboard-admin.component';
 import { ChartModule } from 'angular2-chartjs';
+import { DashboardCustomerComponent } from 'src/app/pages/common/dashboard-customer/dashboard-customer.component';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
-  interactionPlugin
+  interactionPlugin,
+  timeGridPlugin,
+  listPlugin
 ]);
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -72,13 +78,15 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     NgbModule,
     CreditCardDirectivesModule,
     DashboardAdminComponent,
-    ChartModule
+    ChartModule,
+    DashboardCustomerComponent
   ],
   declarations: [
     SpinnerComponent,
     LoaderComponent,
     DashboardComponent,
-    DashboardAdminComponent
+    DashboardAdminComponent,
+    DashboardCustomerComponent
   ],
   providers: [
     {

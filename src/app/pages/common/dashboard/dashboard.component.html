@@ -1,1 +1,2 @@
-<app-dashboard-admin></app-dashboard-admin>
+<app-dashboard-admin *ngIf="isAdmin"></app-dashboard-admin>
+<app-dashboard-customer *ngIf="isCustomer"></app-dashboard-customer>

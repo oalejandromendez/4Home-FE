@@ -17,4 +17,8 @@ export class DashboardService {
     return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/dashboard/admin`);
   }
 
+  customer(id: any) {
+    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/dashboard/customer/${id}`);
+  }
+
 }

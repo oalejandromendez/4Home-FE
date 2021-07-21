@@ -114,7 +114,8 @@
                                 <td *ngIf="reservation.type === 1">Esporádico</td>
                                 <td *ngIf="reservation.type === 2">Mensualidad</td>
                                 <td>{{ reservation.service.working_day.name }}</td>
-                                <td>${{ (reservation.service.price * reservation.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
+                                <td *ngIf="reservation.type === 1">${{ (reservation.service.price * reservation.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
+                                <td *ngIf="reservation.type === 2">${{ ( (reservation.service.price * reservation.service.quantity)*4 ) | currency: '' : '' : '1.0-0' }}</td>
                                 <td>{{ reservation.customer_address.address }}</td>
                                 <td>
                                     <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>

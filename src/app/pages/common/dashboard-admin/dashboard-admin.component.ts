@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChartComponent } from 'angular2-chartjs';
 import { ToastOptions, ToastyService } from 'ng2-toasty';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 
 @Component({
@@ -49,11 +50,17 @@ export class DashboardAdminComponent implements OnInit {
   labelsServiceType = [];
   dataServiceType = [];
 
+  name = null;
+
   constructor(
     private dashboardService: DashboardService,
     private toastyService: ToastyService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
+
+    const user = this.authService.authUser();
+    this.name = user.name + " " + user.lastname;
 
     this.customerChartOption  = {
       responsive: true,

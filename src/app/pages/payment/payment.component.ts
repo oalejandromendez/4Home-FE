@@ -48,13 +48,20 @@ export class PaymentComponent implements OnInit {
   }
 
   loadInformationPayment() {
-    const amount = String(this.reservationPayment.service.price * this.reservationPayment.service.quantity);
+    var amount = '0';
+    if(this.reservationPayment.type === 1) {
+      const amount = String(this.reservationPayment.service.price * this.reservationPayment.service.quantity);
+    } else {
+      if(this.reservationPayment.type === 2) {
+        const amount = String( (this.reservationPayment.service.price * this.reservationPayment.service.quantity)*4 );
+      }
+    }
     const reference = new Date().getTime().toString().slice(-5) + this.reservationPayment.reference;
     this.payment.merchantId = environment.merchantId;
     this.payment.accountId = environment.accountId;
     this.payment.description = 'Compra de servicios 4Home S.A.S. Servicio con referencia #'  + this.reservationPayment.reference;
     this.payment.referenceCode = reference
-    this.payment.amount = amount
+    this.payment.amount = amount;
     this.payment.tax = '0';
     this.payment.taxReturnBase = '0';
     this.payment.currency = 'COP',
@@ -62,8 +69,15 @@ export class PaymentComponent implements OnInit {
     this.payment.test = '1';
     this.payment.extra1 = this.reservationPayment.reference;
     this.payment.extra2 = this.reservationPayment.id;
-    this.subtotal = this.reservationPayment.service.price * this.reservationPayment.service.quantity;
-    this.total = this.reservationPayment.service.price * this.reservationPayment.service.quantity;
+    if(this.reservationPayment.type === 1) {
+      this.subtotal = this.reservationPayment.service.price * this.reservationPayment.service.quantity;
+      this.total = this.reservationPayment.service.price * this.reservationPayment.service.quantity;
+    } else {
+      if(this.reservationPayment.type === 2) {
+        this.subtotal = (this.reservationPayment.service.price * this.reservationPayment.service.quantity)*4;
+        this.total = (this.reservationPayment.service.price * this.reservationPayment.service.quantity)*4;
+      }
+    }
   }
 
   loadReserve() {

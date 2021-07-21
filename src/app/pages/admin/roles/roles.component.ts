@@ -217,12 +217,62 @@ export class RolesComponent implements OnInit, OnDestroy {
         return 'Modificar tipo de servicios';
       case 'ELIMINAR_TIPO_SERVICIO':
         return 'Eliminar tipo de servicios';
+      case 'ACCEDER_ESTADOS':
+        return 'Acceder al modulo de estados';
+      case 'VER_ESTADOS':
+        return 'Acceder a lista de estados';
+      case 'CREAR_ESTADOS':
+        return 'Crear estados';
+      case 'MODIFICAR_ESTADOS':
+        return 'Modificar estados';
+      case 'ELIMINAR_ESTADOS':
+        return 'Eliminar estados';
       case 'ACCEDER_AGENDAMIENTOS':
         return 'Acceder al modulo de agendamientos';
       case 'VER_AGENDAMIENTOS':
         return 'Acceder a lista de agendamientos';
       case 'MODIFICAR_AGENDAMIENTOS':
         return 'Modificar agendamientos';
+      case 'ACCEDER_DISPONIBILIDAD':
+        return 'Acceder a disponibilidad';
+      case 'VER_DISPONIBILIDAD':
+        return 'Ver disponibilidad';
+      case 'MODIFICAR_DISPONIBILIDAD':
+        return 'Modificar disponibilidad';
+      case 'ACCEDER_CODIGOS_PROMOCIONALES':
+        return 'Acceder codigos de descuento';
+      case 'VER_CODIGOS_PROMOCIONALES':
+        return 'Ver codigos de descuento';
+      case 'CREAR_CODIGOS_PROMOCIONALES':
+        return 'Crear codigos de descuento';
+      case 'MODIFICAR_CODIGOS_PROMOCIONALES':
+        return 'Modificar codigos de descuento';
+      case 'ELIMINAR_CODIGOS_PROMOCIONALES':
+        return 'Eliminar codigos de descuento';
+      case 'ACCEDER_REPROGRAMACIONES':
+        return 'Acceder a reprogramaciones';
+      case 'VER_REPROGRAMACIONES':
+        return 'Ver reprogramaciones';
+      case 'CREAR_REPROGRAMACIONES':
+        return 'Crear reprogramaciones';
+      case 'ACCEDER_REPORTES':
+        return 'Acceder a reportes';
+      case 'REPORTE_AGENDA':
+        return 'Acceder a reporte de agenda';
+      case 'REPORTE_PAGOS_VENCIDOS':
+        return 'Acceder a reporte de pagos vencidos';
+      case 'REPORTE_HISTORIAL':
+        return 'Acceder a reporte de historial de servicios';
+      case 'REPORTE_PAGOS_PENDIENTES':
+        return 'Acceder a reporte de pagos pendientes';
+      case 'REPORTE_SERVICIOS_PROFESIONALES':
+        return 'Acceder a reporte de servicios por profesionales';
+      case 'REPORTE_HISTORIAL_PAGOS':
+        return 'Acceder a reporte de historial de pagos';
+      case 'REPORTE_SERVICIO':
+        return 'Acceder a reporte de servicio';
+      case 'REPORTE_REGISTRO_ACTIVIDADES':
+        return 'Acceder a reporte de registro de actividades';
     }
   }
 

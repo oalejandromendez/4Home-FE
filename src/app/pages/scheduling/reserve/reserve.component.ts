@@ -379,7 +379,13 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
         this.daysArray.removeAt(0)
       }
       this.quantity = this.service.quantity;
-      this.price = this.quantity * this.service.price;
+      if(this.service.type === 1) {
+        this.price = this.quantity * this.service.price;
+      } else {
+        if(this.service.type === 2) {
+          this.price = (this.quantity * this.service.price)*4;
+        }
+      }
       this.days.map( day => {
         const editDay = this.daysEdit.find( day => day.day === this.daysArray.controls.length);
         this.daysArray.push(

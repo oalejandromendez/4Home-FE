@@ -203,7 +203,8 @@
                 <div>
                   <span class="label-info">Total</span>
                   <br>
-                  <label class="font-weight-bold label-info-customer">${{ (reservation.service.quantity * reservation.service.price) | currency: '' : '' : '1.0-0' }}</label>
+                  <label class="font-weight-bold label-info-customer" *ngIf="reservation.type ===1">${{ (reservation.service.quantity * reservation.service.price) | currency: '' : '' : '1.0-0' }}</label>
+                  <label class="font-weight-bold label-info-customer" *ngIf="reservation.type ===2">${{ ( (reservation.service.quantity * reservation.service.price)*4 ) | currency: '' : '' : '1.0-0' }}</label>
                 </div>
               </div>
             </div>

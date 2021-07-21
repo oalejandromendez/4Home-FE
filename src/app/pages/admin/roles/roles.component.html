@@ -22,11 +22,11 @@
                                     {{ rol.name }}
                                 </td>
                                 <td>
-                                    <button *ngIf="canEdit && rol.name != 'SUPERADMIN' && rol.name != 'CLIENTE'" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(rol.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
+                                    <button *ngIf="canEdit && rol.name != 'SUPERADMIN' && rol.name != 'CLIENTE' && rol.name != 'SERVICIO' && rol.name != 'OPERACIÓN'" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(rol.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
                                       <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
                                     </button>
 
-                                    <button *ngIf="canDelete && rol.name != 'SUPERADMIN' && rol.name != 'CLIENTE'" type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(rol.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class"
+                                    <button *ngIf="canDelete && rol.name != 'SUPERADMIN' && rol.name != 'CLIENTE' && rol.name != 'SERVICIO' && rol.name != 'OPERACIÓN'" type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(rol.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class"
                                         container="body">
                                       <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
                                     </button>

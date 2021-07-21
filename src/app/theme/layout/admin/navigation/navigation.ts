@@ -209,7 +209,7 @@ const NavigationItems = [
         title: 'Reportes',
         type: 'collapse',
         icon: 'assets/img/menu/report.png',
-        hidden: false,
+        hidden: true,
         children: [
           {
             id: 'scheduler',
@@ -217,7 +217,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/shedule',
             icon: 'assets/img/menu/scheduler.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'overdue',
@@ -225,7 +225,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/expiration',
             icon: 'assets/img/menu/overdue.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'servicesr',
@@ -233,7 +233,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/history',
             icon: 'assets/img/menu/servicesr.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'pendingPayments',
@@ -241,7 +241,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/pending',
             icon: 'assets/img/menu/pendingPayments.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'servicesProfessional',
@@ -249,7 +249,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/professional',
             icon: 'assets/img/menu/report-professional.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'historyPayments',
@@ -257,7 +257,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/payment',
             icon: 'assets/img/menu/history.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'servicer',
@@ -265,7 +265,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/service',
             icon: 'assets/img/menu/service-report.png',
-            hidden: false
+            hidden: true
           },
           {
             id: 'log',
@@ -273,7 +273,7 @@ const NavigationItems = [
             type: 'item',
             url: '/report/activity',
             icon: 'assets/img/menu/log.png',
-            hidden: false
+            hidden: true
           }
         ]
       },
@@ -314,7 +314,15 @@ export class NavigationItem {
           const status          = resp.filter( (perm: any) => perm.name === "ACCEDER_ESTADOS");
           const promocode       = resp.filter( (perm: any) => perm.name === "ACCEDER_CODIGOS_PROMOCIONALES");
           const reschedule      = resp.filter( (perm: any) => perm.name === "ACCEDER_REPROGRAMACIONES");
-
+          const report          = resp.filter( (perm: any) => perm.name === "ACCEDER_REPORTES");
+          const scheduler       = resp.filter( (perm: any) => perm.name === "REPORTE_AGENDA");
+          const overdue         = resp.filter( (perm: any) => perm.name === "REPORTE_PAGOS_VENCIDOS");
+          const servicesr       = resp.filter( (perm: any) => perm.name === "REPORTE_HISTORIAL");
+          const pendingPayments = resp.filter( (perm: any) => perm.name === "REPORTE_PAGOS_PENDIENTES");
+          const servicesProfessional = resp.filter( (perm: any) => perm.name === "REPORTE_SERVICIOS_PROFESIONALES");
+          const historyPayments = resp.filter( (perm: any) => perm.name === "REPORTE_HISTORIAL_PAGOS");
+          const servicer        = resp.filter( (perm: any) => perm.name === "REPORTE_SERVICIO");
+          const log             = resp.filter( (perm: any) => perm.name === "REPORTE_REGISTRO_ACTIVIDADES");
 
 
           if(users.length > 0 && children.id === 'users') {
@@ -411,6 +419,64 @@ export class NavigationItem {
             children.hidden = false;
           } else if (reschedule.length === 0 && children.id === 'reschedule') {
             children.hidden = true;
+          }
+
+          if(report.length > 0 && children.id === 'report') {
+            children.hidden = false;
+          } else if (report.length === 0 && children.id === 'report') {
+            children.hidden = true;
+          }
+
+          if(children.id === 'report') {
+            children.children.map( child => {
+              if(scheduler.length > 0 && child.id === 'scheduler') {
+                child.hidden = false;
+              } else if (scheduler.length === 0 && child.id === 'scheduler') {
+                child.hidden = true;
+              }
+
+              if(overdue.length > 0 && child.id === 'overdue') {
+                child.hidden = false;
+              } else if (overdue.length === 0 && child.id === 'overdue') {
+                child.hidden = true;
+              }
+
+              if(servicesr.length > 0 && child.id === 'servicesr') {
+                child.hidden = false;
+              } else if (servicesr.length === 0 && child.id === 'servicesr') {
+                child.hidden = true;
+              }
+
+              if(pendingPayments.length > 0 && child.id === 'pendingPayments') {
+                child.hidden = false;
+              } else if (pendingPayments.length === 0 && child.id === 'pendingPayments') {
+                child.hidden = true;
+              }
+
+              if(servicesProfessional.length > 0 && child.id === 'servicesProfessional') {
+                child.hidden = false;
+              } else if (servicesProfessional.length === 0 && child.id === 'servicesProfessional') {
+                child.hidden = true;
+              }
+
+              if(historyPayments.length > 0 && child.id === 'historyPayments') {
+                child.hidden = false;
+              } else if (historyPayments.length === 0 && child.id === 'historyPayments') {
+                child.hidden = true;
+              }
+
+              if(servicer.length > 0 && child.id === 'servicer') {
+                child.hidden = false;
+              } else if (servicer.length === 0 && child.id === 'servicer') {
+                child.hidden = true;
+              }
+
+              if(log.length > 0 && child.id === 'log') {
+                child.hidden = false;
+              } else if (log.length === 0 && child.id === 'log') {
+                child.hidden = true;
+              }
+            });
           }
         });
       });
