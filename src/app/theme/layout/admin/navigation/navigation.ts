@@ -76,7 +76,7 @@ const NavigationItems = [
         url: '/scheduling/history',
         icon: 'assets/img/menu/payment-history.png',
         classes: 'nav-item',
-        hidden: false
+        hidden: true
       },
       {
         id: 'availability',
@@ -323,6 +323,7 @@ export class NavigationItem {
           const historyPayments = resp.filter( (perm: any) => perm.name === "REPORTE_HISTORIAL_PAGOS");
           const servicer        = resp.filter( (perm: any) => perm.name === "REPORTE_SERVICIO");
           const log             = resp.filter( (perm: any) => perm.name === "REPORTE_REGISTRO_ACTIVIDADES");
+          const paymentHistory  = resp.filter( (perm: any) => perm.name === "ACCEDER_HISTORIAL_CLIENTE");
 
 
           if(users.length > 0 && children.id === 'users') {
@@ -424,6 +425,12 @@ export class NavigationItem {
           if(report.length > 0 && children.id === 'report') {
             children.hidden = false;
           } else if (report.length === 0 && children.id === 'report') {
+            children.hidden = true;
+          }
+
+          if(paymentHistory.length > 0 && children.id === 'paymentHistory') {
+            children.hidden = false;
+          } else if (paymentHistory.length === 0 && children.id === 'paymentHistory') {
             children.hidden = true;
           }
 

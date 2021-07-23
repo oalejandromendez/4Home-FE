@@ -273,6 +273,8 @@ export class RolesComponent implements OnInit, OnDestroy {
         return 'Acceder a reporte de servicio';
       case 'REPORTE_REGISTRO_ACTIVIDADES':
         return 'Acceder a reporte de registro de actividades';
+      case 'ACCEDER_HISTORIAL_CLIENTE':
+        return 'Acceder historial de pagos (Cliente)';
     }
   }
 

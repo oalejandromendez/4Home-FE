@@ -50,10 +50,10 @@ export class PaymentComponent implements OnInit {
   loadInformationPayment() {
     var amount = '0';
     if(this.reservationPayment.type === 1) {
-      const amount = String(this.reservationPayment.service.price * this.reservationPayment.service.quantity);
+      amount = String(this.reservationPayment.service.price * this.reservationPayment.service.quantity);
     } else {
       if(this.reservationPayment.type === 2) {
-        const amount = String( (this.reservationPayment.service.price * this.reservationPayment.service.quantity)*4 );
+        amount = String( (this.reservationPayment.service.price * this.reservationPayment.service.quantity)*4 );
       }
     }
     const reference = new Date().getTime().toString().slice(-5) + this.reservationPayment.reference;

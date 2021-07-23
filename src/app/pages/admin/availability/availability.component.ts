@@ -23,7 +23,6 @@ export class AvailabilityComponent implements OnInit {
   professional = null;
 
   schedule = false;
-  history = false;
 
   calendarOptions: CalendarOptions = {};
 
@@ -148,10 +147,6 @@ export class AvailabilityComponent implements OnInit {
         });
       });
     }
-  }
-
-  selectSchedule() {
-    this.schedule = true;
   }
 
 }

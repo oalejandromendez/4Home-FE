@@ -120,6 +120,7 @@
                     <th>id</th>
                     <th>Referencia</th>
                     <th>Tipo</th>
+                    <th>Estado</th>
                     <th>Profesional</th>
                     <th>Cliente</th>
                     <th>Dirección</th>
@@ -133,6 +134,14 @@
                       <span *ngIf="reserve.type === 1" class="badge badge-primary f-12">Esporadico</span>
                       <span *ngIf="reserve.type === 2" class="badge badge-warning f-12">Mensualidad</span>
                     </td>
+                    <td>
+                      <span *ngIf="reserve.status === 1" class="badge badge-warning">RESERVADO</span>
+                      <span *ngIf="reserve.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+                      <span *ngIf="reserve.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
+                      <span *ngIf="reserve.status === 4" class="badge badge-success">PAGO APROBADO</span>
+                      <span *ngIf="reserve.status === 9" class="badge badge-primary">REPROGRAMADA</span>
+                      <span *ngIf="reserve.status === 10" class="badge badge-primary">TERMINADO</span>
+                  </td>
                     <td>{{ reserve.professional.name }} {{ reserve.professional.lastname }}</td>
                     <td>{{ reserve.user.name }} {{ reserve.user.lastname }}</td>
                     <td>{{ reserve.customer_address.address }}</td>

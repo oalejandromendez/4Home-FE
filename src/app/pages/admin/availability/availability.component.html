@@ -139,22 +139,6 @@
           </div>
         </div>
 
-
-        <div class="row col-md-12">
-
-          <div class="col-md-6">
-
-            <button type="buttom" class="btn btn-warning btn-sm m-0" (click)="selectSchedule()" >Agenda</button>
-
-          </div>
-          <div class="col-md-6">
-
-            <button type="buttom" class="btn btn-success btn-sm m-0" >Historial</button>
-
-          </div>
-
-        </div>
-
       </div>
 
     </div>
@@ -163,7 +147,7 @@
 
   <div class="col-md-6" *ngIf="professional">
 
-    <div class="card br-10 mb-0" *ngIf="schedule">
+    <div class="card br-10 mb-0">
       <div class="card-body calendar">
         <full-calendar #calendar deepChangeDetection="true" [options]="calendarOptions"></full-calendar>
       </div>

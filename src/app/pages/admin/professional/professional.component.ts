@@ -366,6 +366,16 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           };
           this.toastyService.error(toastOptions);
         } else {
+          if(err.status === 505) {
+            const toastOptions: ToastOptions = {
+              title: 'Error',
+              msg: 'No se puede modificar el estado del usuario porque tiene reservas abiertas',
+              showClose: false,
+              timeout: 2000,
+              theme: 'bootstrap',
+            };
+            this.toastyService.error(toastOptions);
+          }
           if (err.status === 401) {
             this.router.navigateByUrl('/auth/login');
           }
