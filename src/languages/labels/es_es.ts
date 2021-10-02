@@ -1,0 +1,16 @@
+export const labels = {
+  client_type: 'Tipo de Cliente',
+  document_type: 'Tipo de Documento',
+  identification: 'Identificación',
+  names: 'Nombres',
+  lastnames: 'Apellidos',
+  email: 'Email',
+  password: 'Contraseña',
+  password_confirm: 'Confirmar Contraseña',
+  phone: 'Teléfono',
+  cellphone: 'Celular',
+  contact_name: 'Nombre de contacto',
+  billing_address: 'Dirección de facturación',
+  addresses: 'Direcciones',
+  address: 'Dirección',
+};

@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ToastOptions, ToastyService } from 'ng2-toasty';
-import { map } from 'rxjs/operators';
-import { UserModel } from 'src/app/models/admin/user.model';
-import { AuthModel } from 'src/app/models/auth/auth.model';
-import { AuthService } from 'src/app/services/auth/auth.service';
-import { DocumentTypeService } from 'src/app/services/common/documenttype/documenttype.service';
-import { LoaderService } from 'src/app/services/common/loader/loader.service';
-import { SignupService } from 'src/app/services/scheduling/signup/signup.service';
+import {Component, OnInit} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {ToastOptions, ToastyService} from 'ng2-toasty';
+import {map} from 'rxjs/operators';
+import {UserModel} from 'src/app/models/admin/user.model';
+import {AuthModel} from 'src/app/models/auth/auth.model';
+import {AuthService} from 'src/app/services/auth/auth.service';
+import {DocumentTypeService} from 'src/app/services/common/documenttype/documenttype.service';
+import {LoaderService} from 'src/app/services/common/loader/loader.service';
+import {SignupService} from 'src/app/services/scheduling/signup/signup.service';
 import Swal from 'sweetalert2';
+import {labels} from '@lang/labels/es_es';
+import {texts} from '@lang/texts/es_es';
+import {messages} from '@lang/messages/es_es';
 
 @Component({
   selector: 'app-sign-up',
@@ -18,16 +21,20 @@ import Swal from 'sweetalert2';
 })
 export class SignUpComponent implements OnInit {
 
+  labels = labels;
+  texts = texts;
+  messages = messages;
+
   customer: UserModel = new UserModel();
 
   submitted = false;
   form: FormGroup;
 
-  documentTypes: Array<any> = new Array();
-  customerTypes: Array<any> = new Array();
+  documentTypes: Array<any> = [];
+  customerTypes: Array<any> = [];
 
   // ----------Pattern-----------
-  emailPattern: any = /^[A-Za-z0-9._%+-]{3,}@[a-zA-Z]{3,}([.]{1}[a-zA-Z]{2,}|[.]{1}[a-zA-Z]{2,}[.]{1}[a-zA-Z]{2,})/;
+  emailPattern: any = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/;
   passwordPattern: any = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
   showpassword = false;
   showconfirmation = false;
@@ -64,20 +71,20 @@ export class SignUpComponent implements OnInit {
   loadForm() {
     this.form = new FormGroup({
       type_document: new FormControl(null, [Validators.required]),
-      identification: new FormControl('', [Validators.required, Validators.maxLength(20), Validators.pattern('^[0-9]*$')],this.validateIdentification.bind(this)),
-      name: new FormControl('', [Validators.required, Validators.maxLength(50)],),
+      identification: new FormControl('', [Validators.required, Validators.maxLength(20), Validators.pattern('^[0-9]*$')], this.validateIdentification.bind(this)),
+      name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       lastname: new FormControl('', [Validators.required, Validators.max(50)]),
       email: new FormControl('', [Validators.required, Validators.max(50), Validators.pattern(this.emailPattern)], this.validateEmail.bind(this)),
       phone: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       mobile: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
-      password: new FormControl('',[Validators.required, Validators.minLength(8), Validators.maxLength(12), Validators.pattern(this.passwordPattern)]),
+      password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(12), Validators.pattern(this.passwordPattern)]),
       password_confirmation: new FormControl('', [Validators.required]),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
       contact_name: new FormControl('', [Validators.required, Validators.maxLength(250)]),
       billing_address: new FormControl('', [Validators.required, Validators.maxLength(250)]),
       customer_type: new FormControl(null, [Validators.required]),
-      addresses: this.formBuilder.array([], {validators: this.minAddresses })
-    }, { validators: this.matchingPasswords('password', 'password_confirmation') });
+      addresses: this.formBuilder.array([], {validators: this.minAddresses})
+    }, {validators: this.matchingPasswords('password', 'password_confirmation')});
   }
 
   matchingPasswords(password: string, passwordconfirmation: string) {
@@ -93,26 +100,26 @@ export class SignUpComponent implements OnInit {
   }
 
   minAddresses: ValidatorFn = (form: FormArray) => {
-    return form.controls.length >= 1 ? null : { required: true};
+    return form.controls.length >= 1 ? null : {required: true};
   }
 
   validateIdentification(control: AbstractControl) {
-    return this.singupService.validateIdentification(control.value).pipe(map( (resp: any) => {
-      return Object.keys(resp).length > 0 ? { identification: true } : null ;
+    return this.singupService.validateIdentification(control.value).pipe(map((resp: any) => {
+      return Object.keys(resp).length > 0 ? {identification: true} : null;
     }));
   }
 
   validateEmail(control: AbstractControl) {
-    return this.singupService.validateEmail(control.value).pipe(map( (resp: any) => {
-      return Object.keys(resp).length > 0 ? { email: true } : null ;
+    return this.singupService.validateEmail(control.value).pipe(map((resp: any) => {
+      return Object.keys(resp).length > 0 ? {email: true} : null;
     }));
   }
 
   getDocumentsType() {
     this.loaderService.loading(true);
-    this.documentTypeService.getWithoutAuthentication().subscribe( (resp: any) => {
-      resp.map( (type: any) => {
-        this.documentTypes.push({ value: String(type.id), label: type.name } );
+    this.documentTypeService.getWithoutAuthentication().subscribe((resp: any) => {
+      resp.map((type: any) => {
+        this.documentTypes.push({value: String(type.id), label: type.name});
         this.documentTypes = this.documentTypes.slice();
       });
       this.loaderService.loading(false);
@@ -120,16 +127,16 @@ export class SignUpComponent implements OnInit {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
 
   getCustomerTypes() {
     this.loaderService.loading(true);
-    this.singupService.customerType().subscribe( (resp: any) => {
-      resp.data.map( (type: any) => {
-        this.customerTypes.push({ value: String(type.id), label: type.name } );
+    this.singupService.customerType().subscribe((resp: any) => {
+      resp.data.map((type: any) => {
+        this.customerTypes.push({value: String(type.id), label: type.name});
         this.customerTypes = this.customerTypes.slice();
       });
       this.loaderService.loading(false);
@@ -137,7 +144,7 @@ export class SignUpComponent implements OnInit {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
@@ -148,7 +155,7 @@ export class SignUpComponent implements OnInit {
   }
 
   saveAddress() {
-    if(!this.address) return false;
+    if (!this.address) return false;
     this.addressesArray.push(
       this.formBuilder.group({
         index: new FormControl(this.addressesArray.controls.length),
@@ -159,7 +166,7 @@ export class SignUpComponent implements OnInit {
   }
 
   getAddress(address: any) {
-    if(address) {
+    if (address) {
       this.address = null;
       this.addAddress = false;
       this.oldAddress = address;
@@ -169,15 +176,15 @@ export class SignUpComponent implements OnInit {
   }
 
   updateAddress() {
-    if(this.oldAddress) {
+    if (this.oldAddress) {
       this.oldAddress.controls.address.setValue(this.address);
       this.cancelAddress();
     }
   }
 
   removeAddress() {
-    if(this.oldAddress) {
-      this.addressesArray.removeAt( this.addressesArray.value.findIndex( address => address.index === this.oldAddress.value.index ));
+    if (this.oldAddress) {
+      this.addressesArray.removeAt(this.addressesArray.value.findIndex(address => address.index === this.oldAddress.value.index));
       this.cancelAddress();
     }
   }
@@ -195,12 +202,19 @@ export class SignUpComponent implements OnInit {
 
     this.submitted = true;
 
-    if (!this.form.valid) { return; }
+    if (!this.form.valid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: messages.not_valid_form
+      });
+      return;
+    }
 
     Swal.fire({
       allowOutsideClick: false,
       icon: 'info',
-      text:  'Espere...'
+      text: 'Espere...'
     });
 
     Swal.showLoading();
@@ -208,20 +222,20 @@ export class SignUpComponent implements OnInit {
     this.customer = this.form.value;
     this.customer.roles = ['2'];
 
-    const listAddresses = new Array();
+    const listAddresses = [];
 
-    this.addressesArray.value.map( (address: any) => {
+    this.addressesArray.value.map((address: any) => {
       listAddresses.push(address.address);
     });
 
     this.customer.addresses = listAddresses;
 
-    this.singupService.post( this.customer ).subscribe( (data: any) => {
+    this.singupService.post(this.customer).subscribe((data: any) => {
 
       that.authUser.email = that.customer.email;
       that.authUser.password = that.customer.password;
 
-      that.authService.login( that.authUser ).subscribe( resp => {
+      that.authService.login(that.authUser).subscribe(resp => {
         Swal.close();
         that.router.navigate(['/dashboard']);
       }, (err) => {
@@ -229,7 +243,7 @@ export class SignUpComponent implements OnInit {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text:  'Ha ocurrido un error'
+          text: 'Ha ocurrido un error'
         });
       });
 
@@ -237,7 +251,7 @@ export class SignUpComponent implements OnInit {
       Swal.close();
       if (err.error.errors) {
         let mensage = '';
-        Object.keys(err.error.errors).forEach( (data, index) => {
+        Object.keys(err.error.errors).forEach((data, index) => {
           mensage += err.error.errors[data][0] + '<br>';
         });
         const toastOptions: ToastOptions = {

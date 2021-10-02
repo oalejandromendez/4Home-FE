@@ -46,11 +46,11 @@ export class ServiceComponent implements OnInit, OnDestroy {
   types: Array<any> = [
     {
       value: 1,
-      label: "Esporádico"
+      label: 'Esporádico'
     },
     {
       value: 2,
-      label: "Mensualidad"
+      label: 'Mensualidad'
     }
   ];
 
@@ -302,7 +302,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
   }
 
   edit(id: any) {
-    if(id) {
+    if (id) {
       this.id = id;
       const data = this.services.find( (service: any) => service.id === id);
       this.service = data;
@@ -323,7 +323,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
     this.service = new ServiceModel();
     this.form.reset({status: true});
     this.form.controls.status.disable();
-    if(!this.canCreate) {
+    if (!this.canCreate) {
       this.form.disable();
     }
   }
@@ -372,22 +372,22 @@ export class ServiceComponent implements OnInit, OnDestroy {
     const that = this;
     this.userService.permissions().subscribe( resp => {
       const create = resp.filter( (permission: any) => permission.name === 'CREAR_SERVICIOS');
-      if(create.length >= 1) {
+      if (create.length >= 1) {
         that.canCreate = true;
       }
       const see = resp.filter( (permission: any) => permission.name === 'VER_SERVICIOS');
-      if(see.length >= 1) {
+      if (see.length >= 1) {
         that.canSee = true;
       }
       const edit = resp.filter( (permission: any) => permission.name === 'MODIFICAR_SERVICIOS');
-      if(edit.length >= 1) {
+      if (edit.length >= 1) {
         that.canEdit = true;
       }
       const deleteP = resp.filter( (permission: any) => permission.name === 'ELIMINAR_SERVICIOS');
-      if(deleteP.length >= 1) {
+      if (deleteP.length >= 1) {
         that.canDelete = true;
       }
-      if(!that.canCreate) {
+      if (!that.canCreate) {
         this.form.disable();
       }
       this.loadData();
