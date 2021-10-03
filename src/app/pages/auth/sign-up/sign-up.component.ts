@@ -136,8 +136,10 @@ export class SignUpComponent implements OnInit {
     this.loaderService.loading(true);
     this.singupService.customerType().subscribe((resp: any) => {
       resp.data.map((type: any) => {
-        this.customerTypes.push({value: String(type.id), label: type.name});
-        this.customerTypes = this.customerTypes.slice();
+        if (type.status === 1) {
+          this.customerTypes.push({value: String(type.id), label: type.name});
+          this.customerTypes = this.customerTypes.slice();
+        }
       });
       this.loaderService.loading(false);
     }, error => {

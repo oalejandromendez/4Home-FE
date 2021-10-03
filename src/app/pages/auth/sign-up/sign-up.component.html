@@ -282,13 +282,19 @@
 
 
             <div class="col-md-3" style="border-left: 3px solid #d0d0d0;">
-              <div class="row mb-2 place-items-center">
-                <div class="col-md-5 pr-0">
-                  <h5 class="f-14 m-0">{{labels.addresses}}</h5>
-                  <i class="feather icon-info ml-1" placement="right" ngbTooltip="{{texts.addresses_info}}"
-                     triggers="click:blur" tooltipClass="my-custom-tooltip"></i>
+              <div class="form-group row">
+                <div class="col-md-7 pr-0">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label class="col-form-label">{{labels.addresses}}</label>
+                    </div>
+                    <div class="col-md-1 offset-md-1 alignment-info-form"><i
+                      class="feather icon-info ml-1" placement="top" ngbTooltip="{{texts.addresses_info}}"
+                      triggers="click:blur" tooltipClass="my-custom-tooltip"></i>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-md-7" style="text-align: right;">
+                <div class="col-md-5" style="text-align: right;">
                   <img *ngIf="!addAddress && !editAddress" placement="top" ngbTooltip="{{texts.add_address}}"
                        (click)="newAddress();" alt="Theme-Logo" class="img-fluid" src="assets/img/add_.png"
                        style="width: 30px;">
@@ -306,7 +312,8 @@
                 <div class='row'>
                   <div class="align-self-center pr-0" [class.col-md-6]="addAddress && !editAddress"
                        [class.col-md-4]="!addAddress && editAddress">
-                    <button type="button" class="btn btn-success p-2" (click)="cancelAddress();">{{texts.cancel}}</button>
+                    <button type="button" class="btn btn-success p-2"
+                            (click)="cancelAddress();">{{texts.cancel}}</button>
                   </div>
                   <div class="align-self-center pr-0" [class.col-md-6]="addAddress && !editAddress"
                        [class.col-md-4]="!addAddress && editAddress">
@@ -318,7 +325,8 @@
                     </button>
                   </div>
                   <div class="align-self-center col-md-4 pr-0" *ngIf="!addAddress && editAddress">
-                    <button type="button" class="btn btn-danger p-2" (click)="removeAddress();">{{texts.delete}}</button>
+                    <button type="button" class="btn btn-danger p-2"
+                            (click)="removeAddress();">{{texts.delete}}</button>
                   </div>
                 </div>
               </div>
