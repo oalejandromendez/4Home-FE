@@ -18,4 +18,9 @@ export const labels = {
   init_time: 'Hora Inicial',
   end_time: 'Hora Final',
   status: 'Estado',
+  price: 'Precio',
+  type: 'Tipo',
+  quantity_service: 'Servicios a la semana',
+  working_day: 'Jornada',
+  description: 'Descripción',
 };

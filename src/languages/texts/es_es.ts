@@ -1,5 +1,6 @@
 export const texts = {
   addresses_info: 'Agregar a continuación las direcciones donde desea que se le presten los servicios.',
+  quantity_service_info: 'Agregar a continuación la cantidad de servicios a la semana, tener en cuenta que en el caso de las mensualidades, también serian cantidad de servicios a la semana.',
 
   client_type_required: 'El tipo de cliente es requerido',
   document_type_required: 'El tipo de documento es requerido',
@@ -35,6 +36,14 @@ export const texts = {
   init_time_required: 'La hora de inicio es requerida',
   end_time_required: 'La hora final es requerida',
   init_end_time_validation: 'La hora final debe ser mayor que la hora inicio',
+  price_required: 'El precio es requerido',
+  price_maxlength: 'El precio supera el maximo de caracteres permitido',
+  type_required: 'El tipo es requerido',
+  quantity_service_required: 'La cantidad es requerida',
+  quantity_service_maxlength: 'La cantidad supera el maximo de caracteres permitido',
+  quantity_service_max: 'Se supera la cantidad máxima permitida',
+  working_day_required: 'La jornada es requerida',
+  description_maxlength: 'La descripción supera el maximo de caracteres permitido',
 
   add_address: 'Agregar Dirección',
 

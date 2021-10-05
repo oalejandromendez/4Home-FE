@@ -1,194 +1,202 @@
 <div class="d-flex">
 
-    <div class="col-md-12">
-        <div class="card user-profile-list mb-0" style="margin-top: -15px;">
-            <div class="card-header">
-                <h4>Lista de Servicios</h4>
-            </div>
+  <div class="col-md-12">
+    <div class="card user-profile-list mb-0" style="margin-top: -15px;">
+      <div class="card-header">
+        <h4>Lista de Servicios</h4>
+      </div>
 
-            <div class="card-body">
-                <div *ngIf="canSee" lass="dt-responsive table-responsive ">
-                    <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger " class="display row-border hover table-striped " style="width:100% ">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>Nombre</th>
-                                <th>Tipo</th>
-                                <th>Precio</th>
-                                <th>Jornada</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody *ngIf="services?.length !=0 ">
-                            <tr *ngFor="let service of services; let index = index ">
-                                <td>{{ service.id }}</td>
-                                <td>{{ service.name }}</td>
-                                <td *ngIf="service.type === 1">Esporádico</td>
-                                <td *ngIf="service.type === 2">Mensualidad</td>
-                                <td>${{ service.price | currency: '' : '' : '1.0-0' }}</td>
-                                <td>{{ service.working_day.name }}</td>
-                                <td>
-                                    <span *ngIf="service.status === 1" class="badge badge-success">ACTIVO</span>
-                                    <span *ngIf="service.status === 0" class="badge badge-danger">INACTIVO</span>
-                                </td>
-                                <td>
-                                    <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(service.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
-                                <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
-                            </button>
+      <div class="card-body">
+        <div *ngIf="canSee" class="dt-responsive table-responsive ">
+          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger "
+                 class="display row-border hover table-striped " style="width:100% ">
+            <thead>
+            <tr>
+              <th>id</th>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Precio</th>
+              <th>Jornada</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody *ngIf="services?.length !=0 ">
+            <tr *ngFor="let service of services; let index = index ">
+              <td>{{ service.id }}</td>
+              <td>{{ service.name }}</td>
+              <td *ngIf="service.type === 1">Esporádico</td>
+              <td *ngIf="service.type === 2">Mensualidad</td>
+              <td>${{ service.price | currency: '' : '' : '1.0-0' }}</td>
+              <td>{{ service.working_day.name }}</td>
+              <td>
+                <span *ngIf="service.status === 1" class="badge badge-success">ACTIVO</span>
+                <span *ngIf="service.status === 0" class="badge badge-danger">INACTIVO</span>
+              </td>
+              <td>
+                <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable"
+                        (click)="edit(service.id)" [placement]="'bottom'" ngbTooltip="Editar"
+                        tooltipClass="tooltip-class" container="body">
+                  <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
+                </button>
 
-                                    <button *ngIf="canDelete" type="button" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(service.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
-                                <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
-                            </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div *ngIf="!canSee" class="text-align-center">
-                    <label class="badge badge-info f-20">NO TIENE PERMISO PARA VER LA LISTA DE SERVICIOS</label>
-                </div>
-            </div>
-
+                <button *ngIf="canDelete" type="button"
+                        class="btn btn-icon btn-delete btn-datatable btn-remove-datatable"
+                        (click)="delete(service.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar"
+                        tooltipClass="tooltip-class" container="body">
+                  <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
+        <div *ngIf="!canSee" class="text-align-center">
+          <label class="badge badge-info f-20">NO TIENE PERMISO PARA VER LA LISTA DE SERVICIOS</label>
+        </div>
+      </div>
+
     </div>
+  </div>
 </div>
 <ng2-toasty [position]="'top-right'"></ng2-toasty>
 
 <form [formGroup]="form">
-    <ng-template #modalForm let-c="close" let-d="dismiss">
-        <div class="modal-header">
-            <h5 *ngIf="!id" class="modal-title">Nuevo Servicio</h5>
-            <h5 *ngIf="id" class="modal-title">Modificar Servicio</h5>
-            <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+  <ng-template #modalForm let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 *ngIf="!id" class="modal-title">Nuevo Servicio</h5>
+      <h5 *ngIf="id" class="modal-title">Modificar Servicio</h5>
+      <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.name}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <input type="text" class="form-control" formControlName="name" maxlength="50">
+              <span class="is-invalid" *ngIf="submitted && form.get('name').hasError('required')">
+                <small class="form-text text-danger">{{texts.name_required}}</small>
+              </span>
+              <span class="is-invalid" *ngIf="submitted && form.get('name').hasError('maxlength')">
+                <small class="form-text text-danger">{{texts.name_maxlength}}</small>
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="modal-body">
 
-            <div class="row">
-
-                <div class="col-md-6">
-                    <div class='form-group'>
-                        <label class="col-form-label">Nombre*</label>
-
-                        <div class="p-0 pl-2 align-self-center ">
-                            <input type="text" class="form-control" formControlName="name" maxlength="50">
-                            <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre es requerido</span>
-                            </div>
-                            <div class="is-invalid" *ngIf="submitted && form.get('name').hasError('maxlength')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El nombre supera el maximo de caracteres permitido</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-form-label">Precio*</label>
-                        <div class="align-self-center ">
-                            <input type="text " class="form-control autonumber" formControlName="price" maxlength="10" currencyMask [options]="optionsTemplate">
-
-                            <div class="is-invalid" *ngIf="submitted && form.get('price').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El precio es requerido</span>
-                            </div>
-
-                            <div class="is-invalid" *ngIf="submitted && form.get('price').hasError('maxlength')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El precio supera el maximo de caracteres permitido</span>
-                            </div>
-
-                            <div class="is-invalid" *ngIf="form.get('price').hasError('pattern') && form.get('price').touched">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Digite unicamente números</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="col-form-label">{{labels.price}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <input type="text" class="form-control autonumber" formControlName="price" maxlength="10" currencyMask
+                     [options]="optionsTemplate">
+              <span class="is-invalid" *ngIf="submitted && form.get('price').hasError('required')">
+                <small class="form-text text-danger">{{texts.price_required}}</small>
+              </span>
+              <span class="is-invalid" *ngIf="submitted && form.get('price').hasError('maxlength')">
+                <small class="form-text text-danger">{{texts.price_maxlength}}</small>
+              </span>
+              <span class="is-invalid" *ngIf="form.get('price').hasError('pattern') && form.get('price').touched">
+                <small class="form-text text-danger">{{texts.only_numbers}}</small>
+              </span>
             </div>
-
-            <div class="row">
-
-                <div class="col-md-6">
-
-                    <div class='form-group'>
-                        <label class="col-form-label">Tipo*</label>
-                        <div class="align-self-center">
-                            <ng-select [items]="types" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="type" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('type').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo es requerida</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <div class='form-group'>
-                        <label class="col-form-label">Cantidad*</label>
-
-                        <div class="p-0 pl-2 align-self-center ">
-                            <input type="text" class="form-control" formControlName="quantity" maxlength="1" max="6">
-                            <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad es requerida</span>
-                            </div>
-                            <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('maxlength')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad supera el maximo de caracteres permitido</span>
-                            </div>
-                            <div class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('max')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La cantidad no es valida</span>
-                            </div>
-                            <div class="is-invalid" *ngIf="form.get('quantity').hasError('pattern') && form.get('quantity').touched">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">Digite unicamente números</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class='form-group'>
-                <label class="col-form-label">Jornada*</label>
-                <div class="align-self-center">
-                    <ng-select [items]="workingdays" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." formControlName="working_day" notFoundText="No se encontraron resultados"></ng-select>
-                    <div class="is-invalid" *ngIf="submitted && form.get('working_day').hasError('required')">
-                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">La jornada es requerida</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-form-label">Descripción</label>
-                <div class="align-self-center ">
-                    <textarea class="form-control" formControlName="description" maxlength="250" rows="2"></textarea>
-                    <div class="is-invalid" *ngIf="submitted && form.get('description').hasError('maxlength')">
-                        <span class="badge badge-danger f-size-12 mt-1 m-r-5">La descripción supera el maximo de caracteres permitido</span>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="form-group">
-                <label class="col-form-label pb-0">Estado</label><br>
-                <div class="d-flex align-items-center">
-                    <div class="switch switch-success d-inline m-r-10">
-                        <input type="checkbox" id="status" formControlName="status">
-                        <label for="status" class="cr cr-hw"></label>
-                    </div>
-                    <div>
-                        <span class="badge m-r-5 badge-success ml-2 mt-2" *ngIf="form.get('status').value">Activo</span>
-                        <span class="badge m-r-5 badge-danger ml-2 mt-2" *ngIf="!form.get('status').value">Inactivo</span>
-                    </div>
-                </div>
-            </div>
-
+          </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')" (click)="cancel();">Cancelar</button>
-            <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" [disabled]="!form.valid" (click)="onSubmit()">Guardar</button>
-            <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2" [disabled]="!form.valid" (click)="onSubmit()">Editar</button>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.type}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="types" bindLabel="label" bindValue="value" [clearable]="true"
+                         placeholder="Seleccione..." formControlName="type"
+                         notFoundText="No se encontraron resultados"></ng-select>
+              <span class="is-invalid" *ngIf="submitted && form.get('type').hasError('required')">
+                <small class="form-text text-danger">{{texts.type_required}}</small>
+              </span>
+            </div>
+          </div>
         </div>
-    </ng-template>
+
+        <div class="col-md-6">
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.quantity_service}} <span class="text-danger">*</span><i
+              class="feather icon-info ml-1" placement="top" ngbTooltip="{{texts.quantity_service_info}}"
+              triggers="click:blur" tooltipClass="my-custom-tooltip"></i></label>
+            <div class="align-self-center ">
+              <input type="text" class="form-control" formControlName="quantity" maxlength="1" max="6">
+              <span class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('required')">
+                <small class="form-text text-danger">{{texts.quantity_service_required}}</small>
+              </span>
+              <span class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('maxlength')">
+                <small class="form-text text-danger">{{texts.quantity_service_maxlength}}</small>
+              </span>
+              <span class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('max')">
+                <small class="form-text text-danger">{{texts.quantity_service_max}}</small>
+              </span>
+              <span class="is-invalid" *ngIf="form.get('quantity').hasError('pattern') && form.get('quantity').touched">
+                <small class="form-text text-danger">{{texts.only_numbers}}</small>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class='form-group'>
+        <label class="col-form-label">{{labels.working_day}} <span class="text-danger">*</span></label>
+        <div class="align-self-center">
+          <ng-select [items]="workingdays" bindLabel="label" bindValue="value" [clearable]="true"
+                     placeholder="Seleccione..." formControlName="working_day"
+                     notFoundText="No se encontraron resultados"></ng-select>
+          <span class="is-invalid" *ngIf="submitted && form.get('working_day').hasError('required')">
+            <small class="form-text text-danger">{{texts.working_day_required}}</small>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-form-label">{{labels.description}}</label>
+        <div class="align-self-center ">
+          <textarea class="form-control" formControlName="description" maxlength="250" rows="2"></textarea>
+          <span class="is-invalid" *ngIf="submitted && form.get('description').hasError('maxlength')">
+            <small class="form-text text-danger">{{texts.description_maxlength}}</small>
+          </span>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label class="col-form-label pb-0">{{labels.status}}</label><br>
+        <div class="d-flex align-items-center">
+          <div class="switch switch-success d-inline m-r-10">
+            <input type="checkbox" id="status" formControlName="status">
+            <label for="status" class="cr cr-hw"></label>
+          </div>
+          <div>
+            <span class="badge m-r-5 badge-success ml-2 mt-2" *ngIf="form.get('status').value">Activo</span>
+            <span class="badge m-r-5 badge-danger ml-2 mt-2" *ngIf="!form.get('status').value">Inactivo</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')">
+        Cancelar
+      </button>
+      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2"
+              (click)="onSubmit()">Guardar
+      </button>
+      <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2"
+              (click)="onSubmit()">Editar
+      </button>
+    </div>
+  </ng-template>
 </form>
 <button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
 <button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>

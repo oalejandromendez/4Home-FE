@@ -1,17 +1,20 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DataTableDirective } from 'angular-datatables';
-import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
-import { Subject, Subscription } from 'rxjs';
-import { ServiceModel } from 'src/app/models/admin/service.model';
-import { DataTableLanguage } from 'src/app/models/common/datatable';
-import { ServiceService } from 'src/app/services/admin/service/service.service';
-import { UserService } from 'src/app/services/admin/user/user.service';
-import { WorkingdayService } from 'src/app/services/admin/workingday/workingday.service';
-import { LoaderService } from 'src/app/services/common/loader/loader.service';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DataTableDirective} from 'angular-datatables';
+import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
+import {Subject, Subscription} from 'rxjs';
+import {ServiceModel} from 'src/app/models/admin/service.model';
+import {DataTableLanguage} from 'src/app/models/common/datatable';
+import {ServiceService} from 'src/app/services/admin/service/service.service';
+import {UserService} from 'src/app/services/admin/user/user.service';
+import {WorkingdayService} from 'src/app/services/admin/workingday/workingday.service';
+import {LoaderService} from 'src/app/services/common/loader/loader.service';
 import Swal from 'sweetalert2';
+import {labels} from '@lang/labels/es_es';
+import {texts} from '@lang/texts/es_es';
+import {messages} from '@lang/messages/es_es';
 
 @Component({
   selector: 'app-service',
@@ -21,13 +24,16 @@ import Swal from 'sweetalert2';
 })
 export class ServiceComponent implements OnInit, OnDestroy {
 
+  labels = labels;
+  texts = texts;
+  messages = messages;
+
   @ViewChild('openModal') openModal: ElementRef;
   @ViewChild('closeModal') closeModal: ElementRef;
 
   @ViewChild(DataTableDirective, {static: false})
   dtElement: DataTableDirective;
   dtTrigger: Subject<any> = new Subject();
-  private subscription: Subscription;
 
   dtOptions: any = {};
   services: any[];
@@ -71,7 +77,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
     this.toastyConfig.theme = 'material';
 
     this.optionsTemplate = {
-      decimal: '' ,
+      decimal: '',
       precision: 0,
       prefix: '$',
       thousands: '.',
@@ -89,9 +95,9 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
   getWorkingDay() {
     this.loaderService.loading(false);
-    this.workingdayService.get().subscribe( (resp: any) => {
-      resp.data.map( (workingday: any) => {
-        this.workingdays.push({ value: String(workingday.id), label: workingday.name } );
+    this.workingdayService.get().subscribe((resp: any) => {
+      resp.data.map((workingday: any) => {
+        this.workingdays.push({value: String(workingday.id), label: workingday.name});
         this.workingdays = this.workingdays.slice();
       });
       this.loaderService.loading(true);
@@ -99,7 +105,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
@@ -110,7 +116,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
       price: new FormControl('', [Validators.required, Validators.maxLength(10), Validators.pattern('^[0-9]*$')]),
       working_day: new FormControl('', [Validators.required]),
       type: new FormControl(null, [Validators.required]),
-      quantity: new FormControl('', [Validators.required, Validators.max(6), Validators.pattern('^[0-9]*$') ]),
+      quantity: new FormControl('', [Validators.required, Validators.max(6), Validators.pattern('^[0-9]*$')]),
       description: new FormControl('', [Validators.maxLength(250)]),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
     });
@@ -132,7 +138,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
@@ -159,13 +165,13 @@ export class ServiceComponent implements OnInit, OnDestroy {
           }
         },
         {
-            className: 'btn-sm boton-excel wid-5',
-            text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/excel.png">',
-            titleAttr: 'Exportar como Excel',
-            extend: 'excel',
-            extension: '.xls',
-            exportOptions: {
-              columns: ':not(.notexport)'
+          className: 'btn-sm boton-excel wid-5',
+          text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/excel.png">',
+          titleAttr: 'Exportar como Excel',
+          extend: 'excel',
+          extension: '.xls',
+          exportOptions: {
+            columns: ':not(.notexport)'
           }
         },
         {
@@ -179,20 +185,20 @@ export class ServiceComponent implements OnInit, OnDestroy {
           }
         },
         {
-            className: 'btn-sm boton-imprimir wid-5',
-            text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/print.png">',
-            titleAttr: 'Imprimir',
-            extend: 'print',
-            extension: '.print',
-            exportOptions: {
-              columns: ':not(.notexport)'
+          className: 'btn-sm boton-imprimir wid-5',
+          text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/print.png">',
+          titleAttr: 'Imprimir',
+          extend: 'print',
+          extension: '.print',
+          exportOptions: {
+            columns: ':not(.notexport)'
           }
         },
       ],
       columnDefs: [
-        { targets: 0, searchable: false, visible: false, className: 'notexport' },
-        { targets: 4,  className: 'text-center' },
-        { targets: 5,  className: 'wid-15 text-center' }
+        {targets: 0, searchable: false, visible: false, className: 'notexport'},
+        {targets: 4, className: 'text-center'},
+        {targets: 5, className: 'wid-15 text-center'}
       ],
       order: [],
       language: that.language.getLanguage('es'),
@@ -204,12 +210,19 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
     this.submitted = true;
 
-    if (!this.form.valid) { return; }
+    if (!this.form.valid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: messages.not_valid_form
+      });
+      return;
+    }
 
     Swal.fire({
       allowOutsideClick: false,
       icon: 'info',
-      text:  'Espere...'
+      text: 'Espere...'
     });
 
     Swal.showLoading();
@@ -218,7 +231,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
     if (this.id) {
 
-      this.serviceService.put( this.service, this.id).subscribe( (data: any)  => {
+      this.serviceService.put(this.service, this.id).subscribe((data: any) => {
 
         const toastOptions: ToastOptions = {
           title: '¡Proceso Exitoso!',
@@ -240,7 +253,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
         if (err.error.errors) {
           let mensage = '';
 
-          Object.keys(err.error.errors).forEach( (data, index) => {
+          Object.keys(err.error.errors).forEach((data, index) => {
             mensage += err.error.errors[data][0] + '<br>';
           });
 
@@ -261,7 +274,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
     } else {
 
-      this.serviceService.post( this.service ).subscribe( (data: any) => {
+      this.serviceService.post(this.service).subscribe((data: any) => {
         Swal.close();
         const toastOptions: ToastOptions = {
           title: '¡Proceso Exitoso!',
@@ -281,7 +294,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
         if (err.error.errors) {
           let mensage = '';
 
-          Object.keys(err.error.errors).forEach( (data, index) => {
+          Object.keys(err.error.errors).forEach((data, index) => {
             mensage += err.error.errors[data][0] + '<br>';
           });
           const toastOptions: ToastOptions = {
@@ -304,7 +317,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
   edit(id: any) {
     if (id) {
       this.id = id;
-      const data = this.services.find( (service: any) => service.id === id);
+      const data = this.services.find((service: any) => service.id === id);
       this.service = data;
       if (data) {
         this.form.patchValue(data);
@@ -332,7 +345,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
     if (id) {
       Swal.fire({
         title: 'Esta seguro?',
-        text:  'Usted no podra recuperar los datos eliminados',
+        text: 'Usted no podra recuperar los datos eliminados',
         icon: 'question',
         showConfirmButton: true,
         showCancelButton: false,
@@ -341,13 +354,13 @@ export class ServiceComponent implements OnInit, OnDestroy {
         showLoaderOnConfirm: true,
         preConfirm: () => {
           return new Promise<void>((resolve) => {
-            this.serviceService.delete(id).subscribe( data => {
+            this.serviceService.delete(id).subscribe(data => {
               this.services.splice(index, 1);
               this.dtOptions = {};
               this.loadTable();
               this.rerender();
               this.cancel();
-              Swal.fire('Proceso Exitoso!', 'Se ha eliminado el servicio exitosamente', 'success' );
+              Swal.fire('Proceso Exitoso!', 'Se ha eliminado el servicio exitosamente', 'success');
             }, (err: any) => {
               Swal.fire('Error', err.error.message, 'error');
             });
@@ -370,20 +383,20 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
   getPermissions() {
     const that = this;
-    this.userService.permissions().subscribe( resp => {
-      const create = resp.filter( (permission: any) => permission.name === 'CREAR_SERVICIOS');
+    this.userService.permissions().subscribe(resp => {
+      const create = resp.filter((permission: any) => permission.name === 'CREAR_SERVICIOS');
       if (create.length >= 1) {
         that.canCreate = true;
       }
-      const see = resp.filter( (permission: any) => permission.name === 'VER_SERVICIOS');
+      const see = resp.filter((permission: any) => permission.name === 'VER_SERVICIOS');
       if (see.length >= 1) {
         that.canSee = true;
       }
-      const edit = resp.filter( (permission: any) => permission.name === 'MODIFICAR_SERVICIOS');
+      const edit = resp.filter((permission: any) => permission.name === 'MODIFICAR_SERVICIOS');
       if (edit.length >= 1) {
         that.canEdit = true;
       }
-      const deleteP = resp.filter( (permission: any) => permission.name === 'ELIMINAR_SERVICIOS');
+      const deleteP = resp.filter((permission: any) => permission.name === 'ELIMINAR_SERVICIOS');
       if (deleteP.length >= 1) {
         that.canDelete = true;
       }
