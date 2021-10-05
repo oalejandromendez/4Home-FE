@@ -2,6 +2,7 @@ export const labels = {
   client_type: 'Tipo de Cliente',
   document_type: 'Tipo de Documento',
   identification: 'Identificación',
+  name: 'Nombre',
   names: 'Nombres',
   lastnames: 'Apellidos',
   email: 'Email',
@@ -13,4 +14,8 @@ export const labels = {
   billing_address: 'Dirección de facturación',
   addresses: 'Direcciones',
   address: 'Dirección',
+  service_type: 'Tipo de Servicio',
+  init_time: 'Hora Inicial',
+  end_time: 'Hora Final',
+  status: 'Estado',
 };

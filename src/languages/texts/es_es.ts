@@ -7,7 +7,9 @@ export const texts = {
   identification_maxlength: 'La identificación supera el maximo de caracteres permitido',
   identification_available: 'La identificación esta disponible!',
   identification_unavailable: 'Identificación ya registrada',
+  name_required: 'El nombre es requerido',
   names_required: 'Los nombres son requeridos',
+  name_maxlength: 'El nombre supera el maximo de caracteres permitido',
   names_maxlength: 'Los nombres superan el máximo de caracteres permitido',
   lastnames_required: 'Los apellidos son requeridos',
   lastnames_maxlength: 'Los apellidos superan el máximo de caracteres permitido',
@@ -29,6 +31,10 @@ export const texts = {
   billing_address_required: 'La dirección de facturación es requerido',
   billing_address_maxlength: 'La dirección de facturación supera el maximo de caracteres permitido',
   at_least_one_address: 'Mínimo una dirección es requerida',
+  service_type_required: 'El tipo de servicio es requerido',
+  init_time_required: 'La hora de inicio es requerida',
+  end_time_required: 'La hora final es requerida',
+  init_end_time_validation: 'La hora final debe ser mayor que la hora inicio',
 
   add_address: 'Agregar Dirección',
 
