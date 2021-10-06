@@ -23,4 +23,9 @@ export const labels = {
   quantity_service: 'Servicios a la semana',
   working_day: 'Jornada',
   description: 'Descripción',
+  photo: 'Seleccione una foto',
+  job_position: 'Cargo',
+  phone_contact: 'Teléfono de Contacto',
+  salary: 'Salario',
+  age: 'Edad',
 };

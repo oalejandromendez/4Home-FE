@@ -44,6 +44,14 @@ export const texts = {
   quantity_service_max: 'Se supera la cantidad máxima permitida',
   working_day_required: 'La jornada es requerida',
   description_maxlength: 'La descripción supera el maximo de caracteres permitido',
+  photo_required: 'La foto es requerida',
+  job_position_required: 'El cargo es requerido',
+  phone_contact_required: 'El teléfono de contacto es requerido',
+  salary_required: 'El salario es requerido',
+  salary_maxlength: 'El salario supera el maximo de caracteres permitido',
+  address_required: 'La dirección es requerida',
+  address_maxlength: 'La dirección supera el máximo de caracteres permitido',
+  age_required: 'La edad es requerida',
 
   add_address: 'Agregar Dirección',
 

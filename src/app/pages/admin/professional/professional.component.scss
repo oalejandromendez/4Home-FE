@@ -1,31 +1,33 @@
 .file-input {
-    display: none;
+  display: none;
 }
 
 .btn-file {
-    padding: 0px 10px;
-    margin: 0;
-    font-size: 25px;
-    width: 100%;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+  padding: 0px 10px;
+  margin: 0;
+  font-size: 25px;
+  width: 100%;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
 .modal-professional .modal-dialog {
-    max-width: 75%;
-    width: 75%;
-    margin-top: 10px;
+  max-width: 75%;
+  width: 75%;
+  margin-top: 10px;
 }
 
 .container-image {
-    height: 150px;
-    background-color: #d6d6d6;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    text-align-last: center;
+  min-height: 150px;
+  max-height: 150px;
+  background-color: #d6d6d6;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  text-align-last: center;
 }
 
 .img-professional {
-    width: 62%;
-    margin-top: 6px;
+  max-width: 100%;
+  height: auto;
+  max-height: 150px;
 }

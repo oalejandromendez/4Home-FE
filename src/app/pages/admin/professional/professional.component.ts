@@ -1,31 +1,37 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DataTableDirective } from 'angular-datatables';
-import { ToastOptions, ToastyConfig, ToastyService } from 'ng2-toasty';
-import { Subject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ProfessionalModel } from 'src/app/models/admin/professional.model';
-import { DataTableLanguage } from 'src/app/models/common/datatable';
-import { ProfessionalService } from 'src/app/services/admin/professional/professional.service';
-import { UserService } from 'src/app/services/admin/user/user.service';
-import { LoaderService } from 'src/app/services/common/loader/loader.service';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {NgbCalendar, NgbDateStruct, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DataTableDirective} from 'angular-datatables';
+import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
+import {Subject, Subscription} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {ProfessionalModel} from 'src/app/models/admin/professional.model';
+import {DataTableLanguage} from 'src/app/models/common/datatable';
+import {ProfessionalService} from 'src/app/services/admin/professional/professional.service';
+import {UserService} from 'src/app/services/admin/user/user.service';
+import {LoaderService} from 'src/app/services/common/loader/loader.service';
 import Swal from 'sweetalert2';
 import * as _ from 'lodash';
-import { CustomDatepickerI18n, I18n } from 'src/app/services/common/datepicker/datepicker.service';
-import { DocumentTypeService } from 'src/app/services/common/documenttype/documenttype.service';
-import { PositionService } from 'src/app/services/admin/position/position.service';
-import { StatusService } from 'src/app/services/admin/status/status.service';
+import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
+import {DocumentTypeService} from 'src/app/services/common/documenttype/documenttype.service';
+import {PositionService} from 'src/app/services/admin/position/position.service';
+import {StatusService} from 'src/app/services/admin/status/status.service';
+import {labels} from '@lang/labels/es_es';
+import {texts} from '@lang/texts/es_es';
+import {messages} from '@lang/messages/es_es';
 
 @Component({
   selector: 'app-professional',
   templateUrl: './professional.component.html',
   styleUrls: ['./professional.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [I18n, {provide: NgbDatepickerI18n, useClass: CustomDatepickerI18n}, NgbDatepickerConfig]
 })
 export class ProfessionalComponent implements OnInit, OnDestroy {
+
+  labels = labels;
+  texts = texts;
+  messages = messages;
 
   @ViewChild('openModal') openModal: ElementRef;
   @ViewChild('closeModal') closeModal: ElementRef;
@@ -33,7 +39,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   @ViewChild(DataTableDirective, {static: false})
   dtElement: DataTableDirective;
   dtTrigger: Subject<any> = new Subject();
-  private subscription: Subscription;
 
   dtOptions: any = {};
   professionals: any[];
@@ -48,8 +53,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   canDelete = false;
 
   emailPattern: any = /^[A-Za-z0-9._%+-]{3,}@[a-zA-Z]{3,}([.]{1}[a-zA-Z]{2,}|[.]{1}[a-zA-Z]{2,}[.]{1}[a-zA-Z]{2,})/;
-
-  private imageSrc: string = '';
 
   imageError: string;
   isImageSaved: boolean;
@@ -70,7 +73,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     private language: DataTableLanguage,
     private modalService: NgbModal,
     private toastyConfig: ToastyConfig,
-    private config: NgbDatepickerConfig,
     private calendar: NgbCalendar,
     private I18n: I18n,
     private documentTypeService: DocumentTypeService,
@@ -82,13 +84,10 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     this.getPermissions();
     this.toastyConfig.theme = 'material';
 
-    config.minDate = {year: 2000, month: 1, day: 1};
-    config.maxDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1 , day: this.now.getDate()};
-
     this.I18n.language = 'es';
 
     this.optionsTemplate = {
-      decimal: '' ,
+      decimal: '',
       precision: 0,
       prefix: '$',
       thousands: '.',
@@ -113,9 +112,9 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
   getDocumentsType() {
     this.loaderService.loading(true);
-    this.documentTypeService.get().subscribe( (resp: any) => {
-      resp.map( (type: any) => {
-        this.documentTypes.push({ value: String(type.id), label: type.name } );
+    this.documentTypeService.get().subscribe((resp: any) => {
+      resp.map((type: any) => {
+        this.documentTypes.push({value: String(type.id), label: type.name});
         this.documentTypes = this.documentTypes.slice();
       });
       this.loaderService.loading(false);
@@ -123,16 +122,16 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
 
   getStatuses() {
     this.loaderService.loading(true);
-    this.statusService.get().subscribe( (resp: any) => {
-      resp.filter( (status: any) => status.status === 1 ).map( (status: any) => {
-        this.statuses.push({ value: String(status.id), label: status.name } );
+    this.statusService.get().subscribe((resp: any) => {
+      resp.filter((status: any) => status.status === 1).map((status: any) => {
+        this.statuses.push({value: String(status.id), label: status.name});
         this.statuses = this.statuses.slice();
       });
       this.loaderService.loading(false);
@@ -140,16 +139,16 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
 
   getPositions() {
     this.loaderService.loading(true);
-    this.positionService.get().subscribe( (resp: any) => {
-      resp.filter( (position: any) => position.status === 1 ).map( (position: any) => {
-        this.positions.push({ value: String(position.id), label: position.name } );
+    this.positionService.get().subscribe((resp: any) => {
+      resp.filter((position: any) => position.status === 1).map((position: any) => {
+        this.positions.push({value: String(position.id), label: position.name});
         this.positions = this.positions.slice();
       });
       this.loaderService.loading(false);
@@ -157,7 +156,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
@@ -165,7 +164,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   loadForm() {
     this.form = new FormGroup({
       type_document: new FormControl(null, [Validators.required]),
-      identification: new FormControl('', [Validators.required, Validators.maxLength(20)],this.validateIdentification.bind(this)),
+      identification: new FormControl('', [Validators.required, Validators.maxLength(20)], this.validateIdentification.bind(this)),
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       lastname: new FormControl('', [Validators.required, Validators.max(50)]),
       age: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
@@ -183,42 +182,42 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   validateIdentification(control: AbstractControl) {
-    return this.professionalService.validateIdentification(control.value).pipe(map( (resp: any) => {
+    return this.professionalService.validateIdentification(control.value).pipe(map((resp: any) => {
       if (this.id) {
         if (resp.identification === this.professional.identification) {
           return null;
         }
       }
-      return Object.keys(resp).length > 0 ? { identification: true } : null ;
+      return Object.keys(resp).length > 0 ? {identification: true} : null;
     }));
   }
 
   validateEmail(control: AbstractControl) {
-    return this.professionalService.validateEmail(control.value).pipe(map( (resp: any) => {
+    return this.professionalService.validateEmail(control.value).pipe(map((resp: any) => {
       if (this.id) {
         if (resp.email === this.professional.email) {
           return null;
         }
       }
-      return Object.keys(resp).length > 0 ? { email: true } : null ;
+      return Object.keys(resp).length > 0 ? {email: true} : null;
     }));
   }
 
   ValidateDates: ValidatorFn = (formG: FormGroup) => {
     let startDate = formG.get('admission_date').value;
     let endDate = formG.get('retirement_date').value;
-    const now  = new Date();
+    const now = new Date();
     let dateLimit: string;
     if (startDate && endDate) {
-      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month ) + '-' +
-                                         (startDate.day < 10 ? '0' + startDate.day : startDate.day) ;
-      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month)  + '-' +
-                                     (endDate.day < 10 ? '0' + endDate.day : endDate.day);
+      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month) + '-' +
+        (startDate.day < 10 ? '0' + startDate.day : startDate.day);
+      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month) + '-' +
+        (endDate.day < 10 ? '0' + endDate.day : endDate.day);
 
-      dateLimit = now.getFullYear() + '-' + ( (now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1) ) + '-' +
-                                      (now.getDate() + 1  < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
+      dateLimit = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' +
+        (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
     }
-    return startDate !== null && endDate!= null ? startDate <= endDate ? startDate >= dateLimit ? { errorStartDate: true } : endDate >= dateLimit ? { errorEndDate: true } : null : { dates: true } : null;
+    return startDate !== null && endDate != null ? startDate <= endDate ? startDate >= dateLimit ? {errorStartDate: true} : endDate >= dateLimit ? {errorEndDate: true} : null : {dates: true} : null;
   }
 
   rerender(): void {
@@ -237,7 +236,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text:  'Ha ocurrido un error'
+        text: 'Ha ocurrido un error'
       });
     });
   }
@@ -264,13 +263,13 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           }
         },
         {
-            className: 'btn-sm boton-excel wid-5',
-            text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/excel.png">',
-            titleAttr: 'Exportar como Excel',
-            extend: 'excel',
-            extension: '.xls',
-            exportOptions: {
-              columns: ':not(.notexport)'
+          className: 'btn-sm boton-excel wid-5',
+          text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/excel.png">',
+          titleAttr: 'Exportar como Excel',
+          extend: 'excel',
+          extension: '.xls',
+          exportOptions: {
+            columns: ':not(.notexport)'
           }
         },
         {
@@ -284,20 +283,20 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           }
         },
         {
-            className: 'btn-sm boton-imprimir wid-5',
-            text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/print.png">',
-            titleAttr: 'Imprimir',
-            extend: 'print',
-            extension: '.print',
-            exportOptions: {
-              columns: ':not(.notexport)'
+          className: 'btn-sm boton-imprimir wid-5',
+          text: '<img alt="Theme-Logo" class="img-fluid" src="assets/img/datatable/print.png">',
+          titleAttr: 'Imprimir',
+          extend: 'print',
+          extension: '.print',
+          exportOptions: {
+            columns: ':not(.notexport)'
           }
         },
       ],
       columnDefs: [
-        { targets: 0, searchable: false, visible: false, className: 'notexport' },
-        { targets: 4,  className: 'text-center' },
-        { targets: 5,  className: 'wid-15 text-center' }
+        {targets: 0, searchable: false, visible: false, className: 'notexport'},
+        {targets: 4, className: 'text-center'},
+        {targets: 5, className: 'wid-15 text-center'}
       ],
       order: [],
       language: that.language.getLanguage('es'),
@@ -309,12 +308,14 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
     this.submitted = true;
 
-    if (!this.form.valid) { return; }
+    if (!this.form.valid) {
+      return;
+    }
 
     Swal.fire({
       allowOutsideClick: false,
       icon: 'info',
-      text:  'Espere...'
+      text: 'Espere...'
     });
 
     Swal.showLoading();
@@ -331,7 +332,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
     if (this.id) {
 
-      this.professionalService.put( this.professional, this.id).subscribe( (data: any)  => {
+      this.professionalService.put(this.professional, this.id).subscribe((data: any) => {
 
         const toastOptions: ToastOptions = {
           title: '¡Proceso Exitoso!',
@@ -353,7 +354,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         if (err.error.errors) {
           let mensage = '';
 
-          Object.keys(err.error.errors).forEach( (data, index) => {
+          Object.keys(err.error.errors).forEach((data, index) => {
             mensage += err.error.errors[data][0] + '<br>';
           });
 
@@ -366,7 +367,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           };
           this.toastyService.error(toastOptions);
         } else {
-          if(err.status === 505) {
+          if (err.status === 505) {
             const toastOptions: ToastOptions = {
               title: 'Error',
               msg: 'No se puede modificar el estado del usuario porque tiene reservas abiertas',
@@ -384,7 +385,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
     } else {
 
-      this.professionalService.post( this.professional ).subscribe( (data: any) => {
+      this.professionalService.post(this.professional).subscribe((data: any) => {
         Swal.close();
         const toastOptions: ToastOptions = {
           title: '¡Proceso Exitoso!',
@@ -403,7 +404,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         if (err.error.errors) {
           let mensage = '';
 
-          Object.keys(err.error.errors).forEach( (data, index) => {
+          Object.keys(err.error.errors).forEach((data, index) => {
             mensage += err.error.errors[data][0] + '<br>';
           });
           const toastOptions: ToastOptions = {
@@ -424,9 +425,9 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   edit(id: any) {
-    if(id) {
+    if (id) {
       this.id = id;
-      const data = this.professionals.find( (professional: any) => professional.id === id);
+      const data = this.professionals.find((professional: any) => professional.id === id);
       this.professional = data;
       if (data) {
         this.form.patchValue(data);
@@ -435,14 +436,22 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         this.form.controls.position.setValue(String(data.position.id));
         this.form.controls.status.setValue(String(data.status.id));
         let admission_date = null;
-        if(data.admission_date) {
+        if (data.admission_date) {
           admission_date = data.admission_date.split('-');
-          this.form.controls.admission_date.setValue({ year: +admission_date[0], month: +admission_date[1], day: +admission_date[2]});
+          this.form.controls.admission_date.setValue({
+            year: +admission_date[0],
+            month: +admission_date[1],
+            day: +admission_date[2]
+          });
         }
         let retirement_date = null;
-        if(data.retirement_date) {
+        if (data.retirement_date) {
           retirement_date = data.retirement_date.split('-');
-          this.form.controls.retirement_date.setValue({ year: +retirement_date[0], month: +retirement_date[1], day: +retirement_date[2]});
+          this.form.controls.retirement_date.setValue({
+            year: +retirement_date[0],
+            month: +retirement_date[1],
+            day: +retirement_date[2]
+          });
         }
         this.form.enable();
         this.openModal.nativeElement.click();
@@ -456,7 +465,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     this.professional = new ProfessionalModel();
     this.form.reset();
     this.cardImageBase64 = null;
-    if(!this.canCreate) {
+    if (!this.canCreate) {
       this.form.disable();
     }
   }
@@ -465,7 +474,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     if (id) {
       Swal.fire({
         title: 'Esta seguro?',
-        text:  'Usted no podra recuperar los datos eliminados',
+        text: 'Usted no podra recuperar los datos eliminados',
         icon: 'question',
         showConfirmButton: true,
         showCancelButton: false,
@@ -474,13 +483,13 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         showLoaderOnConfirm: true,
         preConfirm: () => {
           return new Promise<void>((resolve) => {
-            this.professionalService.delete(id).subscribe( data => {
+            this.professionalService.delete(id).subscribe(data => {
               this.professionals.splice(index, 1);
               this.dtOptions = {};
               this.loadTable();
               this.rerender();
               this.cancel();
-              Swal.fire('Proceso Exitoso!', 'Se ha eliminado el profesional exitosamente', 'success' );
+              Swal.fire('Proceso Exitoso!', 'Se ha eliminado el profesional exitosamente', 'success');
             }, (err: any) => {
               Swal.fire('Error', err.error.message, 'error');
             });
@@ -494,7 +503,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   open(modal: any) {
-    this.modalService.open(modal, { windowClass: 'modal-professional'});
+    this.modalService.open(modal, {windowClass: 'modal-professional'});
   }
 
   close(modal: any) {
@@ -503,24 +512,24 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
   getPermissions() {
     const that = this;
-    this.userService.permissions().subscribe( resp => {
-      const create = resp.filter( (permission: any) => permission.name === 'CREAR_PROFESIONALES');
-      if(create.length >= 1) {
+    this.userService.permissions().subscribe(resp => {
+      const create = resp.filter((permission: any) => permission.name === 'CREAR_PROFESIONALES');
+      if (create.length >= 1) {
         that.canCreate = true;
       }
-      const see = resp.filter( (permission: any) => permission.name === 'VER_PROFESIONALES');
-      if(see.length >= 1) {
+      const see = resp.filter((permission: any) => permission.name === 'VER_PROFESIONALES');
+      if (see.length >= 1) {
         that.canSee = true;
       }
-      const edit = resp.filter( (permission: any) => permission.name === 'MODIFICAR_PROFESIONALES');
-      if(edit.length >= 1) {
+      const edit = resp.filter((permission: any) => permission.name === 'MODIFICAR_PROFESIONALES');
+      if (edit.length >= 1) {
         that.canEdit = true;
       }
-      const eliminar = resp.filter( (permission: any) => permission.name === 'ELIMINAR_PROFESIONALES');
-      if(eliminar.length >= 1) {
+      const eliminar = resp.filter((permission: any) => permission.name === 'ELIMINAR_PROFESIONALES');
+      if (eliminar.length >= 1) {
         that.canDelete = true;
       }
-      if(!that.canCreate) {
+      if (!that.canCreate) {
         this.form.disable();
       }
       this.loadData();
@@ -545,38 +554,39 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       const max_height = 15200;
       const max_width = 25600;
       if (fileInput.target.files[0].size > max_size) {
-          this.imageError ='Maximum size allowed is ' + max_size / 1000 + 'Mb';
-          return false;
+        this.imageError = 'Maximum size allowed is ' + max_size / 1000 + 'Mb';
+        return false;
       }
       if (!_.includes(allowed_types, fileInput.target.files[0].type)) {
-          this.imageError = 'Only Images are allowed ( JPG | PNG )';
-          return false;
+        this.imageError = 'Only Images are allowed ( JPG | PNG )';
+        return false;
       }
       const reader = new FileReader();
       reader.onload = (e: any) => {
-          const image = new Image();
-          image.src = e.target.result;
-          image.onload = rs => {
-              const img_height = rs.currentTarget['height'];
-              const img_width = rs.currentTarget['width'];
-              if (img_height > max_height && img_width > max_width) {
-                  this.imageError =
-                      'Maximum dimentions allowed ' +
-                      max_height +
-                      '*' +
-                      max_width +
-                      'px';
-                  return false;
-              } else {
-                  const imgBase64Path = e.target.result;
-                  this.cardImageBase64 = imgBase64Path;
-                  this.isImageSaved = true;
-              }
-          };
+        const image = new Image();
+        image.src = e.target.result;
+        image.onload = rs => {
+          const img_height = rs.currentTarget['height'];
+          const img_width = rs.currentTarget['width'];
+          if (img_height > max_height && img_width > max_width) {
+            this.imageError =
+              'Maximum dimentions allowed ' +
+              max_height +
+              '*' +
+              max_width +
+              'px';
+            return false;
+          } else {
+            const imgBase64Path = e.target.result;
+            this.cardImageBase64 = imgBase64Path;
+            this.isImageSaved = true;
+          }
+        };
       };
       reader.readAsDataURL(fileInput.target.files[0]);
     }
   }
+
   removeImage() {
     this.cardImageBase64 = null;
     this.isImageSaved = false;
