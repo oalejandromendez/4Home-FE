@@ -34,7 +34,7 @@ export class SignUpComponent implements OnInit {
   customerTypes: Array<any> = [];
 
   // ----------Pattern-----------
-  emailPattern: any = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/;
+  emailPattern: any = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/;
   passwordPattern: any = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
   showpassword = false;
   showconfirmation = false;

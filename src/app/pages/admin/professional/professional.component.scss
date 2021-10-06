@@ -18,8 +18,7 @@
 }
 
 .container-image {
-  min-height: 150px;
-  max-height: 150px;
+  height: 150px;
   background-color: #d6d6d6;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -27,7 +26,8 @@
 }
 
 .img-professional {
-  max-width: 100%;
-  height: auto;
-  max-height: 150px;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }

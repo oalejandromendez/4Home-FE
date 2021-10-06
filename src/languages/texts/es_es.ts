@@ -52,6 +52,11 @@ export const texts = {
   address_required: 'La dirección es requerida',
   address_maxlength: 'La dirección supera el máximo de caracteres permitido',
   age_required: 'La edad es requerida',
+  admission_date_required: 'La fecha de ingreso es requerida',
+  admission_date_error: 'La fecha de ingreso tiene error',
+  retirement_date_error: 'Error en la fecha final',
+  retirement_date_less_admission_date: 'La fecha de retiro no puede ser menor a la fecha de ingreso',
+  status_required: 'El estado es requerido',
 
   add_address: 'Agregar Dirección',
 
@@ -60,6 +65,7 @@ export const texts = {
   update: 'Modificar',
   delete: 'Borrar',
 
+  error_date: 'Error en la fecha',
   only_numbers: 'Digite unicamente números',
   verifing: 'Verificando...',
 };

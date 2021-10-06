@@ -28,4 +28,6 @@ export const labels = {
   phone_contact: 'Teléfono de Contacto',
   salary: 'Salario',
   age: 'Edad',
+  admission_date: 'Fecha de ingreso',
+  retirement_date: 'Fecha de retiro',
 };

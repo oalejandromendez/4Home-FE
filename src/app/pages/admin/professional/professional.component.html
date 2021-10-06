@@ -120,11 +120,11 @@
                   </span>
                   <span class="mt-1"
                        *ngIf="form.get('identification').status === 'PENDING' && !form.get('identification').pristine && form.get('identification').value != professional.identification">
-                    <small class="form-text text-danger">{{texts.verifing}}</small>
+                    <small class="form-text text-info">{{texts.verifing}}</small>
                   </span>
                   <span class="mt-1"
                        *ngIf="form.get('identification').status === 'VALID' && !form.get('identification').pristine && form.get('identification').value != professional.identification">
-                    <small class="form-text text-danger">{{texts.identification_available}}</small>
+                    <small class="form-text text-success">{{texts.identification_available}}</small>
                   </span>
                   <span class="mt-1"
                        *ngIf="form.get('identification').hasError('identification') && !form.get('identification').pristine && form.get('identification').value != professional.identification">
@@ -294,100 +294,54 @@
 
         <div class="col-md-3">
           <div class="form-group">
-            <label class="col-form-label">Fecha de ingreso*</label>
+            <label class="col-form-label">{{labels.admission_date}} <span class="text-danger">*</span></label>
             <div class="input-group">
-              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="admission_date" ngbDatepicker
-                     [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate"
-                     #startDate="ngbDatepicker">
-              <div class="input-group-append bg-default" (click)="startDate.toggle()">
-                                <span class="input-group-text">
-                                <i class="fa fa-calendar"></i>
-                              </span>
-              </div>
+              <input type="date" class="form-control" formControlName="admission_date">
             </div>
-            <div class="is-invalid" *ngIf="submitted && form.get('admission_date').hasError('required')">
-              <span class="badge badge-danger f-size-12 mt-1 m-r-5">La fecha de ingreso es requerida</span>
-            </div>
-            <div class="mt-1" *ngIf="form.get('admission_date').errors && !form.get('admission_date').pristine">
-              <span class="badge m-r-5 badge-danger">Error en la fecha</span>
-            </div>
-            <div class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('admission_date').pristine">
-              <span class="badge m-r-5 badge-danger">La fecha de ingreso tiene error</span>
-            </div>
+            <span class="is-invalid" *ngIf="submitted && form.get('admission_date').hasError('required')">
+              <small class="form-text text-danger">{{texts.admission_date_required}}</small>
+            </span>
+            <span class="mt-1" *ngIf="form.get('admission_date').errors && !form.get('admission_date').pristine">
+              <small class="form-text text-danger">{{texts.error_date}}</small>
+            </span>
+            <span class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('admission_date').pristine">
+              <small class="form-text text-danger">{{texts.admission_date_error}}</small>
+            </span>
           </div>
         </div>
         <div class="col-md-3">
 
           <div class="form-group">
-            <label class="col-form-label">Fecha de retiro</label>
+            <label class="col-form-label">{{labels.retirement_date}}</label>
             <div class="input-group">
-              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="retirement_date" ngbDatepicker
-                     [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker">
-              <div class="input-group-append bg-default" (click)="endDate.toggle()">
-                                <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
-                                    </span>
-              </div>
+              <input type="date" class="form-control" formControlName="retirement_date">
             </div>
-            <div class="mt-1" *ngIf="form.get('retirement_date').errors && !form.get('retirement_date').pristine">
-              <span class="badge m-r-5 badge-danger">Error en la fecha final</span>
-            </div>
-            <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('retirement_date').pristine">
-              <span class="badge m-r-5 badge-danger break-spaces">La fecha de retiro no puede ser menor a la fecha de ingreso</span>
-            </div>
-            <div class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('retirement_date').pristine">
-              <span class="badge m-r-5 badge-danger">Error en la fecha final</span>
-            </div>
+            <span class="mt-1" *ngIf="form.get('retirement_date').errors && !form.get('retirement_date').pristine">
+              <small class="form-text text-danger">{{texts.retirement_date_error}}</small>
+            </span>
+            <span class="mt-1" *ngIf="form.hasError('dates') && !form.get('retirement_date').pristine">
+              <small class="form-text text-danger">{{texts.retirement_date_less_admission_date}}</small>
+            </span>
+            <span class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('retirement_date').pristine">
+              <small class="form-text text-danger">{{texts.retirement_date_error}}</small>
+            </span>
           </div>
 
         </div>
 
         <div class="col-md-3">
           <div class='form-group'>
-            <label class="col-form-label">Estado*</label>
+            <label class="col-form-label">{{labels.status}} <span class="text-danger">*</span></label>
             <div class="align-self-center">
               <ng-select [items]="statuses" bindLabel="label" bindValue="value" [clearable]="true"
                          placeholder="Seleccione..." formControlName="status"
                          notFoundText="No se encontraron resultados"></ng-select>
-              <div class="is-invalid" *ngIf="submitted && form.get('status').hasError('required')">
-                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El estado es requerido</span>
-              </div>
+              <span class="is-invalid" *ngIf="submitted && form.get('status').hasError('required')">
+                <small class="form-text text-danger">{{texts.status_required}}</small>
+              </span>
             </div>
           </div>
         </div>
-
-
-        <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
-                     let-disabled="disabled" let-focused="focused">
-                    <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused"
-                          [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
-                          [class.text-muted-day]="disabled">
-                        {{ date.day }}
-                    </span>
-        </ng-template>
-        <ng-template #footerTemplateStartDate>
-          <hr class="my-0">
-          <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
-                  (click)="form.get('admission_date').setValue(today); startDate.close()">Hoy
-          </button>
-          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">Cerrar</button>
-        </ng-template>
-
-        <ng-template #customEndDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
-                     let-disabled="disabled" let-focused="focused">
-                    <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused"
-                          [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
-                          [class.text-muted-day]="disabled">
-                        {{ date.day }}
-                    </span>
-        </ng-template>
-        <ng-template #footerTemplateEndDate>
-          <hr class="my-0">
-          <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
-                  (click)="form.get('retirement_date').setValue(today); endDate.close()">Hoy
-          </button>
-          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="endDate.close()">Cerrar</button>
-        </ng-template>
       </div>
     </div>
     <div class="modal-footer">

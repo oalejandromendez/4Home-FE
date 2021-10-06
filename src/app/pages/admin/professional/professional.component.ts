@@ -1,10 +1,10 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {NgbCalendar, NgbDateStruct, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbDateStruct, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DataTableDirective} from 'angular-datatables';
 import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
-import {Subject, Subscription} from 'rxjs';
+import {Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ProfessionalModel} from 'src/app/models/admin/professional.model';
 import {DataTableLanguage} from 'src/app/models/common/datatable';
@@ -13,7 +13,6 @@ import {UserService} from 'src/app/services/admin/user/user.service';
 import {LoaderService} from 'src/app/services/common/loader/loader.service';
 import Swal from 'sweetalert2';
 import * as _ from 'lodash';
-import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
 import {DocumentTypeService} from 'src/app/services/common/documenttype/documenttype.service';
 import {PositionService} from 'src/app/services/admin/position/position.service';
 import {StatusService} from 'src/app/services/admin/status/status.service';
@@ -52,7 +51,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   canEdit = false;
   canDelete = false;
 
-  emailPattern: any = /^[A-Za-z0-9._%+-]{3,}@[a-zA-Z]{3,}([.]{1}[a-zA-Z]{2,}|[.]{1}[a-zA-Z]{2,}[.]{1}[a-zA-Z]{2,})/;
+  emailPattern: any = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/;
 
   imageError: string;
   isImageSaved: boolean;
@@ -60,7 +59,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   documentTypes: Array<any> = [];
   positions: Array<any> = [];
   statuses: Array<any> = [];
-  today = this.calendar.getToday();
   now: Date = new Date();
   optionsTemplate: any;
 
@@ -73,8 +71,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     private language: DataTableLanguage,
     private modalService: NgbModal,
     private toastyConfig: ToastyConfig,
-    private calendar: NgbCalendar,
-    private I18n: I18n,
     private documentTypeService: DocumentTypeService,
     private positionService: PositionService,
     private statusService: StatusService
@@ -83,8 +79,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     this.loadForm();
     this.getPermissions();
     this.toastyConfig.theme = 'material';
-
-    this.I18n.language = 'es';
 
     this.optionsTemplate = {
       decimal: '',
@@ -168,15 +162,15 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       lastname: new FormControl('', [Validators.required, Validators.max(50)]),
       age: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
-      email: new FormControl('', [Validators.required, Validators.max(50), Validators.pattern(this.emailPattern)], this.validateEmail.bind(this)),
-      address: new FormControl('', [Validators.required, Validators.max(120)]),
+      email: new FormControl('', [Validators.required, Validators.maxLength(50), Validators.pattern(this.emailPattern)], this.validateEmail.bind(this)),
+      address: new FormControl('', [Validators.required, Validators.maxLength(120)]),
       position: new FormControl(null, [Validators.required]),
       phone: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       phone_contact: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       salary: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
       photo: new FormControl(''),
       status: new FormControl(null, [Validators.required]),
-      admission_date: new FormControl(this.now, [Validators.required]),
+      admission_date: new FormControl('', [Validators.required]),
       retirement_date: new FormControl('')
     }, {validators: this.ValidateDates});
   }
@@ -204,16 +198,11 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   ValidateDates: ValidatorFn = (formG: FormGroup) => {
-    let startDate = formG.get('admission_date').value;
-    let endDate = formG.get('retirement_date').value;
+    const startDate = formG.get('admission_date').value;
+    const endDate = formG.get('retirement_date').value;
     const now = new Date();
     let dateLimit: string;
     if (startDate && endDate) {
-      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month) + '-' +
-        (startDate.day < 10 ? '0' + startDate.day : startDate.day);
-      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month) + '-' +
-        (endDate.day < 10 ? '0' + endDate.day : endDate.day);
-
       dateLimit = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' +
         (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
     }
@@ -309,6 +298,11 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     this.submitted = true;
 
     if (!this.form.valid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: messages.not_valid_form
+      });
       return;
     }
 
@@ -322,13 +316,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
     this.professional = this.form.value;
     this.professional.photo = this.cardImageBase64;
-
-    const startDate = this.form.get('admission_date').value;
-    const endDate = this.form.get('retirement_date').value;
-
-    this.professional.admission_date = startDate.year + '-' + startDate.month + '-' + startDate.day;
-
-    endDate != null ? this.professional.retirement_date = endDate.year + '-' + endDate.month + '-' + endDate.day : '';
 
     if (this.id) {
 
@@ -379,6 +366,12 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
           }
           if (err.status === 401) {
             this.router.navigateByUrl('/auth/login');
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: messages.service_error
+            });
           }
         }
       });
@@ -418,6 +411,12 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         } else {
           if (err.status === 401) {
             this.router.navigateByUrl('/login');
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: messages.service_error
+            });
           }
         }
       });
@@ -435,24 +434,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         this.cardImageBase64 = data.photo;
         this.form.controls.position.setValue(String(data.position.id));
         this.form.controls.status.setValue(String(data.status.id));
-        let admission_date = null;
-        if (data.admission_date) {
-          admission_date = data.admission_date.split('-');
-          this.form.controls.admission_date.setValue({
-            year: +admission_date[0],
-            month: +admission_date[1],
-            day: +admission_date[2]
-          });
-        }
-        let retirement_date = null;
-        if (data.retirement_date) {
-          retirement_date = data.retirement_date.split('-');
-          this.form.controls.retirement_date.setValue({
-            year: +retirement_date[0],
-            month: +retirement_date[1],
-            day: +retirement_date[2]
-          });
-        }
         this.form.enable();
         this.openModal.nativeElement.click();
       }
@@ -566,8 +547,8 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         const image = new Image();
         image.src = e.target.result;
         image.onload = rs => {
-          const img_height = rs.currentTarget['height'];
-          const img_width = rs.currentTarget['width'];
+          const img_height = rs.currentTarget.height;
+          const img_width = rs.currentTarget.width;
           if (img_height > max_height && img_width > max_width) {
             this.imageError =
               'Maximum dimentions allowed ' +
