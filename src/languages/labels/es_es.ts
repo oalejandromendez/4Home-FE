@@ -18,8 +18,8 @@ export const labels = {
   init_time: 'Hora Inicial',
   end_time: 'Hora Final',
   status: 'Estado',
-  price: 'Precio',
-  type: 'Tipo',
+  price_per_service: 'Precio por servicio',
+  type_periodicity: 'Tipo de periodicidad',
   quantity_service: 'Servicios a la semana',
   working_day: 'Jornada',
   description: 'Descripción',
@@ -30,4 +30,7 @@ export const labels = {
   age: 'Edad',
   admission_date: 'Fecha de ingreso',
   retirement_date: 'Fecha de retiro',
+  service: 'Servicio',
+  service_date: 'Fecha Servicio',
+  services_to_schedule: 'Cantidad de servicios',
 };

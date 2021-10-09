@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {NgbDateStruct, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DataTableDirective} from 'angular-datatables';
 import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
 import {Subject} from 'rxjs';
@@ -10,6 +10,7 @@ import {ProfessionalModel} from 'src/app/models/admin/professional.model';
 import {DataTableLanguage} from 'src/app/models/common/datatable';
 import {ProfessionalService} from 'src/app/services/admin/professional/professional.service';
 import {UserService} from 'src/app/services/admin/user/user.service';
+import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
 import {LoaderService} from 'src/app/services/common/loader/loader.service';
 import Swal from 'sweetalert2';
 import * as _ from 'lodash';
@@ -25,6 +26,7 @@ import {messages} from '@lang/messages/es_es';
   templateUrl: './professional.component.html',
   styleUrls: ['./professional.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  providers: [I18n, {provide: NgbDatepickerI18n, useClass: CustomDatepickerI18n}, NgbDatepickerConfig]
 })
 export class ProfessionalComponent implements OnInit, OnDestroy {
 
@@ -59,6 +61,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   documentTypes: Array<any> = [];
   positions: Array<any> = [];
   statuses: Array<any> = [];
+  today = this.calendar.getToday();
   now: Date = new Date();
   optionsTemplate: any;
 
@@ -73,6 +76,9 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     private toastyConfig: ToastyConfig,
     private documentTypeService: DocumentTypeService,
     private positionService: PositionService,
+    private config: NgbDatepickerConfig,
+    private calendar: NgbCalendar,
+    private I18n: I18n,
     private statusService: StatusService
   ) {
     this.loaderService.loading(true);
@@ -86,6 +92,10 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       prefix: '$',
       thousands: '.',
     };
+    config.minDate = {year: 2000, month: 1, day: 1};
+    config.maxDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1 , day: this.now.getDate()};
+    config.navigation = 'arrows';
+    this.I18n.language = 'es';
   }
 
   ngOnInit(): void {
@@ -198,13 +208,18 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
   }
 
   ValidateDates: ValidatorFn = (formG: FormGroup) => {
-    const startDate = formG.get('admission_date').value;
-    const endDate = formG.get('retirement_date').value;
+    let startDate = formG.get('admission_date').value;
+    let endDate = formG.get('retirement_date').value;
     const now = new Date();
     let dateLimit: string;
     if (startDate && endDate) {
-      dateLimit = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' +
-        (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
+      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month ) + '-' +
+                                         (startDate.day < 10 ? '0' + startDate.day : startDate.day) ;
+      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month)  + '-' +
+                                     (endDate.day < 10 ? '0' + endDate.day : endDate.day);
+
+      dateLimit = now.getFullYear() + '-' + ( (now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1) ) + '-' +
+                                      (now.getDate() + 1  < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
     }
     return startDate !== null && endDate != null ? startDate <= endDate ? startDate >= dateLimit ? {errorStartDate: true} : endDate >= dateLimit ? {errorEndDate: true} : null : {dates: true} : null;
   }
@@ -316,6 +331,13 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
 
     this.professional = this.form.value;
     this.professional.photo = this.cardImageBase64;
+
+    const startDate = this.form.get('admission_date').value;
+    const endDate = this.form.get('retirement_date').value;
+
+    this.professional.admission_date = startDate.year + '-' + startDate.month + '-' + startDate.day;
+
+    endDate != null ? this.professional.retirement_date = endDate.year + '-' + endDate.month + '-' + endDate.day : '';
 
     if (this.id) {
 
@@ -434,6 +456,16 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         this.cardImageBase64 = data.photo;
         this.form.controls.position.setValue(String(data.position.id));
         this.form.controls.status.setValue(String(data.status.id));
+        let admission_date = null;
+        if(data.admission_date) {
+          admission_date = data.admission_date.split('-');
+          this.form.controls.admission_date.setValue({ year: +admission_date[0], month: +admission_date[1], day: +admission_date[2]});
+        }
+        let retirement_date = null;
+        if (data.retirement_date) {
+          retirement_date = data.retirement_date.split('-');
+          this.form.controls.retirement_date.setValue({ year: +retirement_date[0], month: +retirement_date[1], day: +retirement_date[2]});
+        }
         this.form.enable();
         this.openModal.nativeElement.click();
       }
@@ -514,7 +546,7 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         this.form.disable();
       }
       this.loadData();
-    }, error => {
+    }, () => {
       const toastOptions: ToastOptions = {
         title: 'Error',
         msg: 'El ususario no tiene roles',
@@ -547,9 +579,10 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
         const image = new Image();
         image.src = e.target.result;
         image.onload = rs => {
-          const img_height = rs.currentTarget.height;
-          const img_width = rs.currentTarget.width;
-          if (img_height > max_height && img_width > max_width) {
+          const target = rs.currentTarget as any;
+          const imgHeight = target.height;
+          const imgWidth = target.width;
+          if (imgHeight > max_height && imgWidth > max_width) {
             this.imageError =
               'Maximum dimentions allowed ' +
               max_height +
@@ -566,10 +599,5 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(fileInput.target.files[0]);
     }
-  }
-
-  removeImage() {
-    this.cardImageBase64 = null;
-    this.isImageSaved = false;
   }
 }

@@ -75,11 +75,11 @@
           <input type="file" class="file-input" accept="image/*" #fileUpload (change)="onFileSelected($event)">
           <label class="col-form-label">{{labels.photo}} <span class="text-danger">*</span></label>
 
-          <div class="container-image">
+          <div class="container-image-professional">
             <img [src]="cardImageBase64" class="img-professional"/>
           </div>
 
-          <div class="form-group text-center">
+          <div class="form-group text-center control-upload-image">
             <button class="btn btn-primary btn-file" (click)="fileUpload.click()">
               <i class="fas fa-paperclip m-0"></i>
             </button>
@@ -296,7 +296,12 @@
           <div class="form-group">
             <label class="col-form-label">{{labels.admission_date}} <span class="text-danger">*</span></label>
             <div class="input-group">
-              <input type="date" class="form-control" formControlName="admission_date">
+              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="admission_date" ngbDatepicker [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate" #startDate="ngbDatepicker">
+              <div class="input-group-append bg-default" (click)="startDate.toggle()">
+                                <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+              </div>
             </div>
             <span class="is-invalid" *ngIf="submitted && form.get('admission_date').hasError('required')">
               <small class="form-text text-danger">{{texts.admission_date_required}}</small>
@@ -314,7 +319,12 @@
           <div class="form-group">
             <label class="col-form-label">{{labels.retirement_date}}</label>
             <div class="input-group">
-              <input type="date" class="form-control" formControlName="retirement_date">
+              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="retirement_date" ngbDatepicker [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker">
+              <div class="input-group-append bg-default" (click)="endDate.toggle()">
+                                <span class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+              </div>
             </div>
             <span class="mt-1" *ngIf="form.get('retirement_date').errors && !form.get('retirement_date').pristine">
               <small class="form-text text-danger">{{texts.retirement_date_error}}</small>
@@ -342,6 +352,29 @@
             </div>
           </div>
         </div>
+
+        <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected" let-disabled="disabled" let-focused="focused">
+                    <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
+                        {{ date.day }}
+                    </span>
+        </ng-template>
+        <ng-template #footerTemplateStartDate>
+          <hr class="my-0">
+          <button class="btn btn-primary btn-sm m-2 float-left btn-dp" (click)="form.get('admission_date').setValue(today); startDate.close()">Hoy</button>
+          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">Cerrar</button>
+        </ng-template>
+
+        <ng-template #customEndDay let-date="date" let-currentMonth="currentMonth" let-selected="selected" let-disabled="disabled" let-focused="focused">
+                    <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
+                        {{ date.day }}
+                    </span>
+        </ng-template>
+        <ng-template #footerTemplateEndDate>
+          <hr class="my-0">
+          <button class="btn btn-primary btn-sm m-2 float-left btn-dp" (click)="form.get('retirement_date').setValue(today); endDate.close()">Hoy</button>
+          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="endDate.close()">Cerrar</button>
+        </ng-template>
+
       </div>
     </div>
     <div class="modal-footer">

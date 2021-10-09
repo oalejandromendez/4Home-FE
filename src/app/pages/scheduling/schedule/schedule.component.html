@@ -6,7 +6,7 @@
             <div class="card-body body-search">
                 <div class="d-flex">
                     <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/schedule/filter.png">
-                    <ng-select style="width: 100%;"  [items]="states" indLabel="label" bindValue="value" [clearable]="false" placeholder="Filtro..." [(ngModel)]="state" [ngModelOptions]="{standalone: true}"></ng-select>
+                    <ng-select style="width: 100%;"  [items]="states" bindLabel="label" bindValue="value" [clearable]="false" placeholder="Filtro..." [(ngModel)]="state" [ngModelOptions]="{standalone: true}"></ng-select>
                   </div>
             </div>
           </div>
@@ -369,8 +369,8 @@
             <div class="card-body pt-2">
 
               <div>
-                <div class="container-image">
-                  <img [src]="professional.photo" class="img-professional" />
+                <div class="container-image-schedule">
+                  <img [src]="professional.photo" class="img-schedule" />
                 </div>
               </div>
 

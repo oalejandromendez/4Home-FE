@@ -1,6 +1,7 @@
 export const texts = {
   addresses_info: 'Agregar a continuación las direcciones donde desea que se le presten los servicios.',
   quantity_service_info: 'Agregar a continuación la cantidad de servicios a la semana, tener en cuenta que en el caso de las mensualidades, también serian cantidad de servicios a la semana.',
+  quantity_days_service_info: 'Cantidad de días de la semana que debe seleccionar para tomar los servicios.',
 
   client_type_required: 'El tipo de cliente es requerido',
   document_type_required: 'El tipo de documento es requerido',
@@ -38,7 +39,7 @@ export const texts = {
   init_end_time_validation: 'La hora final debe ser mayor que la hora inicio',
   price_required: 'El precio es requerido',
   price_maxlength: 'El precio supera el maximo de caracteres permitido',
-  type_required: 'El tipo es requerido',
+  type_periodicity_required: 'El tipo de periodicidad es requerido',
   quantity_service_required: 'La cantidad es requerida',
   quantity_service_maxlength: 'La cantidad supera el maximo de caracteres permitido',
   quantity_service_max: 'Se supera la cantidad máxima permitida',
@@ -57,6 +58,10 @@ export const texts = {
   retirement_date_error: 'Error en la fecha final',
   retirement_date_less_admission_date: 'La fecha de retiro no puede ser menor a la fecha de ingreso',
   status_required: 'El estado es requerido',
+  service_required: 'El servicio es requerido',
+  days_doesnot_match: 'La cantidad de días seleccionados no corresponde con la cantidad de servicios que debe programar',
+  repeatedDate: 'La fecha seleccionada ya esta asociada a otro servicio',
+  service_date_required: 'La fecha es requerida',
 
   add_address: 'Agregar Dirección',
 

@@ -1,298 +1,336 @@
 <div class="d-flex">
 
-    <div class="col-md-3">
+  <div class="col-md-3">
 
-        <div class="card card-primary mb-2" style="margin-top: -15px;" *ngIf="!isCustomer">
+    <div class="card card-primary mb-2" style="margin-top: -15px;" *ngIf="!isCustomer">
 
-            <div class="card-body" style="padding: 10px 15px;" *ngIf="canCreate">
+      <div class="card-body" style="padding: 10px 15px;" *ngIf="canCreate">
 
-                <div class='form-group mb-1'>
-                    <label class="col-form-label  f-12 pb-0">Tipo de Documento*</label>
-                    <div class="align-self-center">
-                        <ng-select class="document-reserve" [items]="documentTypes" indLabel="label" bindValue="value" [clearable]="true" placeholder="Seleccione..." [(ngModel)]="documentType" notFoundText="No se encontraron resultados"></ng-select>
-                    </div>
-                </div>
-
-                <div class='form-group mb-2'>
-                    <label class="col-form-label  f-12 pb-0">Identificación*</label>
-                    <div class="align-self-center">
-                        <input type="text" class="form-control input-reserve" [(ngModel)]="identification" maxlength="10">
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <button type="button" class="btn btn-primary btn-search btn-sm" (click)="search()" [disabled]="!documentType || !identification">Buscar</button>
-                </div>
-
-            </div>
-
-            <div class="card-body text-center" *ngIf="!canCreate">
-                <label class="badge badge-info f-12 break-spaces">NO TIENE PERMISO PARA CREAR RESERVAS</label>
-            </div>
-
+        <div class='form-group mb-1'>
+          <label class="col-form-label  f-12 pb-0">{{labels.document_type}} <span class="text-danger">*</span></label>
+          <div class="align-self-center">
+            <ng-select class="document-reserve" [items]="documentTypes" bindLabel="label" bindValue="value"
+                       [clearable]="true" placeholder="Seleccione..." [(ngModel)]="documentType"
+                       notFoundText="No se encontraron resultados"></ng-select>
+          </div>
         </div>
 
-        <div class="card card-primary" *ngIf="customer" [ngClass]="{'mt-m15' : isCustomer }">
-
-            <div class="card-body p-2 pl-4">
-
-                <div [placement]="'left'" ngbTooltip="Identificación" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/id.png">
-                    <label class="font-weight-bold f-12">{{ customer.identification }}</label>
-                </div>
-
-                <div [placement]="'left'" ngbTooltip="Cliente" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/user.png">
-                    <label class="font-weight-bold f-12">{{ customer.name | titlecase }} {{ customer.lastname | titlecase }}</label>
-                </div>
-
-                <div [placement]="'left'" ngbTooltip="Email" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/email.png">
-                    <label class="font-weight-bold f-12">{{ customer.email }}</label>
-                </div>
-
-                <div [placement]="'left'" ngbTooltip="Celular" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/mobile.png">
-                    <label class="font-weight-bold f-12">{{ customer.mobile }}</label>
-                </div>
-
-                <div [placement]="'left'" ngbTooltip="Teléfono" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/phone.png">
-                    <label class="font-weight-bold f-12">{{ customer.phone }}</label>
-                </div>
-
-                <div [placement]="'left'" ngbTooltip="Nombre de Contacto" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/contact_name.png">
-                    <label class="font-weight-bold f-12">{{ customer.contact_name | titlecase }}</label>
-                </div>
-
-                <div [placement]="'left'" ngbTooltip="Dirección de Facturación" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/billing_address.png">
-                    <label class="font-weight-bold f-12">{{ customer.billing_address }}</label>
-                </div>
-
-                <div *ngFor="let address of customer.customer_address" [placement]="'left'" ngbTooltip="Dirección" tooltipClass="tooltip-class">
-                    <img class="img-customer" src="assets/img/customer/addresses.png">
-                    <label class="font-weight-bold f-12">{{ address.address }}</label>
-                </div>
-
-            </div>
-
+        <div class='form-group mb-2'>
+          <label class="col-form-label  f-12 pb-0">{{labels.identification}} <span class="text-danger">*</span></label>
+          <div class="align-self-center">
+            <input type="text" class="form-control input-reserve" [(ngModel)]="identification" maxlength="10"
+                   (keyup.enter)="search()">
+          </div>
         </div>
+
+        <div class="text-center">
+          <button type="button" class="btn btn-primary btn-search btn-sm" (click)="search()"
+                  [disabled]="!documentType || !identification">Buscar
+          </button>
+        </div>
+
+      </div>
+
+      <div class="card-body text-center" *ngIf="!canCreate">
+        <label class="badge badge-info f-12 break-spaces">NO TIENE PERMISO PARA CREAR RESERVAS</label>
+      </div>
 
     </div>
 
+    <div class="card card-primary" *ngIf="customer" [ngClass]="{'mt-m15' : isCustomer }">
 
-    <div class="col-md-9" style="margin-top: -15px;border-left: 4px solid #d4d4d4;" [hidden]="!customer">
+      <div class="card-body p-2 pl-4">
 
-        <div class="card user-profile-list mb-0">
-            <div class="card-header">
-                <h4>Lista de Reservas</h4>
-            </div>
-
-            <div class="card-body">
-                <div *ngIf="canSee" lass="dt-responsive table-responsive ">
-                    <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger " class="display row-border hover table-striped " style="width:100% ">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>Referencia</th>
-                                <th>Servicio</th>
-                                <th>Tipo</th>
-                                <th>Jornada</th>
-                                <th>Precio</th>
-                                <th>Dirección</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody *ngIf="reservations?.length !=0 ">
-                            <tr *ngFor="let reservation of reservations; let index = index ">
-                                <td>{{ reservation.id }}</td>
-                                <th>{{ reservation.reference }}</th>
-                                <td>{{ reservation.service.name }}</td>
-                                <td *ngIf="reservation.type === 1">Esporádico</td>
-                                <td *ngIf="reservation.type === 2">Mensualidad</td>
-                                <td>{{ reservation.service.working_day.name }}</td>
-                                <td *ngIf="reservation.type === 1">${{ (reservation.service.price * reservation.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
-                                <td *ngIf="reservation.type === 2">${{ ( (reservation.service.price * reservation.service.quantity)*4 ) | currency: '' : '' : '1.0-0' }}</td>
-                                <td>{{ reservation.customer_address.address }}</td>
-                                <td>
-                                    <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>
-                                    <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
-                                    <span *ngIf="reservation.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
-                                    <span *ngIf="reservation.status === 4" class="badge badge-success">PAGO APROBADO</span>
-                                    <span *ngIf="reservation.status === 9" class="badge badge-primary">REPROGRAMADA</span>
-                                    <span *ngIf="reservation.status === 10" class="badge badge-primary">TERMINADO</span>
-                                </td>
-                                <td class="wid-15 text-center">
-                                    <button type="button" *ngIf="reservation.status === 1" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)" [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
-                                      <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
-                                    </button>
-
-                                    <button type="button" *ngIf="reservation.status === 1" class="btn btn-icon btn-delete btn-datatable btn-remove-datatable" (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar" tooltipClass="tooltip-class" container="body">
-                                      <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
-                                    </button>
-
-                                    <button type="button" *ngIf="reservation.status === 2" class="btn btn-icon btn-delete btn-datatable btn-payu" (click)="payments(reservation.id)" [placement]="'bottom'" ngbTooltip="Pagos" tooltipClass="tooltip-class" container="body">
-                                      <img class="img-payu" src="assets/img/payu.png">
-                                    </button>
-
-                                    <button type="button" *ngIf="reservation.status === 6" class="btn btn-icon btn-delete btn-datatable btn-payu" (click)="payments(reservation.id)" [placement]="'bottom'" ngbTooltip="Pagos" tooltipClass="tooltip-class" container="body">
-                                      <img class="img-payu" src="assets/img/payu.png">
-                                    </button>
-
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div *ngIf="!canSee" class="text-align-center">
-                    <label class="badge badge-info f-18">NO TIENE PERMISO PARA VER LA LISTA DE RESERVAS</label>
-                </div>
-            </div>
-
+        <div [placement]="'left'" ngbTooltip="Identificación" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/id.png">
+          <label class="font-weight-bold f-12">{{ customer.identification }}</label>
         </div>
 
+        <div [placement]="'left'" ngbTooltip="Cliente" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/user.png">
+          <label
+            class="font-weight-bold f-12">{{ customer.name | titlecase }} {{ customer.lastname | titlecase }}</label>
+        </div>
+
+        <div [placement]="'left'" ngbTooltip="Email" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/email.png">
+          <label class="font-weight-bold f-12">{{ customer.email }}</label>
+        </div>
+
+        <div [placement]="'left'" ngbTooltip="Celular" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/mobile.png">
+          <label class="font-weight-bold f-12">{{ customer.mobile }}</label>
+        </div>
+
+        <div [placement]="'left'" ngbTooltip="Teléfono" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/phone.png">
+          <label class="font-weight-bold f-12">{{ customer.phone }}</label>
+        </div>
+
+        <div [placement]="'left'" ngbTooltip="Nombre de Contacto" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/contact_name.png">
+          <label class="font-weight-bold f-12">{{ customer.contact_name | titlecase }}</label>
+        </div>
+
+        <div [placement]="'left'" ngbTooltip="Dirección de Facturación" tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/billing_address.png">
+          <label class="font-weight-bold f-12">{{ customer.billing_address }}</label>
+        </div>
+
+        <div *ngFor="let address of customer.customer_address" [placement]="'left'" ngbTooltip="Dirección"
+             tooltipClass="tooltip-class">
+          <img class="img-customer" src="assets/img/customer/addresses.png">
+          <label class="font-weight-bold f-12">{{ address.address }}</label>
+        </div>
+
+      </div>
+
     </div>
+
+  </div>
+
+
+  <div class="col-md-9" style="margin-top: -15px;border-left: 4px solid #d4d4d4;" [hidden]="!customer">
+
+    <div class="card user-profile-list mb-0">
+      <div class="card-header">
+        <h4>Lista de Reservas</h4>
+      </div>
+
+      <div class="card-body">
+        <div *ngIf="canSee" lass="dt-responsive table-responsive ">
+          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger "
+                 class="display row-border hover table-striped " style="width:100% ">
+            <thead>
+            <tr>
+              <th>id</th>
+              <th>Referencia</th>
+              <th>Servicio</th>
+              <th>Tipo</th>
+              <th>Jornada</th>
+              <th>Precio</th>
+              <th>Dirección</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody *ngIf="reservations?.length !=0 ">
+            <tr *ngFor="let reservation of reservations; let index = index ">
+              <td>{{ reservation.id }}</td>
+              <th>{{ reservation.reference }}</th>
+              <td>{{ reservation.service.name }}</td>
+              <td *ngIf="reservation.type === 1">Esporádico</td>
+              <td *ngIf="reservation.type === 2">Mensualidad</td>
+              <td>{{ reservation.service.working_day.name }}</td>
+              <td *ngIf="reservation.type === 1">
+                ${{ (reservation.service.price * reservation.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
+              <td *ngIf="reservation.type === 2">
+                ${{ ((reservation.service.price * reservation.service.quantity) * 4) | currency: '' : '' : '1.0-0' }}</td>
+              <td>{{ reservation.customer_address.address }}</td>
+              <td>
+                <span *ngIf="reservation.status === 1" class="badge badge-warning">RESERVADO</span>
+                <span *ngIf="reservation.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+                <span *ngIf="reservation.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
+                <span *ngIf="reservation.status === 4" class="badge badge-success">PAGO APROBADO</span>
+                <span *ngIf="reservation.status === 9" class="badge badge-primary">REPROGRAMADA</span>
+                <span *ngIf="reservation.status === 10" class="badge badge-primary">TERMINADO</span>
+              </td>
+              <td class="wid-15 text-center">
+                <button type="button" *ngIf="reservation.status === 1"
+                        class="btn btn-icon btn-edit btn-datatable btn-edit-datatable" (click)="edit(reservation.id)"
+                        [placement]="'bottom'" ngbTooltip="Editar" tooltipClass="tooltip-class" container="body">
+                  <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
+                </button>
+
+                <button type="button" *ngIf="reservation.status === 1"
+                        class="btn btn-icon btn-delete btn-datatable btn-remove-datatable"
+                        (click)="delete(reservation.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar"
+                        tooltipClass="tooltip-class" container="body">
+                  <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
+                </button>
+
+                <button type="button" *ngIf="reservation.status === 2"
+                        class="btn btn-icon btn-delete btn-datatable btn-payu" (click)="payments(reservation.id)"
+                        [placement]="'bottom'" ngbTooltip="Pagos" tooltipClass="tooltip-class" container="body">
+                  <img class="img-payu" src="assets/img/payu.png">
+                </button>
+
+                <button type="button" *ngIf="reservation.status === 6"
+                        class="btn btn-icon btn-delete btn-datatable btn-payu" (click)="payments(reservation.id)"
+                        [placement]="'bottom'" ngbTooltip="Pagos" tooltipClass="tooltip-class" container="body">
+                  <img class="img-payu" src="assets/img/payu.png">
+                </button>
+
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="!canSee" class="text-align-center">
+          <label class="badge badge-info f-18">NO TIENE PERMISO PARA VER LA LISTA DE RESERVAS</label>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
 <ng2-toasty [position]="'top-right'"></ng2-toasty>
 
 <form [formGroup]="form">
-    <ng-template #modalForm let-c="close" let-d="dismiss">
-        <div class="modal-header">
-            <h5 *ngIf="!id" class="modal-title">Nueva Reserva</h5>
-            <h5 *ngIf="id" class="modal-title">Modificar Reserva <span class="info-reference">{{ reserve.reference }}</span></h5>
-            <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
-          <span aria-hidden="true">&times;</span>
-        </button>
+  <ng-template #modalForm let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 *ngIf="!id" class="modal-title">Nueva Reserva</h5>
+      <h5 *ngIf="id" class="modal-title">Modificar Reserva <span class="info-reference">{{ reserve.reference }}</span>
+      </h5>
+      <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+
+        <div class="col-md-6">
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.service_type}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="serviceTypes" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." formControlName="service_type"
+                         notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submitted && form.get('service_type').hasError('required')">
+                <small class="form-text text-danger">{{texts.service_type_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.working_day}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="workingDays" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione... " [readonly]="!form.controls.service_type.value"
+                         formControlName="working_day" notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submitted && form.get('working_day').hasError('required')">
+                <small class="form-text text-danger">{{texts.working_day_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.type_periodicity}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="types" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." [readonly]="!form.controls.working_day.value"
+                         formControlName="type" notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submitted && form.get('type').hasError('required')">
+                <small class="form-text text-danger">{{texts.type_periodicity_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.service}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="services" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." [readonly]="!form.controls.type.value" formControlName="service"
+                         notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submitted && form.get('service').hasError('required')">
+                <small class="form-text text-danger">{{texts.service_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.address}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="addresses" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." formControlName="customer_address"
+                         notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submitted && form.get('customer_address').hasError('required')">
+                <small class="form-text text-danger">{{texts.address_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <label class="price" *ngIf="price">Total: ${{ price | currency: '' : '' : '1.0-0'}}</label>
+
         </div>
-        <div class="modal-body">
 
-            <div class="row">
+        <div class="col-md-6" style="border-left: 4px solid #c1c1c1;">
 
-                <div class="col-md-6">
+          <label *ngIf="quantity">{{labels.services_to_schedule}} <i
+            class="feather icon-info ml-1" placement="right" ngbTooltip="{{texts.quantity_days_service_info}}"
+            triggers="click:blur" tooltipClass="my-custom-tooltip"></i>:</label><label class="badge badge-primary ml-2 f-12"
+                                                                       *ngIf="quantity">{{ quantity }}</label>
 
-                    <div class='form-group'>
-                        <label class="col-form-label">Tipo de Servicio*</label>
-                        <div class="align-self-center">
-                            <ng-select [items]="serviceTypes" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione..." formControlName="service_type" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('service_type').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo de servicio es requerido</span>
-                            </div>
-                        </div>
-                    </div>
+          <div class="mt-1 mb-3 " *ngIf="submitted && form.get('days').hasError('invalidQuantity')">
+            <small class="form-text text-danger">{{texts.days_doesnot_match}}</small>
+          </div>
 
-                    <div class='form-group'>
-                        <label class="col-form-label">Jornada*</label>
-                        <div class="align-self-center">
-                            <ng-select [items]="workingDays" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione... " [readonly]="!form.controls.service_type.value" formControlName="working_day" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('working_day').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La jornada es requerida</span>
-                            </div>
-                        </div>
-                    </div>
+          <div class="content-days">
 
-                    <div class='form-group'>
-                        <label class="col-form-label">Tipo*</label>
-                        <div class="align-self-center">
-                            <ng-select [items]="types" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione..." [readonly]="!form.controls.working_day.value" formControlName="type" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('type').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El tipo es requerida</span>
-                            </div>
-                        </div>
-                    </div>
+            <div formArrayName="days" *ngFor="let day of daysArray.controls; let i = index">
 
-                    <div class='form-group'>
-                        <label class="col-form-label">Servicio*</label>
-                        <div class="align-self-center">
-                            <ng-select [items]="services" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione..." [readonly]="!form.controls.type.value" formControlName="service" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('service').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">El servicio es requerido</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class='form-group'>
-                        <label class="col-form-label">Dirección*</label>
-                        <div class="align-self-center">
-                            <ng-select [items]="addresses" indLabel="label" bindValue="value" [clearable]="false" placeholder="Seleccione..." formControlName="customer_address" notFoundText="No se encontraron resultados"></ng-select>
-                            <div class="is-invalid" *ngIf="submitted && form.get('customer_address').hasError('required')">
-                                <span class="badge badge-danger f-size-12 mt-1 m-r-5">La dirección es requerida</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <label class="price" *ngIf="price">Total: ${{ price | currency: '' : '' : '1.0-0'}}</label>
-
-                </div>
-
-                <div class="col-md-6" style="border-left: 4px solid #c1c1c1;">
-
-                    <label *ngIf="quantity">Cantidad de servicios:</label><label class="badge badge-primary ml-2 f-12" *ngIf="quantity">{{ quantity }}</label>
-
-                    <div class="mt-1 mb-3 " *ngIf="form.get('days').hasError('invalidQuantity') && !form.get('days').pristine">
-                        <span class="badge m-r-5 badge-danger break-spaces">La cantidad de días seleccionados no corresponde con la cantidad de servicios</span>
-                    </div>
-
-                    <div class="content-days">
-
-                        <div formArrayName="days" *ngFor="let day of daysArray.controls; let i = index">
-
-                            <div class="form-group" [formGroupName]="day.value.index" *ngIf="day.value.type == 1">
-                                <label class="col-form-label">Fecha Servicio {{ i + 1 }}*</label>
-                                <div class="input-group">
-                                    <input class="form-control" formControlName="date" placeholder="YYYY-MM-DD" ngbDatepicker #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'" [footerTemplate]="footerTemplate" [markDisabled]="isDisabled">
-                                    <div class="input-group-append bg-default" (click)="date.toggle()">
+              <div class="form-group" [formGroupName]="day.value.index" *ngIf="day.value.type == 1">
+                <label class="col-form-label">{{labels.service_date}} {{ i + 1 }} <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input class="form-control" formControlName="date" placeholder="YYYY-MM-DD" ngbDatepicker
+                         #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'"
+                         [footerTemplate]="footerTemplate" [markDisabled]="isDisabled">
+                  <div class="input-group-append bg-default" (click)="date.toggle()">
                                         <span class="input-group-text">
                                           <i class="fa fa-calendar"></i>
                                         </span>
-                                    </div>
-                                </div>
-                                <div class="mt-1" *ngIf="day.get('date').hasError('required')">
-                                    <span class="badge m-r-5 badge-danger">La fecha es requerida</span>
-                                </div>
-                                <div class="mt-1" *ngIf="day.get('date').hasError('repeatedDate')">
-                                    <span class="badge m-r-5 badge-danger">La fecha seleccionada ya esta asociada a otro servicio</span>
-                                </div>
-                                <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled" let-focused="focused" let-selected="selected">
-                                    <div class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted]="disabled">
-                                        {{ date.day }}
-                                    </div>
-                                </ng-template>
-
-                                <ng-template #footerTemplate>
-                                    <hr class="my-0">
-                                    <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="date.close()">Cerrar</button>
-                                </ng-template>
-                            </div>
-
-                            <div class="form-group" [formGroupName]="day.value.index" *ngIf="day.value.type == 2">
-
-                                <div class="form-group">
-                                    <div class="switch d-inline m-r-10">
-                                        <input type="checkbox" id="{{day.value.day}}" formControlName="selected">
-                                        <label for="{{day.value.day}}" class="cr"></label>
-                                    </div>
-                                    <label> {{ day.value.day }}</label>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
+                  </div>
                 </div>
+                <div class="mt-1" *ngIf="day.get('date').hasError('required')">
+                  <small class="form-text text-danger">{{texts.service_date_required}}</small>
+                </div>
+                <div class="mt-1" *ngIf="day.get('date').hasError('repeatedDate')">
+                  <small class="form-text text-danger">{{texts.repeatedDate}}</small>
+                </div>
+                <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled"
+                             let-focused="focused" let-selected="selected">
+                  <div class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused"
+                       [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                       [class.text-muted]="disabled">
+                    {{ date.day }}
+                  </div>
+                </ng-template>
+
+                <ng-template #footerTemplate>
+                  <hr class="my-0">
+                  <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="date.close()">Cerrar</button>
+                </ng-template>
+              </div>
+
+              <div class="form-group" [formGroupName]="day.value.index" *ngIf="day.value.type == 2">
+
+                <div class="form-group">
+                  <div class="switch d-inline m-r-10">
+                    <input type="checkbox" id="{{day.value.day}}" formControlName="selected">
+                    <label for="{{day.value.day}}" class="cr"></label>
+                  </div>
+                  <label> {{ day.value.day }}</label>
+                </div>
+              </div>
 
             </div>
+
+          </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')" (click)="cancel();">Cancelar</button>
-            <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" [disabled]="!form.valid" (click)="onSubmit()">Guardar</button>
-            <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2" [disabled]="!form.valid" (click)="onSubmit()">Editar</button>
-        </div>
-    </ng-template>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')">Cancelar</button>
+      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" (click)="onSubmit()">Guardar</button>
+      <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2" (click)="onSubmit()">Editar</button>
+    </div>
+  </ng-template>
 </form>
 <button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
 <button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>

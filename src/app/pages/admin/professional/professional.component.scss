@@ -17,12 +17,14 @@
   margin-top: 10px;
 }
 
-.container-image {
+.container-image-professional {
   height: 150px;
+  width: 150px;
   background-color: #d6d6d6;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   text-align-last: center;
+  margin: 0 auto;
 }
 
 .img-professional {
@@ -30,4 +32,16 @@
   height: 100%;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.control-upload-image {
+  width: 150px;
+  margin: 0 auto;
+}
+
+.control-upload-image button{
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }

@@ -121,7 +121,7 @@ export class ScheduleComponent implements OnInit {
 
 
     this.loaderService.loading(true);
-    const listDays = new Array();
+    const listDays = [];
     const days = JSON.parse(JSON.stringify(this.daysArray.value));
     days.map( (day: any) => {
       if(day.type === 1 && !day.disabled) {
