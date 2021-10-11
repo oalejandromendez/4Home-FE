@@ -62,6 +62,7 @@ export const texts = {
   days_doesnot_match: 'La cantidad de días seleccionados no corresponde con la cantidad de servicios que debe programar',
   repeatedDate: 'La fecha seleccionada ya esta asociada a otro servicio',
   service_date_required: 'La fecha es requerida',
+  supervisor_required: 'El supervisor es requerido',
 
   add_address: 'Agregar Dirección',
 
