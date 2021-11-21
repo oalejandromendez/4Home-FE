@@ -205,7 +205,6 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
       if (day.type === 1) {
         const date = day.date;
-        console.log(day.date);
         listDays.push({
           date: date.year + '-' + date.month + '-' + date.day
         });

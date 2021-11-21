@@ -38,8 +38,6 @@ export class ResetComponent implements OnInit {
 
   onSubmit() {
 
-    const that = this;
-
     this.submitted = true;
 
     if (!this.form.valid) { return; }

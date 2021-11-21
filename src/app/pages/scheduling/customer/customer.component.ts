@@ -285,7 +285,7 @@ export class CustomerComponent implements OnInit, OnDestroy  {
     this.customer = this.form.value;
     this.customer.roles = ['2'];
 
-    const listAddresses = new Array();
+    const listAddresses = [];
 
     this.addressesArray.value.map( (address: any) => {
       listAddresses.push(address.address);

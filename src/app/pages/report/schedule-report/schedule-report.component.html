@@ -1,138 +1,167 @@
 <div class="d-flex mt-m20">
-  <form class="col-md-3 p-0" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="col-md-12">
+  <form class="col-md-4 p-0" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="col-md-12">
 
-        <div class="card">
+      <div class="card">
 
-          <div class="card-header">
+        <div class="card-header">
 
-            <span class="label-report-shedule">Reporte de Agendamiento</span>
+          <span class="label-report-shedule">Reporte de Agendamiento</span>
 
-          </div>
+        </div>
 
-          <div class="card-body pt-2 pb-2">
+        <div class="card-body pt-2 pb-2">
 
-            <div class="form-group">
-              <div>
-                <span class="label">Fecha Inicial*</span>
-              </div>
-              <div class="input-group">
-                <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate" #startDate="ngbDatepicker">
-                <div class="input-group-append bg-default" (click)="startDate.toggle()">
+          <div class="form-group">
+            <div>
+              <span class="label">Fecha Inicial <span class="text-danger">*</span></span>
+            </div>
+            <div class="input-group">
+              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker
+                     [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate"
+                     #startDate="ngbDatepicker">
+              <div class="input-group-append bg-default" (click)="startDate.toggle()">
                   <span class="input-group-text">
                     <i class="fa fa-calendar"></i>
                   </span>
-                </div>
-              </div>
-              <div class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
-                <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
-              </div>
-              <div class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('init').pristine">
-                <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
               </div>
             </div>
+            <div class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
+              <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
+            </div>
+            <div class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('init').pristine">
+              <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
+            </div>
+          </div>
 
-            <div class="form-group">
-              <div>
-                <span class="label">Fecha Final*</span>
-              </div>
-              <div class="input-group">
-                <input class="form-control" placeholder="YYYY-MM-DD" formControlName="end" ngbDatepicker [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker">
-                <div class="input-group-append bg-default" (click)="endDate.toggle()">
+          <div class="form-group">
+            <div>
+              <span class="label">Fecha Final <span class="text-danger">*</span></span>
+            </div>
+            <div class="input-group">
+              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="end" ngbDatepicker
+                     [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker">
+              <div class="input-group-append bg-default" (click)="endDate.toggle()">
                   <span class="input-group-text">
                     <i class="fa fa-calendar"></i>
                   </span>
-                </div>
-              </div>
-              <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
-                  <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
-              </div>
-              <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
-                  <span class="badge m-r-5 badge-danger">La fecha final debe ser mayor a la fecha de inicio</span>
-              </div>
-              <div class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('end').pristine">
-                  <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
               </div>
             </div>
-
-            <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected" let-disabled="disabled" let-focused="focused">
-              <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
-                {{ date.day }}
-              </span>
-            </ng-template>
-
-            <ng-template #footerTemplateStartDate>
-                <hr class="my-0">
-                <button class="btn btn-primary btn-sm m-2 float-left btn-dp" (click)="form.get('init').setValue(today); startDate.close()">Hoy</button>
-                <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">Cerrar</button>
-            </ng-template>
-
-            <ng-template #customEndDay let-date="date" let-currentMonth="currentMonth" let-selected="selected" let-disabled="disabled" let-focused="focused">
-              <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused" [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
-                {{ date.day }}
-              </span>
-            </ng-template>
-
-            <ng-template #footerTemplateEndDate>
-              <hr class="my-0">
-              <button class="btn btn-primary btn-sm m-2 float-left btn-dp" (click)="form.get('end').setValue(today); endDate.close()">Hoy</button>
-              <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="endDate.close()">Cerrar</button>
-            </ng-template>
-
+            <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
+              <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
+            </div>
+            <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
+              <span class="badge m-r-5 badge-danger">La fecha final debe ser mayor a la fecha de inicio</span>
+            </div>
+            <div class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('end').pristine">
+              <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
+            </div>
           </div>
 
-          <div class="row">
-            <div class="col-xl-12 col-md-6 mtb-m12">
-              <div class="col-md-12 pr-0">
-                <div class="card-submit">
-                  <div class="form-group text-center">
-                    <div class="col-md-12 col-md-offset-3">
-                      <button type="button" class="btn btn-secondary btn-sm" (click)="clear()">Limpiar</button>
-                      <button type="submit" class="btn btn-success btn-sm" [disabled]="!form.valid">Consultar</button>
-                    </div>
+          <div class="form-group">
+            <div>
+              <span class="label">{{labels.customer}}</span>
+            </div>
+            <div class="input-group">
+              <ng-multiselect-dropdown class="form-control"
+                                       [ngModelOptions]="{standalone: true}"
+                                       [(ngModel)]="customersSelected"
+                                       [placeholder]="'Clientes'"
+                                       [data]="customers"
+                                       [settings]="dropdownCustomers">
+              </ng-multiselect-dropdown>
+            </div>
+          </div>
+
+          <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
+                       let-disabled="disabled" let-focused="focused">
+              <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused"
+                    [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                    [class.text-muted-day]="disabled">
+                {{ date.day }}
+              </span>
+          </ng-template>
+
+          <ng-template #footerTemplateStartDate>
+            <hr class="my-0">
+            <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
+                    (click)="form.get('init').setValue(today); startDate.close()">Hoy
+            </button>
+            <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">Cerrar</button>
+          </ng-template>
+
+          <ng-template #customEndDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
+                       let-disabled="disabled" let-focused="focused">
+              <span class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused"
+                    [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                    [class.text-muted-day]="disabled">
+                {{ date.day }}
+              </span>
+          </ng-template>
+
+          <ng-template #footerTemplateEndDate>
+            <hr class="my-0">
+            <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
+                    (click)="form.get('end').setValue(today); endDate.close()">Hoy
+            </button>
+            <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="endDate.close()">Cerrar</button>
+          </ng-template>
+
+        </div>
+
+        <div class="row">
+          <div class="col-xl-12 col-md-6 mtb-m12">
+            <div class="col-md-12 pr-0">
+              <div class="card-submit">
+                <div class="form-group text-center">
+                  <div class="col-md-12 col-md-offset-3">
+                    <button type="button" class="btn btn-secondary btn-sm" (click)="clear()">Limpiar</button>
+                    <button type="submit" class="btn btn-success btn-sm" [disabled]="!form.valid">Consultar</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
         </div>
 
       </div>
+
+    </div>
   </form>
 
-  <div class="col-md-9">
+  <div class="col-md-8">
     <div class="card">
       <div class="card-body">
         <div class="dt-responsive table-responsive mt-2">
-          <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="display row-border hover table-striped" style="width:100%">
+          <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                 class="display row-border hover table-striped" style="width:100%">
             <thead>
-                <tr>
-                    <th>id</th>
-                    <th>Referencia</th>
-                    <th>Fecha</th>
-                    <th>Tipo</th>
-                    <th>Profesional</th>
-                    <th>Cliente</th>
-                    <th>Dirección</th>
-                </tr>
+            <tr>
+              <th>id</th>
+              <th>Referencia</th>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Profesional</th>
+              <th>Cliente</th>
+              <th>Dirección</th>
+            </tr>
             </thead>
             <tbody *ngIf="reserves?.length != 0">
-                <tr *ngFor="let reserve of reserves; let index = index">
-                    <td>{{ reserve.reserve.id }}</td>
-                    <td>{{ reserve.reserve.reference }}</td>
-                    <td>{{ reserve.date | date:'fullDate' }}</td>
-                    <td>
-                      <span *ngIf="reserve.reserve.type === 1" class="badge badge-primary f-12">Esporadico</span>
-                      <span *ngIf="reserve.reserve.type === 2" class="badge badge-warning f-12">Mensualidad</span>
-                    </td>
-                    <td>{{ reserve.reserve.professional.name }} {{ reserve.reserve.professional.lastname }}</td>
-                    <td>{{ reserve.reserve.user.name }} {{ reserve.reserve.user.lastname }}</td>
-                    <td>{{ reserve.reserve.customer_address.address }}</td>
-                </tr>
-                <tr *ngIf="reserves?.length === 0">
-                  <td colspan="6" class="no-data-available">No existen pagos registrados</td>
-                </tr>
+            <tr *ngFor="let reserve of reserves; let index = index">
+              <td>{{ reserve.reserve.id }}</td>
+              <td>{{ reserve.reserve.reference }}</td>
+              <td>{{ reserve.date | date:'fullDate' }}</td>
+              <td>
+                <span *ngIf="reserve.reserve.type === 1" class="badge badge-primary f-12">Esporadico</span>
+                <span *ngIf="reserve.reserve.type === 2" class="badge badge-warning f-12">Mensualidad</span>
+              </td>
+              <td>{{ reserve.reserve.professional.name }} {{ reserve.reserve.professional.lastname }}</td>
+              <td>{{ reserve.reserve.user.name }} {{ reserve.reserve.user.lastname }}</td>
+              <td>{{ reserve.reserve.customer_address.address }}</td>
+            </tr>
+            <tr *ngIf="reserves?.length === 0">
+              <td colspan="6" class="no-data-available">No existen pagos registrados</td>
+            </tr>
             </tbody>
           </table>
         </div>

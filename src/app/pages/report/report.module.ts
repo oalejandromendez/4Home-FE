@@ -12,6 +12,7 @@ import { ProfessionalReportComponent } from './professional-report/professional-
 import { PaymentReportComponent } from './payment-report/payment-report.component';
 import { ServiceReportComponent } from './service-report/service-report.component';
 import { ActivityComponent } from './activity/activity.component';
+import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { ActivityComponent } from './activity/activity.component';
     SharedModule,
     NgbTooltipModule,
     NgbDatepickerModule,
-    NgbTabsetModule
+    NgbTabsetModule,
+    NgMultiSelectDropDownModule
   ]
 })
 export class ReportModule { }

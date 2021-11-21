@@ -74,4 +74,8 @@ export const texts = {
   error_date: 'Error en la fecha',
   only_numbers: 'Digite unicamente números',
   verifing: 'Verificando...',
+
+  not_data: 'No existen datos',
+  select_all: 'Seleccionar todos',
+  unselect_all: 'Deseleccionar todos',
 };

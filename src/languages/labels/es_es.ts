@@ -34,4 +34,6 @@ export const labels = {
   service_date: 'Fecha Servicio',
   services_to_schedule: 'Cantidad de servicios',
   supervisor: 'Supervisor',
+  customer: 'Cliente',
+  search: 'Buscar',
 };
