@@ -144,6 +144,7 @@
               <th>Profesional</th>
               <th>Cliente</th>
               <th>Dirección</th>
+              <th>{{labels.status}}</th>
             </tr>
             </thead>
             <tbody *ngIf="reserves?.length != 0">
@@ -158,6 +159,14 @@
               <td>{{ reserve.reserve.professional.name }} {{ reserve.reserve.professional.lastname }}</td>
               <td>{{ reserve.reserve.user.name }} {{ reserve.reserve.user.lastname }}</td>
               <td>{{ reserve.reserve.customer_address.address }}</td>
+              <td>
+                <span *ngIf="reserve.reserve.status === 1" class="badge badge-warning">RESERVADO</span>
+                <span *ngIf="reserve.reserve.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+                <span *ngIf="reserve.reserve.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
+                <span *ngIf="reserve.reserve.status === 4" class="badge badge-success">PAGO APROBADO</span>
+                <span *ngIf="reserve.reserve.status === 9" class="badge badge-primary">REPROGRAMADA</span>
+                <span *ngIf="reserve.reserve.status === 10" class="badge badge-primary">TERMINADO</span>
+              </td>
             </tr>
             <tr *ngIf="reserves?.length === 0">
               <td colspan="6" class="no-data-available">No existen pagos registrados</td>
