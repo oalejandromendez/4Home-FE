@@ -1,67 +1,60 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
-import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
-import {DataTableDirective} from 'angular-datatables';
-import {ToastOptions, ToastyService} from 'ng2-toasty';
-import {Subject, Subscription} from 'rxjs';
-import {DataTableLanguage} from 'src/app/models/common/datatable';
-import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
-import {LoaderService} from 'src/app/services/common/loader/loader.service';
-import {ReportService} from 'src/app/services/report/report.service';
-import Swal from 'sweetalert2';
-import * as _ from 'lodash';
-import {CustomerService} from '@src/services/scheduling/customer/customer.service';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+
 import {labels} from '@lang/labels/es_es';
 import {messages} from '@lang/messages/es_es';
 import {texts} from '@lang/texts/es_es';
+import Swal from 'sweetalert2';
+import {LoaderService} from '@src/services/common/loader/loader.service';
+import {ProfessionalService} from '@src/services/admin/professional/professional.service';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+import {CustomDatepickerI18n, I18n} from '@src/services/common/datepicker/datepicker.service';
+import {Subject} from 'rxjs';
+import {DataTableLanguage} from '@src/models/common/datatable';
+import {ToastOptions, ToastyService} from 'ng2-toasty';
+import {ReportService} from '@src/services/report/report.service';
+import {DataTableDirective} from 'angular-datatables';
+import * as _ from 'lodash';
+import {Router} from '@angular/router';
 
 @Component({
-  selector: 'app-schedule-report',
-  templateUrl: './schedule-report.component.html',
-  styleUrls: ['./schedule-report.component.scss'],
+  selector: 'app-schedule-professionals-report',
+  templateUrl: './schedule-professionals-report.component.html',
+  styleUrls: ['./schedule-professionals-report.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [I18n, {provide: NgbDatepickerI18n, useClass: CustomDatepickerI18n}, NgbDatepickerConfig]
 })
-export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  dates: any[] = [];
+  today = this.calendar.getToday();
+  form: FormGroup;
+
+  @ViewChild(DataTableDirective, {static: false})
+
+  dtElement: DataTableDirective;
+
+  reserves: any[] = [];
+  professionals: any[] = [];
+  professionalsSelected: any[] = [];
+
+  dtOptions: any = {};
+  dtTrigger: Subject<any> = new Subject();
+  dropdownProfessionals: {};
 
   labels = labels;
   messages = messages;
   texts = texts;
 
-  @ViewChild(DataTableDirective, {static: false})
-
-  dtElement: DataTableDirective;
-  dtOptions: any = {};
-  dtTrigger: Subject<any> = new Subject();
-
-  today = this.calendar.getToday();
-  now: Date = new Date();
-
-  form: FormGroup;
-  submitted = false;
-
-  reserves: any[] = [];
-
-  customers: any[] = [];
-  dropdownCustomers: {};
-
-  customersSelected: any[] = [];
-
-  constructor(
-    private I18n: I18n,
-    private config: NgbDatepickerConfig,
-    private calendar: NgbCalendar,
-    private loaderService: LoaderService,
-    private language: DataTableLanguage,
-    private reportService: ReportService,
-    private dateService: CustomDatepickerI18n,
-    private router: Router,
-    private toastyService: ToastyService,
-    private customerService: CustomerService
-  ) {
-    config.minDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1, day: this.now.getDate()};
-    this.dropdownCustomers = {
+  constructor(private loaderService: LoaderService,
+              private professionalService: ProfessionalService,
+              private dateService: CustomDatepickerI18n,
+              private language: DataTableLanguage,
+              private toastyService: ToastyService,
+              private reportService: ReportService,
+              private router: Router,
+              private calendar: NgbCalendar) {
+    this.dropdownProfessionals = {
       idField: 'id',
       textField: 'label',
       singleSelection: false,
@@ -77,14 +70,7 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
   ngOnInit(): void {
     this.loadForm();
     this.loadTable();
-    this.getCustomers();
-  }
-
-  loadForm() {
-    this.form = new FormGroup({
-      init: new FormControl(this.today, [Validators.required]),
-      end: new FormControl(this.today, [Validators.required]),
-    }, {validators: this.dateService.ValidateDates});
+    this.getProfessionals();
   }
 
   ngAfterViewInit(): void {
@@ -95,12 +81,11 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     this.dtTrigger.unsubscribe();
   }
 
-  rerender(): void {
-    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      dtInstance.destroy();
-      this.dtTrigger.next();
-      this.loaderService.loading(false);
-    });
+  loadForm() {
+    this.form = new FormGroup({
+      init: new FormControl(this.today, [Validators.required]),
+      end: new FormControl(this.today, [Validators.required]),
+    }, {validators: this.dateService.ValidateDates});
   }
 
   loadTable() {
@@ -155,15 +140,31 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     };
   }
 
-  isWeekend(date: NgbDateStruct) {
-    return this.dateService.isWeekend(date);
+  getProfessionals() {
+    this.loaderService.loading(true);
+    this.professionalService.get().subscribe(resp => {
+      this.professionals = resp.data.map(data => {
+        const label = `${data.identification} - ${data.name} ${data.lastname}`;
+        return {id: data.id, label};
+      });
+      this.loaderService.loading(false);
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error'
+      });
+    });
   }
 
   onSubmit() {
 
-    this.submitted = true;
-
     if (!this.form.valid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: messages.not_valid_form
+      });
       return;
     }
 
@@ -180,11 +181,21 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
 
     const init = startDate.year + '-' + startDate.month + '-' + startDate.day;
     const end = endDate.year + '-' + endDate.month + '-' + endDate.day;
-    const customers = this.customersSelected;
+    const professionals = this.professionalsSelected;
 
-    this.reserves = [];
+    const initD = new Date(startDate.year, startDate.month - 1, startDate.day);
+    const endD = new Date(endDate.year, endDate.month - 1, endDate.day);
 
-    this.reportService.schedule({init, end, customers}).subscribe((data: any) => {
+    while (initD <= endD) {
+      console.log(initD);
+      this.dates.push(initD.toDateString());
+      initD.setDate(initD.getDate() + 1);
+    }
+
+    console.log(this.dates);
+    console.log(new Date(this.dates[0]));
+
+    /*this.reportService.schedule({init, end, professionals}).subscribe((data: any) => {
 
       if (data.monthly.length === 0 && data.sporadic.length === 0) {
         const toastOptions: ToastOptions = {
@@ -260,33 +271,28 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
           this.router.navigateByUrl('/login');
         }
       }
+    });*/
+  }
+
+  rerender(): void {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      dtInstance.destroy();
+      this.dtTrigger.next();
+      this.loaderService.loading(false);
     });
+  }
+
+  isWeekend(date: NgbDateStruct) {
+    return this.dateService.isWeekend(date);
   }
 
   clear() {
     this.form.reset();
-    this.customersSelected = [];
+    this.professionalsSelected = [];
     if (this.reserves) {
       this.reserves = [];
       this.dtTrigger.next();
     }
-  }
-
-  getCustomers() {
-    this.loaderService.loading(true);
-    this.customerService.get().subscribe(resp => {
-      this.customers = resp.map(data => {
-        const label = `${data.identification} - ${data.name} ${data.lastname}`;
-        return {id: data.id, label};
-      });
-      this.loaderService.loading(false);
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ha ocurrido un error'
-      });
-    });
   }
 
 }

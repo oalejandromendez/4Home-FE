@@ -6,7 +6,7 @@
 
         <div class="card-header">
 
-          <span class="label-report-shedule">{{labels.scheduling_report_customers}}</span>
+          <span class="label-report-shedule">{{labels.scheduling_report_professionals}}</span>
 
         </div>
 
@@ -65,10 +65,10 @@
             <div class="input-group">
               <ng-multiselect-dropdown class="form-control"
                                        [ngModelOptions]="{standalone: true}"
-                                       [(ngModel)]="customersSelected"
-                                       [placeholder]="'Clientes'"
-                                       [data]="customers"
-                                       [settings]="dropdownCustomers">
+                                       [(ngModel)]="professionalsSelected"
+                                       [placeholder]="'Profesionales'"
+                                       [data]="professionals"
+                                       [settings]="dropdownProfessionals">
               </ng-multiselect-dropdown>
             </div>
           </div>
@@ -137,13 +137,7 @@
                  class="display row-border hover table-striped" style="width:100%">
             <thead>
             <tr>
-              <th>id</th>
-              <th>Referencia</th>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>Profesional</th>
-              <th>Cliente</th>
-              <th>Dirección</th>
+              <th>{{labels.professional}}</th>
               <th>{{labels.status}}</th>
             </tr>
             </thead>

@@ -36,4 +36,7 @@ export const labels = {
   supervisor: 'Supervisor',
   customer: 'Cliente',
   search: 'Buscar',
+  scheduling_report_customers: 'Reporte de Agendamiento por clientes',
+  scheduling_report_professionals: 'Reporte de Agendamiento por profesionales',
+  professional: 'Profesional'
 };

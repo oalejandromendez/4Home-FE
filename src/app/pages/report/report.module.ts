@@ -13,10 +13,11 @@ import { PaymentReportComponent } from './payment-report/payment-report.componen
 import { ServiceReportComponent } from './service-report/service-report.component';
 import { ActivityComponent } from './activity/activity.component';
 import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
+import { ScheduleProfessionalsReportComponent } from './schedule-professionals-report/schedule-professionals-report.component';
 
 
 @NgModule({
-  declarations: [ScheduleReportComponent, ExpirationComponent, HistoryReportComponent, PendingReportComponent, ProfessionalReportComponent, PaymentReportComponent, ServiceReportComponent, ActivityComponent],
+  declarations: [ScheduleReportComponent, ExpirationComponent, HistoryReportComponent, PendingReportComponent, ProfessionalReportComponent, PaymentReportComponent, ServiceReportComponent, ActivityComponent, ScheduleProfessionalsReportComponent],
   imports: [
     CommonModule,
     ReportRoutingModule,

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import { UserService } from 'src/app/services/admin/user/user.service';
-import { LoaderService } from 'src/app/services/common/loader/loader.service';
+import {UserService} from 'src/app/services/admin/user/user.service';
+import {LoaderService} from 'src/app/services/common/loader/loader.service';
 
 export interface NavigationItem {
   id: string;
@@ -205,20 +205,37 @@ const NavigationItems = [
         hidden: true
       },
       {
+        id: 'scheduler',
+        title: 'Agenda',
+        type: 'collapse',
+        icon: 'assets/img/menu/scheduler.png',
+        hidden: true,
+        children: [
+          {
+            id: 'schedulerCustomer',
+            title: 'por Clientes',
+            type: 'item',
+            url: '/report/shedule',
+            icon: 'assets/img/menu/schedule.png',
+            hidden: true
+          },
+          {
+            id: 'schedulerProfessional',
+            title: 'por Profesionales',
+            type: 'item',
+            url: '/report/shedule-professionals',
+            icon: 'assets/img/menu/scheduling.png',
+            hidden: true
+          },
+        ]
+      },
+      {
         id: 'report',
         title: 'Reportes',
         type: 'collapse',
         icon: 'assets/img/menu/report.png',
         hidden: true,
         children: [
-          {
-            id: 'scheduler',
-            title: 'Agenda',
-            type: 'item',
-            url: '/report/shedule',
-            icon: 'assets/img/menu/scheduler.png',
-            hidden: true
-          },
           {
             id: 'overdue',
             title: 'Pagos vencidos',
@@ -289,7 +306,8 @@ export class NavigationItem {
     private loaderService: LoaderService
   ) {
   }
-  public permissions () {
+
+  public permissions() {
     return this.userService.permissions().toPromise();
   }
 
@@ -297,84 +315,86 @@ export class NavigationItem {
     this.loaderService.loading(true);
     await this.permissions().then(resp => {
       NavigationItems.map(item => {
-        item.children.map( children => {
-          const users           = resp.filter( (perm: any) => perm.name === "ACCEDER_USUARIOS");
-          const roles           = resp.filter( (perm: any) => perm.name === "ACCEDER_ROLES");
-          const professional    = resp.filter( (perm: any) => perm.name === "ACCEDER_PROFESIONALES");
-          const position        = resp.filter( (perm: any) => perm.name === "ACCEDER_CARGOS");
-          const servicetype     = resp.filter( (perm: any) => perm.name === "ACCEDER_TIPO_SERVICIO");
-          const workingday      = resp.filter( (perm: any) => perm.name === "ACCEDER_JORNADAS");
-          const service         = resp.filter( (perm: any) => perm.name === "ACCEDER_SERVICIOS");
-          const customertype    = resp.filter( (perm: any) => perm.name === "ACCEDER_TIPO_CLIENTE");
-          const customer        = resp.filter( (perm: any) => perm.name === "ACCEDER_CLIENTES");
+        item.children.map(children => {
+          const users = resp.filter((perm: any) => perm.name === 'ACCEDER_USUARIOS');
+          const roles = resp.filter((perm: any) => perm.name === 'ACCEDER_ROLES');
+          const professional = resp.filter((perm: any) => perm.name === 'ACCEDER_PROFESIONALES');
+          const position = resp.filter((perm: any) => perm.name === 'ACCEDER_CARGOS');
+          const servicetype = resp.filter((perm: any) => perm.name === 'ACCEDER_TIPO_SERVICIO');
+          const workingday = resp.filter((perm: any) => perm.name === 'ACCEDER_JORNADAS');
+          const service = resp.filter((perm: any) => perm.name === 'ACCEDER_SERVICIOS');
+          const customertype = resp.filter((perm: any) => perm.name === 'ACCEDER_TIPO_CLIENTE');
+          const customer = resp.filter((perm: any) => perm.name === 'ACCEDER_CLIENTES');
           // const holiday         = resp.filter( (perm: any) => perm.name === "ACCEDER_FESTIVOS");
-          const reserve         = resp.filter( (perm: any) => perm.name === "ACCEDER_RESERVAS");
-          const schedule        = resp.filter( (perm: any) => perm.name === "ACCEDER_AGENDAMIENTOS");
-          const availability    = resp.filter( (perm: any) => perm.name === "ACCEDER_DISPONIBILIDAD");
-          const status          = resp.filter( (perm: any) => perm.name === "ACCEDER_ESTADOS");
-          const promocode       = resp.filter( (perm: any) => perm.name === "ACCEDER_CODIGOS_PROMOCIONALES");
-          const reschedule      = resp.filter( (perm: any) => perm.name === "ACCEDER_REPROGRAMACIONES");
-          const report          = resp.filter( (perm: any) => perm.name === "ACCEDER_REPORTES");
-          const scheduler       = resp.filter( (perm: any) => perm.name === "REPORTE_AGENDA");
-          const overdue         = resp.filter( (perm: any) => perm.name === "REPORTE_PAGOS_VENCIDOS");
-          const servicesr       = resp.filter( (perm: any) => perm.name === "REPORTE_HISTORIAL");
-          const pendingPayments = resp.filter( (perm: any) => perm.name === "REPORTE_PAGOS_PENDIENTES");
-          const servicesProfessional = resp.filter( (perm: any) => perm.name === "REPORTE_SERVICIOS_PROFESIONALES");
-          const historyPayments = resp.filter( (perm: any) => perm.name === "REPORTE_HISTORIAL_PAGOS");
-          const servicer        = resp.filter( (perm: any) => perm.name === "REPORTE_SERVICIO");
-          const log             = resp.filter( (perm: any) => perm.name === "REPORTE_REGISTRO_ACTIVIDADES");
-          const paymentHistory  = resp.filter( (perm: any) => perm.name === "ACCEDER_HISTORIAL_CLIENTE");
+          const reserve = resp.filter((perm: any) => perm.name === 'ACCEDER_RESERVAS');
+          const schedule = resp.filter((perm: any) => perm.name === 'ACCEDER_AGENDAMIENTOS');
+          const availability = resp.filter((perm: any) => perm.name === 'ACCEDER_DISPONIBILIDAD');
+          const status = resp.filter((perm: any) => perm.name === 'ACCEDER_ESTADOS');
+          const promocode = resp.filter((perm: any) => perm.name === 'ACCEDER_CODIGOS_PROMOCIONALES');
+          const reschedule = resp.filter((perm: any) => perm.name === 'ACCEDER_REPROGRAMACIONES');
+          const report = resp.filter((perm: any) => perm.name === 'ACCEDER_REPORTES');
+          const scheduler = resp.filter((perm: any) => perm.name === 'REPORTE_AGENDA');
+          const schedulerCustomer = resp.filter((perm: any) => perm.name === 'REPORTE_AGENDA_CLIENTES');
+          const schedulerProfessional = resp.filter((perm: any) => perm.name === 'REPORTE_AGENDA_PROFESIONALES');
+          const overdue = resp.filter((perm: any) => perm.name === 'REPORTE_PAGOS_VENCIDOS');
+          const servicesr = resp.filter((perm: any) => perm.name === 'REPORTE_HISTORIAL');
+          const pendingPayments = resp.filter((perm: any) => perm.name === 'REPORTE_PAGOS_PENDIENTES');
+          const servicesProfessional = resp.filter((perm: any) => perm.name === 'REPORTE_SERVICIOS_PROFESIONALES');
+          const historyPayments = resp.filter((perm: any) => perm.name === 'REPORTE_HISTORIAL_PAGOS');
+          const servicer = resp.filter((perm: any) => perm.name === 'REPORTE_SERVICIO');
+          const log = resp.filter((perm: any) => perm.name === 'REPORTE_REGISTRO_ACTIVIDADES');
+          const paymentHistory = resp.filter((perm: any) => perm.name === 'ACCEDER_HISTORIAL_CLIENTE');
 
 
-          if(users.length > 0 && children.id === 'users') {
+          if (users.length > 0 && children.id === 'users') {
             children.hidden = false;
-          } else if(users.length === 0 && children.id === 'users') {
-            children.hidden = true
+          } else if (users.length === 0 && children.id === 'users') {
+            children.hidden = true;
           }
 
-          if(roles.length > 0 && children.id === 'roles') {
+          if (roles.length > 0 && children.id === 'roles') {
             children.hidden = false;
           } else if (roles.length === 0 && children.id === 'roles') {
             children.hidden = true;
           }
 
-          if(professional.length > 0 && children.id === 'professional') {
+          if (professional.length > 0 && children.id === 'professional') {
             children.hidden = false;
           } else if (professional.length === 0 && children.id === 'professional') {
             children.hidden = true;
           }
 
-          if(position.length > 0 && children.id === 'position') {
+          if (position.length > 0 && children.id === 'position') {
             children.hidden = false;
           } else if (position.length === 0 && children.id === 'position') {
             children.hidden = true;
           }
 
-          if(servicetype.length > 0 && children.id === 'servicetype') {
+          if (servicetype.length > 0 && children.id === 'servicetype') {
             children.hidden = false;
           } else if (servicetype.length === 0 && children.id === 'servicetype') {
             children.hidden = true;
           }
 
-          if(workingday.length > 0 && children.id === 'workingday') {
+          if (workingday.length > 0 && children.id === 'workingday') {
             children.hidden = false;
           } else if (workingday.length === 0 && children.id === 'workingday') {
             children.hidden = true;
           }
 
-          if(service.length > 0 && children.id === 'service') {
+          if (service.length > 0 && children.id === 'service') {
             children.hidden = false;
           } else if (service.length === 0 && children.id === 'service') {
             children.hidden = true;
           }
 
-          if(customertype.length > 0 && children.id === 'customertype') {
+          if (customertype.length > 0 && children.id === 'customertype') {
             children.hidden = false;
           } else if (customertype.length === 0 && children.id === 'customertype') {
             children.hidden = true;
           }
 
-          if(customer.length > 0 && children.id === 'customer') {
+          if (customer.length > 0 && children.id === 'customer') {
             children.hidden = false;
           } else if (customer.length === 0 && children.id === 'customer') {
             children.hidden = true;
@@ -386,99 +406,114 @@ export class NavigationItem {
             children.hidden = true;
           }*/
 
-          if(reserve.length > 0 && children.id === 'reserve') {
+          if (reserve.length > 0 && children.id === 'reserve') {
             children.hidden = false;
           } else if (reserve.length === 0 && children.id === 'reserve') {
             children.hidden = true;
           }
 
-          if(schedule.length > 0 && children.id === 'schedule') {
+          if (schedule.length > 0 && children.id === 'schedule') {
             children.hidden = false;
           } else if (schedule.length === 0 && children.id === 'schedule') {
             children.hidden = true;
           }
 
-          if(availability.length > 0 && children.id === 'availability') {
+          if (availability.length > 0 && children.id === 'availability') {
             children.hidden = false;
           } else if (availability.length === 0 && children.id === 'availability') {
             children.hidden = true;
           }
 
-          if(status.length > 0 && children.id === 'status') {
+          if (status.length > 0 && children.id === 'status') {
             children.hidden = false;
           } else if (status.length === 0 && children.id === 'status') {
             children.hidden = true;
           }
 
-          if(promocode.length > 0 && children.id === 'promocode') {
+          if (promocode.length > 0 && children.id === 'promocode') {
             children.hidden = false;
           } else if (promocode.length === 0 && children.id === 'promocode') {
             children.hidden = true;
           }
 
-          if(reschedule.length > 0 && children.id === 'reschedule') {
+          if (reschedule.length > 0 && children.id === 'reschedule') {
             children.hidden = false;
           } else if (reschedule.length === 0 && children.id === 'reschedule') {
             children.hidden = true;
           }
 
-          if(report.length > 0 && children.id === 'report') {
+          if (report.length > 0 && children.id === 'report') {
             children.hidden = false;
           } else if (report.length === 0 && children.id === 'report') {
             children.hidden = true;
           }
 
-          if(paymentHistory.length > 0 && children.id === 'paymentHistory') {
+          if (paymentHistory.length > 0 && children.id === 'paymentHistory') {
             children.hidden = false;
           } else if (paymentHistory.length === 0 && children.id === 'paymentHistory') {
             children.hidden = true;
           }
+          if (scheduler.length > 0 && children.id === 'scheduler') {
+            children.hidden = false;
+          } else if (scheduler.length === 0 && children.id === 'scheduler') {
+            children.hidden = true;
+          }
 
-          if(children.id === 'report') {
-            children.children.map( child => {
-              if(scheduler.length > 0 && child.id === 'scheduler') {
+          if (children.id === 'scheduler') {
+            children.children.map(child => {
+              if (schedulerCustomer.length > 0 && child.id === 'schedulerCustomer') {
                 child.hidden = false;
-              } else if (scheduler.length === 0 && child.id === 'scheduler') {
+              } else if (schedulerCustomer.length === 0 && child.id === 'schedulerCustomer') {
                 child.hidden = true;
               }
 
-              if(overdue.length > 0 && child.id === 'overdue') {
+              if (schedulerProfessional.length > 0 && child.id === 'schedulerProfessional') {
+                child.hidden = false;
+              } else if (schedulerProfessional.length === 0 && child.id === 'schedulerProfessional') {
+                child.hidden = true;
+              }
+            });
+          }
+          if (children.id === 'report') {
+            children.children.map(child => {
+
+              if (overdue.length > 0 && child.id === 'overdue') {
                 child.hidden = false;
               } else if (overdue.length === 0 && child.id === 'overdue') {
                 child.hidden = true;
               }
 
-              if(servicesr.length > 0 && child.id === 'servicesr') {
+              if (servicesr.length > 0 && child.id === 'servicesr') {
                 child.hidden = false;
               } else if (servicesr.length === 0 && child.id === 'servicesr') {
                 child.hidden = true;
               }
 
-              if(pendingPayments.length > 0 && child.id === 'pendingPayments') {
+              if (pendingPayments.length > 0 && child.id === 'pendingPayments') {
                 child.hidden = false;
               } else if (pendingPayments.length === 0 && child.id === 'pendingPayments') {
                 child.hidden = true;
               }
 
-              if(servicesProfessional.length > 0 && child.id === 'servicesProfessional') {
+              if (servicesProfessional.length > 0 && child.id === 'servicesProfessional') {
                 child.hidden = false;
               } else if (servicesProfessional.length === 0 && child.id === 'servicesProfessional') {
                 child.hidden = true;
               }
 
-              if(historyPayments.length > 0 && child.id === 'historyPayments') {
+              if (historyPayments.length > 0 && child.id === 'historyPayments') {
                 child.hidden = false;
               } else if (historyPayments.length === 0 && child.id === 'historyPayments') {
                 child.hidden = true;
               }
 
-              if(servicer.length > 0 && child.id === 'servicer') {
+              if (servicer.length > 0 && child.id === 'servicer') {
                 child.hidden = false;
               } else if (servicer.length === 0 && child.id === 'servicer') {
                 child.hidden = true;
               }
 
-              if(log.length > 0 && child.id === 'log') {
+              if (log.length > 0 && child.id === 'log') {
                 child.hidden = false;
               } else if (log.length === 0 && child.id === 'log') {
                 child.hidden = true;
@@ -488,7 +523,7 @@ export class NavigationItem {
         });
       });
       this.loaderService.loading(false);
-    })
+    });
   }
 
   get() {

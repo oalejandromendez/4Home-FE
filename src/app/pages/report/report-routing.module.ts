@@ -8,6 +8,7 @@ import { PendingReportComponent } from './pending-report/pending-report.componen
 import { ProfessionalReportComponent } from './professional-report/professional-report.component';
 import { ScheduleReportComponent } from './schedule-report/schedule-report.component';
 import { ServiceReportComponent } from './service-report/service-report.component';
+import {ScheduleProfessionalsReportComponent} from '@src/pages/report/schedule-professionals-report/schedule-professionals-report.component';
 
 
 const routes: Routes = [
@@ -17,6 +18,10 @@ const routes: Routes = [
       {
         path: 'shedule',
         component: ScheduleReportComponent,
+      },
+      {
+        path: 'shedule-professionals',
+        component: ScheduleProfessionalsReportComponent,
       },
       {
         path: 'expiration',

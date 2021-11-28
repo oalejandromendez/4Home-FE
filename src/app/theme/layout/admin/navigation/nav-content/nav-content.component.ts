@@ -36,7 +36,7 @@ export class NavContentComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     if (this.windowWidth < 992) {
-      this.dattaConfig['layout'] = 'vertical';
+      this.dattaConfig.layout = 'vertical';
       setTimeout(() => {
         document.querySelector('.pcoded-navbar').classList.add('menupos-static');
         (document.querySelector('#nav-ps-datta') as HTMLElement).style.maxHeight = '100%';
@@ -45,7 +45,7 @@ export class NavContentComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.dattaConfig['layout'] === 'horizontal') {
+    if (this.dattaConfig.layout === 'horizontal') {
       this.contentWidth = this.navbarContent.nativeElement.clientWidth;
       this.wrapperWidth = this.navbarWrapper.nativeElement.clientWidth;
     }
