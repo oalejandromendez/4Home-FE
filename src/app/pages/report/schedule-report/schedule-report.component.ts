@@ -60,7 +60,6 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     private toastyService: ToastyService,
     private customerService: CustomerService
   ) {
-    config.minDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1, day: this.now.getDate()};
     this.dropdownCustomers = {
       idField: 'id',
       textField: 'label',

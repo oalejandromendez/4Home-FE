@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { NgbDatepickerI18n, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import {Injectable} from '@angular/core';
+import {NgbDatepickerI18n, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
 import {FormGroup, ValidatorFn} from '@angular/forms';
 
 const I18N_VALUES = {
@@ -17,7 +17,7 @@ const I18N_VALUES = {
   providedIn: 'root'
 })
 export class I18n {
-  language =  sessionStorage.getItem('lang') ? sessionStorage.getItem('lang') : 'es';
+  language = sessionStorage.getItem('lang') ? sessionStorage.getItem('lang') : 'es';
 }
 
 @Injectable({
@@ -32,9 +32,11 @@ export class CustomDatepickerI18n extends NgbDatepickerI18n {
   getWeekdayShortName(weekday: number): string {
     return I18N_VALUES[this._i18n.language].weekdays[weekday - 1];
   }
+
   getMonthShortName(month: number): string {
     return I18N_VALUES[this._i18n.language].months[month - 1];
   }
+
   getMonthFullName(month: number): string {
     return this.getMonthShortName(month);
   }
@@ -43,7 +45,7 @@ export class CustomDatepickerI18n extends NgbDatepickerI18n {
     return `${date.day}-${date.month}-${date.year}`;
   }
 
-  ValidateDates: ValidatorFn = (formG: FormGroup) => {
+  ValidateDatesWithInit: ValidatorFn = (formG: FormGroup) => {
     let startDate = formG.get('init').value;
     let endDate = formG.get('end').value;
     const now = new Date();
@@ -58,6 +60,19 @@ export class CustomDatepickerI18n extends NgbDatepickerI18n {
     }
     return startDate !== null && endDate !== null && startDate <= endDate ?
       startDate < dateLimit ? {errorStartDate: true} : endDate < dateLimit ? {errorEndDate: true} : null : {dates: true};
+  }
+
+  ValidateDates: ValidatorFn = (formG: FormGroup) => {
+    let startDate = formG.get('init').value;
+    let endDate = formG.get('end').value;
+    if (startDate && endDate) {
+      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month) + '-' +
+        (startDate.day < 10 ? '0' + startDate.day : startDate.day);
+      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month) + '-' +
+        (endDate.day < 10 ? '0' + endDate.day : endDate.day);
+    }
+    return startDate !== null && endDate !== null && startDate <= endDate ?
+      null : {dates: true};
   }
 
   isWeekend(date: NgbDateStruct) {

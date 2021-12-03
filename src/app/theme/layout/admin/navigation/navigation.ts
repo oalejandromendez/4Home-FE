@@ -169,6 +169,15 @@ const NavigationItems = [
         hidden: true
       },
       {
+        id: 'novelties',
+        title: 'Novedades de Servicio',
+        type: 'item',
+        url: '/admin/novelties',
+        icon: 'assets/img/menu/unavailable.png',
+        classes: 'nav-item',
+        hidden: true
+      },
+      {
         id: 'promocode',
         title: 'Códigos Promocionales',
         type: 'item',
@@ -344,6 +353,7 @@ export class NavigationItem {
           const servicer = resp.filter((perm: any) => perm.name === 'REPORTE_SERVICIO');
           const log = resp.filter((perm: any) => perm.name === 'REPORTE_REGISTRO_ACTIVIDADES');
           const paymentHistory = resp.filter((perm: any) => perm.name === 'ACCEDER_HISTORIAL_CLIENTE');
+          const novelties = resp.filter((perm: any) => perm.name === 'ACCEDER_NOVEDADES');
 
 
           if (users.length > 0 && children.id === 'users') {
@@ -456,6 +466,12 @@ export class NavigationItem {
           if (scheduler.length > 0 && children.id === 'scheduler') {
             children.hidden = false;
           } else if (scheduler.length === 0 && children.id === 'scheduler') {
+            children.hidden = true;
+          }
+
+          if (novelties.length > 0 && children.id === 'novelties') {
+            children.hidden = false;
+          } else if (novelties.length === 0 && children.id === 'novelties') {
             children.hidden = true;
           }
 

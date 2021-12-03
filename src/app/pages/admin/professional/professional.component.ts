@@ -94,7 +94,6 @@ export class ProfessionalComponent implements OnInit, OnDestroy {
     };
     config.minDate = {year: 2000, month: 1, day: 1};
     config.maxDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1 , day: this.now.getDate()};
-    config.navigation = 'arrows';
     this.I18n.language = 'es';
   }
 

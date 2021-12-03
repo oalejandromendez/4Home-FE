@@ -63,6 +63,12 @@ export const texts = {
   repeatedDate: 'La fecha seleccionada ya esta asociada a otro servicio',
   service_date_required: 'La fecha es requerida',
   supervisor_required: 'El supervisor es requerido',
+  professional_required: 'El profesional es requerido',
+  type_required: 'El tipo es requerido',
+  valid_date: 'Digite una fecha válida',
+  init_date_required: 'La fecha inicial es requerida',
+  end_date_required: 'La fecha final es requerida',
+  end_date_less_init_date: 'La fecha final debe ser mayor a la fecha de inicio',
 
   add_address: 'Agregar Dirección',
 
@@ -78,4 +84,6 @@ export const texts = {
   not_data: 'No existen datos',
   select_all: 'Seleccionar todos',
   unselect_all: 'Deseleccionar todos',
+
+  not_allowed_positions_list: 'NO TIENE PERMISO PARA VER LA LISTA DE CARGOS',
 };

@@ -16,9 +16,10 @@ import { ServicetypeComponent } from './servicetype/servicetype.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { StatusComponent } from './status/status.component';
 import { ProfileComponent } from './profile/profile.component';
+import {NoveltiesComponent} from '@src/pages/admin/novelties/novelties.component';
 
 @NgModule({
-  declarations: [UsersComponent, RolesComponent, ProfessionalComponent, PositionComponent, WorkingdayComponent, ServiceComponent, HolidayComponent, ServicetypeComponent, AvailabilityComponent, StatusComponent, ProfileComponent],
+  declarations: [UsersComponent, RolesComponent, ProfessionalComponent, PositionComponent, WorkingdayComponent, ServiceComponent, HolidayComponent, ServicetypeComponent, AvailabilityComponent, StatusComponent, ProfileComponent, NoveltiesComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

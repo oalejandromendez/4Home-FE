@@ -11,10 +11,9 @@ import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct} from
 import {CustomDatepickerI18n, I18n} from '@src/services/common/datepicker/datepicker.service';
 import {Subject} from 'rxjs';
 import {DataTableLanguage} from '@src/models/common/datatable';
-import {ToastOptions, ToastyService} from 'ng2-toasty';
+import {ToastyService} from 'ng2-toasty';
 import {ReportService} from '@src/services/report/report.service';
 import {DataTableDirective} from 'angular-datatables';
-import * as _ from 'lodash';
 import {Router} from '@angular/router';
 
 @Component({

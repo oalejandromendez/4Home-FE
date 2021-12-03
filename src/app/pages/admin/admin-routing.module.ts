@@ -11,6 +11,7 @@ import { ServicetypeComponent } from './servicetype/servicetype.component';
 import { StatusComponent } from './status/status.component';
 import { UsersComponent } from './users/users.component';
 import { WorkingdayComponent } from './workingday/workingday.component';
+import {NoveltiesComponent} from '@src/pages/admin/novelties/novelties.component';
 
 
 const routes: Routes = [
@@ -60,6 +61,10 @@ const routes: Routes = [
       {
         path: 'profile',
         component: ProfileComponent,
+      },
+      {
+        path: 'novelties',
+        component: NoveltiesComponent,
       },
     ]
   }

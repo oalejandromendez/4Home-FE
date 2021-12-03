@@ -1,0 +1,178 @@
+<div class="d-flex">
+
+  <div class="col-md-12">
+    <div class="card user-profile-list mb-0" style="margin-top: -15px;">
+      <div class="card-header">
+        <h4>{{labels.novelties_list}}</h4>
+      </div>
+
+      <div class="card-body">
+        <div *ngIf="canSee" class="dt-responsive table-responsive ">
+          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger "
+                 class="display row-border hover table-striped " style="width:100% ">
+            <thead>
+            <tr>
+              <th>{{labels.id}}</th>
+              <th>{{labels.professional}}</th>
+              <th>{{labels.initial_date}}</th>
+              <th>{{labels.type}}</th>
+              <th>{{labels.final_date}}</th>
+              <th>{{labels.actions}}</th>
+            </tr>
+            </thead>
+            <tbody *ngIf="novelties?.length !=0 ">
+            <tr *ngFor="let novelty of novelties; let index = index ">
+              <td>{{ novelty.id }}</td>
+              <td>{{ novelty.name }}</td>
+              <td>{{ novelty.name }}</td>
+              <td>{{ novelty.name }}</td>
+              <td>
+                <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable"
+                        (click)="edit(novelty.id)" [placement]="'bottom'" ngbTooltip="Editar"
+                        tooltipClass="tooltip-class" container="body">
+                  <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
+                </button>
+
+                <button *ngIf="canDelete" type="button"
+                        class="btn btn-icon btn-delete btn-datatable btn-remove-datatable"
+                        (click)="delete(novelty.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar"
+                        tooltipClass="tooltip-class" container="body">
+                  <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="!canSee" class="text-align-center">
+          <label class="badge badge-info f-20">{{texts.not_allowed_positions_list}}</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<ng2-toasty [position]="'top-right'"></ng2-toasty>
+
+<form [formGroup]="form">
+  <ng-template #modalForm let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 *ngIf="!id" class="modal-title">{{labels.new_novelty}}</h5>
+      <h5 *ngIf="id" class="modal-title">{{labels.update_novelty}}</h5>
+      <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class='form-group'>
+        <label class="col-form-label">{{labels.professional}} <span class="text-danger">*</span></label>
+        <div class="align-self-center">
+          <ng-select [items]="professionals" bindLabel="label" bindValue="value" [clearable]="true"
+                     placeholder="Seleccione..." formControlName="professional"
+                     notFoundText="No se encontraron resultados"></ng-select>
+          <div class="is-invalid" *ngIf="submitted && form.get('professional').hasError('required')">
+            <small class="form-text text-danger">{{texts.professional_required}}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class='form-group'>
+        <label class="col-form-label">{{labels.type}} <span class="text-danger">*</span></label>
+        <div class="align-self-center">
+          <ng-select [items]="types" bindLabel="label" bindValue="value" [clearable]="true"
+                     placeholder="Seleccione..." formControlName="type"
+                     notFoundText="No se encontraron resultados"></ng-select>
+          <div class="is-invalid" *ngIf="submitted && form.get('type').hasError('required')">
+            <small class="form-text text-danger">{{texts.type_required}}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-form-label">{{labels.initial_date}} <span class="text-danger">*</span></label>
+        <div class="input-group">
+          <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker
+                 [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate" #startDate="ngbDatepicker">
+          <div class="input-group-append bg-default" (click)="startDate.toggle()">
+                                <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+          </div>
+        </div>
+        <span class="is-invalid" *ngIf="submitted && form.get('init').hasError('required')">
+              <small class="form-text text-danger">{{texts.init_date_required}}</small>
+        </span>
+        <span class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
+              <span class="badge m-r-5 badge-danger">{{texts.valid_date}}</span>
+        </span>
+
+        <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
+                     let-disabled="disabled" let-focused="focused">
+                    <span class="custom-day" [class.focused]="focused" [class.bg-primary]="selected"
+                          [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
+                        {{ date.day }}
+                    </span>
+        </ng-template>
+        <ng-template #footerTemplateStartDate>
+          <hr class="my-0">
+          <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
+                  (click)="form.get('init').setValue(today); startDate.close()">{{labels.btn_today}}
+          </button>
+          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">{{labels.btn_close}}</button>
+        </ng-template>
+      </div>
+
+      <div class="form-group">
+        <label class="col-form-label">{{labels.final_date}} <span class="text-danger">*</span></label>
+        <div class="input-group">
+          <input class="form-control" placeholder="YYYY-MM-DD" formControlName="end" ngbDatepicker
+                 [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker">
+          <div class="input-group-append bg-default" (click)="endDate.toggle()">
+                                <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+          </div>
+        </div>
+        <div class="is-invalid" *ngIf="submitted && form.get('end').hasError('required')">
+              <small class="form-text text-danger">{{texts.end_date_required}}</small>
+        </div>
+        <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
+              <small class="form-text text-danger">{{texts.valid_date}}</small>
+        </div>
+        <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
+          <small class="form-text text-danger">{{texts.end_date_less_init_date}}</small>
+        </div>
+
+        <ng-template #customEndDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
+                     let-disabled="disabled" let-focused="focused">
+                    <span class="custom-day" [class.focused]="focused" [class.bg-primary]="selected"
+                          [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
+                        {{ date.day }}
+                    </span>
+        </ng-template>
+        <ng-template #footerTemplateEndDate>
+          <hr class="my-0">
+          <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
+                  (click)="form.get('end').setValue(today); startDate.close()">{{labels.btn_today}}
+          </button>
+          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">{{labels.btn_close}}</button>
+        </ng-template>
+      </div>
+
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')">
+        {{labels.btn_cancel}}
+      </button>
+      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" (click)="onSubmit()">{{labels.btn_save}}
+      </button>
+      <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2"
+              (click)="onSubmit()">{{labels.btn_edit}}
+      </button>
+    </div>
+  </ng-template>
+</form>
+<button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
+<button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>

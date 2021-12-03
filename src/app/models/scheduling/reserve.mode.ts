@@ -15,6 +15,6 @@ export class ReserveModel {
       this.id = '';
       this.status = true;
       this.professional = '';
-      this.supervisor = ''
+      this.supervisor = '';
   }
 }

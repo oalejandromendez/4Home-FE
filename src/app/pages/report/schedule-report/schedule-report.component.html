@@ -14,7 +14,7 @@
 
           <div class="form-group">
             <div>
-              <span class="label">Fecha Inicial <span class="text-danger">*</span></span>
+              <span class="label">{{labels.initial_date}} <span class="text-danger">*</span></span>
             </div>
             <div class="input-group">
               <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker
@@ -26,17 +26,17 @@
                   </span>
               </div>
             </div>
-            <div class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
-              <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
+            <div class="is-invalid" *ngIf="submitted && form.get('init').hasError('required')">
+              <small class="form-text text-danger">{{texts.init_date_required}}</small>
             </div>
-            <div class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('init').pristine">
-              <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
+            <div class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
+              <small class="form-text text-danger">{{texts.valid_date}}</small>
             </div>
           </div>
 
           <div class="form-group">
             <div>
-              <span class="label">Fecha Final <span class="text-danger">*</span></span>
+              <span class="label">{{labels.final_date}} <span class="text-danger">*</span></span>
             </div>
             <div class="input-group">
               <input class="form-control" placeholder="YYYY-MM-DD" formControlName="end" ngbDatepicker
@@ -47,14 +47,14 @@
                   </span>
               </div>
             </div>
+            <div class="is-invalid" *ngIf="submitted && form.get('end').hasError('required')">
+              <small class="form-text text-danger">{{texts.end_date_required}}</small>
+            </div>
             <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
-              <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
+              <small class="form-text text-danger">{{texts.valid_date}}</small>
             </div>
             <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
-              <span class="badge m-r-5 badge-danger">La fecha final debe ser mayor a la fecha de inicio</span>
-            </div>
-            <div class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('end').pristine">
-              <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
+              <small class="form-text text-danger">{{texts.end_date_less_init_date}}</small>
             </div>
           </div>
 
@@ -115,8 +115,10 @@
               <div class="card-submit">
                 <div class="form-group text-center">
                   <div class="col-md-12 col-md-offset-3">
-                    <button type="button" class="btn btn-secondary btn-sm" (click)="clear()">Limpiar</button>
-                    <button type="submit" class="btn btn-success btn-sm" [disabled]="!form.valid">Consultar</button>
+                    <button type="button" class="btn btn-secondary btn-sm"
+                            (click)="clear()">{{labels.btn_clean}}</button>
+                    <button type="submit" class="btn btn-success btn-sm"
+                            [disabled]="!form.valid">{{labels.btn_consult}}</button>
                   </div>
                 </div>
               </div>

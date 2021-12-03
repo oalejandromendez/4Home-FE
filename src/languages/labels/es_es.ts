@@ -1,4 +1,5 @@
 export const labels = {
+  id: 'id',
   client_type: 'Tipo de Cliente',
   document_type: 'Tipo de Documento',
   identification: 'Identificación',
@@ -38,5 +39,19 @@ export const labels = {
   search: 'Buscar',
   scheduling_report_customers: 'Reporte de Agendamiento por clientes',
   scheduling_report_professionals: 'Reporte de Agendamiento por profesionales',
-  professional: 'Profesional'
+  professional: 'Profesional',
+  type: 'Tipo',
+  novelties_list: 'Lista de Novedades',
+  new_novelty: 'Nueva Novedad',
+  update_novelty: 'Modificar Novedad',
+  initial_date: 'Fecha Inicial',
+  final_date: 'Fecha Final',
+  actions: 'Acciones',
+  btn_clean: 'Limpiar',
+  btn_cancel: 'Cancelar',
+  btn_save: 'Guardar',
+  btn_edit: 'Editar',
+  btn_consult: 'Consultar',
+  btn_close: 'Cerrar',
+  btn_today: 'Hoy',
 };
