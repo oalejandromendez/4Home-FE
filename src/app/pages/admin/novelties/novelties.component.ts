@@ -98,7 +98,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.noveltyService.get().subscribe(resp => {
-      this.novelties = resp;
+      this.novelties = resp.data;
       this.dtTrigger.next();
       this.loaderService.loading(false);
     }, error => {
@@ -297,7 +297,15 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       this.novelty = data;
       if (data) {
         this.form.patchValue(data);
-        this.form.controls.status.enable();
+        this.form.controls.professional.setValue(String(data.professional.id));
+        if(data.initial_date) {
+          const initial_date = data.initial_date.split('-');
+          this.form.controls.init.setValue({ year: +initial_date[0], month: +initial_date[1], day: +initial_date[2]});
+        }
+        if (data.final_date) {
+          const final_date = data.final_date.split('-');
+          this.form.controls.end.setValue({ year: +final_date[0], month: +final_date[1], day: +final_date[2]});
+        }
         this.form.enable();
         this.openModal.nativeElement.click();
       }

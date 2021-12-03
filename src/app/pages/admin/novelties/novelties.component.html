@@ -8,14 +8,13 @@
 
       <div class="card-body">
         <div *ngIf="canSee" class="dt-responsive table-responsive ">
-          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger "
-                 class="display row-border hover table-striped " style="width:100% ">
+          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger " class="display row-border hover table-striped " style="width:100% ">
             <thead>
             <tr>
               <th>{{labels.id}}</th>
               <th>{{labels.professional}}</th>
-              <th>{{labels.initial_date}}</th>
               <th>{{labels.type}}</th>
+              <th>{{labels.initial_date}}</th>
               <th>{{labels.final_date}}</th>
               <th>{{labels.actions}}</th>
             </tr>
@@ -23,9 +22,10 @@
             <tbody *ngIf="novelties?.length !=0 ">
             <tr *ngFor="let novelty of novelties; let index = index ">
               <td>{{ novelty.id }}</td>
-              <td>{{ novelty.name }}</td>
-              <td>{{ novelty.name }}</td>
-              <td>{{ novelty.name }}</td>
+              <td>{{ novelty.professional.name }} {{ novelty.professional.lastname }}</td>
+              <td>{{ novelty.type| transformData: 'NoveltyType' }}</td>
+              <td>{{ novelty.initial_date| date:'fullDate'  }}</td>
+              <td>{{ novelty.final_date| date:'fullDate'  }}</td>
               <td>
                 <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable"
                         (click)="edit(novelty.id)" [placement]="'bottom'" ngbTooltip="Editar"
