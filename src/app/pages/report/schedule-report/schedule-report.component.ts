@@ -198,17 +198,26 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
         if (data.monthly.length > 0) {
           data.monthly.map((reserve: any) => {
             let scheduling_date = new Date(reserve.reserve.scheduling_date);
+            let original_scheduling_date = new Date(reserve.reserve.scheduling_date);
             scheduling_date.setMonth(scheduling_date.getMonth() + 1);
-            let end = new Date(endDate.year, endDate.month - 1, endDate.day);
+            const end = new Date(endDate.year, endDate.month - 1, endDate.day);
+            const start = new Date(startDate.year, startDate.month - 1, startDate.day);
+
             let limit: Date;
+            let init: Date;
             if (scheduling_date < end) {
               limit = scheduling_date;
             } else {
               limit = end;
             }
-            let today = new Date(startDate.year, startDate.month - 1, startDate.day);
-            while (today <= limit) {
-              let dayOfWeek = today.getDay();
+            if (start > original_scheduling_date) {
+              init = start;
+            } else {
+              init = original_scheduling_date;
+            }
+            limit.setDate(limit.getDate() + 1);
+            while (init <= limit) {
+              let dayOfWeek = init.getDay();
               if (dayOfWeek == 0) {
                 dayOfWeek = 6;
               } else {
@@ -216,11 +225,11 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
               }
               if (dayOfWeek === reserve.day) {
                 this.reserves.push({
-                  date: JSON.parse(JSON.stringify(today)),
+                  date: JSON.parse(JSON.stringify(init)),
                   reserve: reserve.reserve
                 });
               }
-              today.setDate(today.getDate() + 1);
+              init.setDate(init.getDate() + 1);
             }
           });
         }

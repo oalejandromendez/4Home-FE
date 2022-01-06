@@ -8,7 +8,8 @@
 
       <div class="card-body">
         <div *ngIf="canSee" class="dt-responsive table-responsive ">
-          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger " class="display row-border hover table-striped " style="width:100% ">
+          <table datatable [dtOptions]="dtOptions " [dtTrigger]="dtTrigger "
+                 class="display row-border hover table-striped " style="width:100% ">
             <thead>
             <tr>
               <th>{{labels.id}}</th>
@@ -16,6 +17,7 @@
               <th>{{labels.type}}</th>
               <th>{{labels.initial_date}}</th>
               <th>{{labels.final_date}}</th>
+              <th>{{labels.status}}</th>
               <th>{{labels.actions}}</th>
             </tr>
             </thead>
@@ -27,17 +29,31 @@
               <td>{{ novelty.initial_date| date:'fullDate'  }}</td>
               <td>{{ novelty.final_date| date:'fullDate'  }}</td>
               <td>
-                <button *ngIf="canEdit" type="button" class="btn btn-icon btn-edit btn-datatable btn-edit-datatable"
+                <span *ngIf="novelty.status === 0" class="badge badge-warning">SIN AGENDAMIENTO</span>
+                <span *ngIf="novelty.status === 1" class="badge badge-success">PRE-AGENDADA</span>
+                <span *ngIf="novelty.status === 2" class="badge badge-success">AGENDADA</span>
+              </td>
+              <td>
+                <button *ngIf="canEdit && novelty.status === 0" type="button"
+                        class="btn btn-icon btn-edit btn-datatable btn-edit-datatable"
                         (click)="edit(novelty.id)" [placement]="'bottom'" ngbTooltip="Editar"
                         tooltipClass="tooltip-class" container="body">
                   <i class="fas fa-edit" style="color:white; margin-left: 2px;"></i>
                 </button>
 
-                <button *ngIf="canDelete" type="button"
+                <button *ngIf="canDelete && novelty.status === 0" type="button"
                         class="btn btn-icon btn-delete btn-datatable btn-remove-datatable"
                         (click)="delete(novelty.id, index)" [placement]="'bottom'" ngbTooltip="Eliminar"
                         tooltipClass="tooltip-class" container="body">
                   <i class="fa fa-trash" aria-hidden="true" style="color:white; margin-left: 2px;"></i>
+                </button>
+
+                <button *ngIf="novelty.status === 0" type="button"
+                        class="btn_preschedule btn btn-icon btn-delete btn-datatable"
+                        (click)="preschedule(novelty)" [placement]="'bottom'" ngbTooltip="Pre-agendar"
+                        tooltipClass="tooltip-class" container="body">
+                  <img class="img-payu" src="assets/img/schedule/created_at.png" style="color:white; margin-left: 2px;"
+                       alt=""/>
                 </button>
               </td>
             </tr>
@@ -59,7 +75,7 @@
     <div class="modal-header">
       <h5 *ngIf="!id" class="modal-title">{{labels.new_novelty}}</h5>
       <h5 *ngIf="id" class="modal-title">{{labels.update_novelty}}</h5>
-      <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+      <button type="button" class="close basic-close" aria-label="Close" (click)="cancel(); d('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -119,7 +135,8 @@
           <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
                   (click)="form.get('init').setValue(today); startDate.close()">{{labels.btn_today}}
           </button>
-          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">{{labels.btn_close}}</button>
+          <button class="btn btn-danger btn-sm m-2 float-right btn-dp"
+                  (click)="startDate.close()">{{labels.btn_close}}</button>
         </ng-template>
       </div>
 
@@ -135,10 +152,10 @@
           </div>
         </div>
         <div class="is-invalid" *ngIf="submitted && form.get('end').hasError('required')">
-              <small class="form-text text-danger">{{texts.end_date_required}}</small>
+          <small class="form-text text-danger">{{texts.end_date_required}}</small>
         </div>
         <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
-              <small class="form-text text-danger">{{texts.valid_date}}</small>
+          <small class="form-text text-danger">{{texts.valid_date}}</small>
         </div>
         <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
           <small class="form-text text-danger">{{texts.end_date_less_init_date}}</small>
@@ -156,7 +173,8 @@
           <button class="btn btn-primary btn-sm m-2 float-left btn-dp"
                   (click)="form.get('end').setValue(today); startDate.close()">{{labels.btn_today}}
           </button>
-          <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">{{labels.btn_close}}</button>
+          <button class="btn btn-danger btn-sm m-2 float-right btn-dp"
+                  (click)="startDate.close()">{{labels.btn_close}}</button>
         </ng-template>
       </div>
 
@@ -166,7 +184,8 @@
       <button type="button" class="btn btn-secondary mr-2" (click)="cancel(); d('Cross click')">
         {{labels.btn_cancel}}
       </button>
-      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" (click)="onSubmit()">{{labels.btn_save}}
+      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2"
+              (click)="onSubmit()">{{labels.btn_save}}
       </button>
       <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2"
               (click)="onSubmit()">{{labels.btn_edit}}
@@ -174,5 +193,228 @@
     </div>
   </ng-template>
 </form>
+
+<ng-template #modalScheduleForm let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h5 *ngIf="!id" class="modal-title">{{labels.new_novelty}}</h5>
+    <h5 *ngIf="id" class="modal-title">{{labels.update_novelty}}</h5>
+    <button type="button" class="close basic-close" aria-label="Close" (click)="cancelSchedule(); d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div *ngIf="canSee" class="table-responsive" style="overflow-x: scroll !important;">
+      <table class="display row-border hover table-striped dataTable" style="width:100%">
+        <thead>
+        <tr>
+          <th>{{labels.reference}}</th>
+          <th>{{labels.customer}}</th>
+          <th>{{labels.service}}</th>
+          <th>{{labels.type}}</th>
+          <th>{{labels.working_day}}</th>
+          <th>{{labels.price}}</th>
+          <th>{{labels.address}}</th>
+          <th>{{labels.status}}</th>
+          <th>{{labels.actions}}</th>
+        </tr>
+        </thead>
+        <tbody *ngIf="reserves?.length !=0 ">
+        <tr *ngFor="let reserve of reserves; let index = index">
+          <td>{{ reserve.reference }}</td>
+          <td>{{ reserve.user.name }} {{ reserve.user.lastname }}</td>
+          <td>{{ reserve.service.name }}</td>
+          <td *ngIf="reserve.type === 1">Esporádico</td>
+          <td *ngIf="reserve.type === 2">Mensualidad</td>
+          <td>{{ reserve.service.working_day.name }}</td>
+          <td *ngIf="reserve.type === 1">
+            ${{ (reserve.service.price * reserve.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
+          <td *ngIf="reserve.type === 2">
+            ${{ ((reserve.service.price * reserve.service.quantity) * 4) | currency: '' : '' : '1.0-0' }}</td>
+          <td>{{ reserve.customer_address.address }}</td>
+          <td>
+            <span *ngIf="reserve.status === 1" class="badge badge-warning">RESERVADO</span>
+            <span *ngIf="reserve.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+            <span *ngIf="reserve.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
+            <span *ngIf="reserve.status === 4" class="badge badge-success">PAGO APROBADO</span>
+            <span *ngIf="reserve.status === 9" class="badge badge-primary">REPROGRAMADA</span>
+            <span *ngIf="reserve.status === 10" class="badge badge-primary">TERMINADO</span>
+          </td>
+          <td>
+            <button type="button"
+                    class="btn_preschedule btn btn-icon btn-delete btn-datatable"
+                    (click)="re_Schedule(reserve)" [placement]="'bottom'" ngbTooltip="Re-agendar"
+                    tooltipClass="tooltip-class" container="body">
+              <img class="img-payu" src="assets/img/schedule/created_at.png" style="color:white; margin-left: 2px;"
+                   alt=""/>
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary mr-2" (click)="cancelSchedule(); d('Cross click')">
+      {{labels.btn_cancel}}
+    </button>
+    <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2" (click)="onSubmit()">{{labels.btn_save}}
+    </button>
+    <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2"
+            (click)="onSubmit()">{{labels.btn_edit}}
+    </button>
+  </div>
+</ng-template>
+
+
+<form [formGroup]="formReSchedule">
+  <ng-template #modalReScheduleForm let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 *ngIf="!id" class="modal-title">{{labels.re_scheduling}}</h5>
+      <h5 *ngIf="id" class="modal-title">{{labels.update_novelty}}</h5>
+      <button type="button" class="close basic-close" aria-label="Close" (click)="cancelReSchedule(); d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+
+        <div class="col-md-6">
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.service_type}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="serviceTypes" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." formControlName="service_type"
+                         notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('service_type').hasError('required')">
+                <small class="form-text text-danger">{{texts.service_type_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.working_day}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="workingDays" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione... " [readonly]="!formReSchedule.controls.service_type.value"
+                         formControlName="working_day" notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('working_day').hasError('required')">
+                <small class="form-text text-danger">{{texts.working_day_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.type_periodicity}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="typesPeriodicity" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." [readonly]="!formReSchedule.controls.working_day.value"
+                         formControlName="type" notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('type').hasError('required')">
+                <small class="form-text text-danger">{{texts.type_periodicity_required}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class='form-group'>
+            <label class="col-form-label">{{labels.service}} <span class="text-danger">*</span></label>
+            <div class="align-self-center">
+              <ng-select [items]="services" bindLabel="label" bindValue="value" [clearable]="false"
+                         placeholder="Seleccione..." [readonly]="!formReSchedule.controls.type.value" formControlName="service"
+                         notFoundText="No se encontraron resultados"></ng-select>
+              <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('service').hasError('required')">
+                <small class="form-text text-danger">{{texts.service_required}}</small>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-md-6" style="border-left: 4px solid #c1c1c1;">
+
+          <div class="content-days">
+
+            <div formArrayName="days" *ngFor="let day of daysArray.controls; let i = index">
+
+              <div class="form-group" [formGroupName]="day.value.index" *ngIf="day.value.type == 1">
+                <label class="col-form-label">{{labels.service_date}} {{ i + 1 }} <span
+                  class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input class="form-control" formControlName="date" placeholder="YYYY-MM-DD" ngbDatepicker
+                         #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'" (ngModelChange)="changeDate()"
+                         [footerTemplate]="footerTemplate">
+                  <div class="input-group-append bg-default" (click)="date.toggle()">
+                                        <span class="input-group-text">
+                                          <i class="fa fa-calendar"></i>
+                                        </span>
+                  </div>
+                </div>
+                <div class="mt-1" *ngIf="day.get('date').hasError('required')">
+                  <small class="form-text text-danger">{{texts.service_date_required}}</small>
+                </div>
+                <div class="mt-1" *ngIf="day.get('date').hasError('repeatedDate')">
+                  <small class="form-text text-danger">{{texts.repeatedDate}}</small>
+                </div>
+                <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled"
+                             let-focused="focused" let-selected="selected">
+                  <div class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
+                       [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                       [class.text-muted]="disabled">
+                    {{ date.day }}
+                  </div>
+                </ng-template>
+
+                <ng-template #footerTemplate>
+                  <hr class="my-0">
+                  <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="date.close()">Cerrar</button>
+                </ng-template>
+              </div>
+
+              <div class="form-group" [formGroupName]="day.value.index" *ngIf="day.value.type == 2">
+
+                <div class="form-group">
+                  <div class="switch d-inline m-r-10">
+                    <input type="checkbox" id="{{day.value.day}}" formControlName="selected">
+                    <label for="{{day.value.day}}" class="cr"></label>
+                  </div>
+                  <label> {{ day.value.day }}</label>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <button type="buttom" class="btn btn-success btn-sm m-0" (click)="checkAvailability()"
+                  [disabled]="form.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar Disponibilidad
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="cancelReSchedule(); d('Cross click')">
+        {{labels.btn_cancel}}
+      </button>
+      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2"
+              (click)="onSubmitReSchedule()">{{labels.btn_save}}
+      </button>
+      <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2"
+              (click)="onSubmitReSchedule()">{{labels.btn_edit}}
+      </button>
+    </div>
+  </ng-template>
+</form>
 <button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
 <button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>
+
+<button #openScheduleModal type="button" class="btn btn-primary hidden"
+        (click)="openModalSchedule(modalScheduleForm)"></button>
+<button #closeScheduleModal type="button" class="btn btn-primary hidden" (click)="close(modalScheduleForm)"></button>
+
+<button #openReScheduleModal type="button" class="btn btn-primary hidden"
+        (click)="openModalReschedule(modalReScheduleForm)"></button>
+<button #closeReScheduleModal type="button" class="btn btn-primary hidden"
+        (click)="close(modalReScheduleForm)"></button>

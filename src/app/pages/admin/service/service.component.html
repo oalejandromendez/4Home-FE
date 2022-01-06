@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row" *ngIf="!is_novelty">
         <div class="col-md-6">
           <div class='form-group'>
             <label class="col-form-label">{{labels.type_periodicity}} <span class="text-danger">*</span></label>
@@ -125,9 +125,9 @@
 
         <div class="col-md-6">
           <div class='form-group'>
-            <label class="col-form-label">{{labels.quantity_service}} <span class="text-danger">*</span><i
-              class="feather icon-info ml-1" placement="top" ngbTooltip="{{texts.quantity_service_info}}"
-              triggers="click:blur" tooltipClass="my-custom-tooltip"></i></label>
+            <label class="col-form-label">{{labels.quantity_service}} <span class="text-danger">*</span>
+              <i class="feather icon-info ml-1" placement="top" ngbTooltip="{{texts.quantity_service_info}}"
+                 triggers="click:blur" tooltipClass="my-custom-tooltip"></i></label>
             <div class="align-self-center ">
               <input type="text" class="form-control" formControlName="quantity" maxlength="1" max="6">
               <span class="is-invalid" *ngIf="submitted && form.get('quantity').hasError('required')">
@@ -180,6 +180,24 @@
           <div>
             <span class="badge m-r-5 badge-success ml-2 mt-2" *ngIf="form.get('status').value">Activo</span>
             <span class="badge m-r-5 badge-danger ml-2 mt-2" *ngIf="!form.get('status').value">Inactivo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-form-label pb-0">{{labels.is_novelty}}
+          <i class="feather icon-info ml-1" placement="top" ngbTooltip="{{texts.is_novelty_service_info}}"
+             triggers="click:blur" tooltipClass="my-custom-tooltip"></i></label><br>
+        <div class="d-flex align-items-center">
+          <div class="switch switch-success d-inline m-r-10">
+            <input type="checkbox" id="is_novelty" formControlName="is_novelty" (change)="changeNovelty()">
+            <label for="is_novelty" class="cr cr-hw"></label>
+          </div>
+          <div>
+            <span class="badge m-r-5 badge-success ml-2 mt-2"
+                  *ngIf="form.get('is_novelty').value">{{texts.service_novelty}}</span>
+            <span class="badge m-r-5 badge-danger ml-2 mt-2"
+                  *ngIf="!form.get('is_novelty').value">{{texts.normal_service}}</span>
           </div>
         </div>
       </div>

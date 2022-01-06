@@ -60,6 +60,8 @@ export class ServiceComponent implements OnInit, OnDestroy {
     }
   ];
 
+  is_novelty: boolean;
+
   constructor(
     private router: Router,
     private toastyService: ToastyService,
@@ -119,6 +121,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
       quantity: new FormControl('', [Validators.required, Validators.max(6), Validators.pattern('^[0-9]*$')]),
       description: new FormControl('', [Validators.maxLength(250)]),
       status: new FormControl({value: true, disabled: true}, [Validators.required]),
+      is_novelty: new FormControl({value: true, disabled: true}, [Validators.required]),
     });
   }
 
@@ -322,6 +325,8 @@ export class ServiceComponent implements OnInit, OnDestroy {
       if (data) {
         this.form.patchValue(data);
         this.form.controls.working_day.setValue(String(data.working_day.id));
+        this.form.controls.is_novelty.setValue(data.is_novelty);
+        this.is_novelty = Boolean(data.is_novelty);
         this.form.controls.status.enable();
         this.form.enable();
         this.openModal.nativeElement.click();
@@ -374,6 +379,11 @@ export class ServiceComponent implements OnInit, OnDestroy {
   }
 
   open(modal: any) {
+    if (!this.id) {
+      this.is_novelty = false;
+      this.form.controls.is_novelty.setValue(0);
+    }
+    this.form.controls.is_novelty.enable();
     this.modalService.open(modal);
   }
 
@@ -415,6 +425,12 @@ export class ServiceComponent implements OnInit, OnDestroy {
       this.toastyService.error(toastOptions);
       this.loaderService.loading(true);
     });
+  }
+
+  changeNovelty() {
+    this.is_novelty = this.form.get('is_novelty').value;
+    this.form.controls.quantity.setValue((this.is_novelty) ? 0 : '');
+    this.form.controls.type.setValue((this.is_novelty) ? 1 : '');
   }
 
 }

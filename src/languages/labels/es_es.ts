@@ -19,6 +19,7 @@ export const labels = {
   init_time: 'Hora Inicial',
   end_time: 'Hora Final',
   status: 'Estado',
+  price: 'Precio',
   price_per_service: 'Precio por servicio',
   type_periodicity: 'Tipo de periodicidad',
   quantity_service: 'Servicios a la semana',
@@ -54,4 +55,7 @@ export const labels = {
   btn_consult: 'Consultar',
   btn_close: 'Cerrar',
   btn_today: 'Hoy',
+  is_novelty: 'Novedad',
+  reference: 'Referencia',
+  re_scheduling: 'Re Agendamiento de servicio',
 };

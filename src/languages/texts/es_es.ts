@@ -2,6 +2,7 @@ export const texts = {
   addresses_info: 'Agregar a continuación las direcciones donde desea que se le presten los servicios.',
   quantity_service_info: 'Agregar a continuación la cantidad de servicios a la semana, tener en cuenta que en el caso de las mensualidades, también serian cantidad de servicios a la semana.',
   quantity_days_service_info: 'Cantidad de días de la semana que debe seleccionar para tomar los servicios.',
+  is_novelty_service_info: 'Encender esta opción si el servicio es para especificar reposición por alguna novedad del profesional. La cantidad de servicios sera determinada por las fechas de ausencia y se tratara como un servicio esporádico.',
 
   client_type_required: 'El tipo de cliente es requerido',
   document_type_required: 'El tipo de documento es requerido',
@@ -86,4 +87,7 @@ export const texts = {
   unselect_all: 'Deseleccionar todos',
 
   not_allowed_positions_list: 'NO TIENE PERMISO PARA VER LA LISTA DE CARGOS',
+
+  service_novelty: 'Novedad de servicio',
+  normal_service: 'Servicio normal',
 };

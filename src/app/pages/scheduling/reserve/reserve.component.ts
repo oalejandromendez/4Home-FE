@@ -381,7 +381,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     const days = form.controls.map(control => control.value.type === 2);
     const selected = form.controls.map(control => control.value.selected).reduce((prev, next) => next ? prev + next : prev, 0);
     return days.length === 7 ? selected !== this.quantity ? {invalidQuantity: true} : null : null;
-  };
+  }
 
   resetDays() {
     this.quantity = null;
@@ -479,7 +479,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       this.loaderService.loading(true);
       this.serviceService.findByTypeAndWorking(type, workingDay).subscribe(resp => {
         this.listServices = resp.data;
-        resp.data.filter((service: any) => service.status === 1).map((service: any) => {
+        resp.data.filter((service: any) => service.status === 1 && service.is_novelty === 0).map((service: any) => {
           this.services.push({value: service.id, label: service.name});
           this.services = this.services.slice();
         });
