@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {NgbCalendar, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DataTableDirective} from 'angular-datatables';
 import {ToastOptions, ToastyConfig, ToastyService} from 'ng2-toasty';
 import {Subject} from 'rxjs';
@@ -15,7 +15,7 @@ import {texts} from '@lang/texts/es_es';
 import {NoveltyModel} from '@src/models/admin/novelty.model';
 import {NoveltyService} from '@src/services/admin/novelty/novelty.service';
 import {ProfessionalService} from '@src/services/admin/professional/professional.service';
-import {CustomDatepickerI18n} from '@src/services/common/datepicker/datepicker.service';
+import {CustomDatepickerI18n, I18n} from '@src/services/common/datepicker/datepicker.service';
 import {ReportService} from '@src/services/report/report.service';
 import * as _ from 'lodash';
 import {ServicetypeService} from '@src/services/admin/servicetype/servicetype.service';
@@ -27,7 +27,8 @@ import {ReserveModel} from '@src/models/scheduling/reserve.mode';
   selector: 'app-novelties',
   templateUrl: './novelties.component.html',
   styleUrls: ['./novelties.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [I18n, {provide: NgbDatepickerI18n, useClass: CustomDatepickerI18n}, NgbDatepickerConfig]
 })
 export class NoveltiesComponent implements OnInit, OnDestroy {
 
@@ -84,6 +85,9 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   get daysArray() {
     return this.formReSchedule.get('days') as FormArray;
   }
+
+  now: Date = new Date();
+  minDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1, day: this.now.getDate() + 2};
 
   constructor(
     private router: Router,

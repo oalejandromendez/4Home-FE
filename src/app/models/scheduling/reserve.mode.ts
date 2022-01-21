@@ -10,6 +10,7 @@ export class ReserveModel {
   professional: string;
   supervisor: string;
   payment: any;
+  initial_service_date: string;
 
   constructor() {
       this.id = '';

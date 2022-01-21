@@ -58,4 +58,7 @@ export const labels = {
   is_novelty: 'Novedad',
   reference: 'Referencia',
   re_scheduling: 'Re Agendamiento de servicio',
+  initial_service_date: 'Fecha inicial de servicio',
+  reserve_data: 'Información de la reserva',
+  schedule: 'Horario',
 };

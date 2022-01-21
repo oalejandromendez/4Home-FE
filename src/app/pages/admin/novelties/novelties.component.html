@@ -109,7 +109,8 @@
         <label class="col-form-label">{{labels.initial_date}} <span class="text-danger">*</span></label>
         <div class="input-group">
           <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker
-                 [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate" #startDate="ngbDatepicker">
+                 [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate" #startDate="ngbDatepicker"
+                 [minDate]="minDate">
           <div class="input-group-append bg-default" (click)="startDate.toggle()">
                                 <span class="input-group-text">
                                 <i class="fa fa-calendar"></i>
@@ -125,8 +126,9 @@
 
         <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
                      let-disabled="disabled" let-focused="focused">
-                    <span class="custom-day" [class.focused]="focused" [class.bg-primary]="selected"
-                          [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
+                    <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
+                          [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                          [class.text-muted-day]="disabled">
                         {{ date.day }}
                     </span>
         </ng-template>
@@ -289,7 +291,8 @@
               <ng-select [items]="serviceTypes" bindLabel="label" bindValue="value" [clearable]="false"
                          placeholder="Seleccione..." formControlName="service_type"
                          notFoundText="No se encontraron resultados"></ng-select>
-              <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('service_type').hasError('required')">
+              <div class="is-invalid"
+                   *ngIf="submittedReSchedule && formReSchedule.get('service_type').hasError('required')">
                 <small class="form-text text-danger">{{texts.service_type_required}}</small>
               </div>
             </div>
@@ -301,7 +304,8 @@
               <ng-select [items]="workingDays" bindLabel="label" bindValue="value" [clearable]="false"
                          placeholder="Seleccione... " [readonly]="!formReSchedule.controls.service_type.value"
                          formControlName="working_day" notFoundText="No se encontraron resultados"></ng-select>
-              <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('working_day').hasError('required')">
+              <div class="is-invalid"
+                   *ngIf="submittedReSchedule && formReSchedule.get('working_day').hasError('required')">
                 <small class="form-text text-danger">{{texts.working_day_required}}</small>
               </div>
             </div>
@@ -323,7 +327,8 @@
             <label class="col-form-label">{{labels.service}} <span class="text-danger">*</span></label>
             <div class="align-self-center">
               <ng-select [items]="services" bindLabel="label" bindValue="value" [clearable]="false"
-                         placeholder="Seleccione..." [readonly]="!formReSchedule.controls.type.value" formControlName="service"
+                         placeholder="Seleccione..." [readonly]="!formReSchedule.controls.type.value"
+                         formControlName="service"
                          notFoundText="No se encontraron resultados"></ng-select>
               <div class="is-invalid" *ngIf="submittedReSchedule && formReSchedule.get('service').hasError('required')">
                 <small class="form-text text-danger">{{texts.service_required}}</small>
@@ -344,7 +349,8 @@
                   class="text-danger">*</span></label>
                 <div class="input-group">
                   <input class="form-control" formControlName="date" placeholder="YYYY-MM-DD" ngbDatepicker
-                         #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'" (ngModelChange)="changeDate()"
+                         #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'"
+                         (ngModelChange)="changeDate()"
                          [footerTemplate]="footerTemplate">
                   <div class="input-group-append bg-default" (click)="date.toggle()">
                                         <span class="input-group-text">
@@ -360,11 +366,11 @@
                 </div>
                 <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled"
                              let-focused="focused" let-selected="selected">
-                  <div class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
-                       [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
-                       [class.text-muted]="disabled">
+                  <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
+                        [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                        [class.text-muted]="disabled">
                     {{ date.day }}
-                  </div>
+                  </span>
                 </ng-template>
 
                 <ng-template #footerTemplate>
@@ -388,7 +394,7 @@
 
           </div>
           <button type="buttom" class="btn btn-success btn-sm m-0" (click)="checkAvailability()"
-                  [disabled]="form.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar Disponibilidad
+                  [disabled]="formReSchedule.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar Disponibilidad
           </button>
         </div>
       </div>

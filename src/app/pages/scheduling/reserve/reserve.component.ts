@@ -29,6 +29,7 @@ import {Router} from '@angular/router';
 import {labels} from '@lang/labels/es_es';
 import {texts} from '@lang/texts/es_es';
 import {messages} from '@lang/messages/es_es';
+import {ScheduleService} from '@src/services/scheduling/schedule/schedule.service';
 
 @Component({
   selector: 'app-reserve',
@@ -106,7 +107,6 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
   quantity = null;
   price = null;
-  days: Array<any> = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
   addresses: Array<any> = [];
   daysEdit: Array<any> = [];
@@ -129,7 +129,8 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
     private I18n: I18n,
     private holidayService: HolidayService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public scheduleService: ScheduleService
   ) {
     this.loaderService.loading(true);
     this.getPermissions();
@@ -203,16 +204,16 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.daysArray.value.map((day: any) => {
 
-      if (day.type === 1) {
+      if (day.type === this.scheduleService.SPORADIC_PERIODICITY) {
         const date = day.date;
         listDays.push({
           date: date.year + '-' + date.month + '-' + date.day
         });
       }
 
-      if (day.type === 2 && day.selected) {
+      if (day.type === this.scheduleService.MONTHLY_PERIODICITY && day.selected) {
         listDays.push({
-          day: day.index++
+          day: day.index
         });
       }
 
@@ -305,7 +306,7 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
 
   isDisabled = (date: NgbDateStruct, current: { month: number, year: number }) => {
     return this.disabledDates.find(x => NgbDate.from(x).equals(date)) ? true : false;
-  };
+  }
 
   isWeekend(date: NgbDateStruct) {
     const d = new Date(date.year, date.month - 1, date.day);
@@ -398,21 +399,21 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
         this.daysArray.removeAt(0);
       }
       this.quantity = this.service.quantity;
-      if (this.service.type === 1) {
+      if (this.service.type === this.scheduleService.SPORADIC_PERIODICITY) {
         this.price = this.quantity * this.service.price;
       } else {
-        if (this.service.type === 2) {
+        if (this.service.type === this.scheduleService.MONTHLY_PERIODICITY) {
           this.price = (this.quantity * this.service.price) * 4;
         }
       }
-      this.days.map(day => {
+      this.scheduleService.DAYS.map(day => {
         const editDay = this.daysEdit.find(day => day.day === this.daysArray.controls.length);
         this.daysArray.push(
           this.formBuilder.group({
             index: new FormControl(this.daysArray.controls.length),
             day: new FormControl(day),
             selected: new FormControl(editDay === undefined ? false : true),
-            type: 2
+            type: this.scheduleService.MONTHLY_PERIODICITY
           })
         );
       });
@@ -428,26 +429,26 @@ export class ReserveComponent implements OnInit, OnDestroy, AfterViewInit {
       this.price = this.quantity * this.service.price;
       if (this.daysEdit.length > 0) {
         this.daysEdit.map(date => {
-          const reserve_date = date.date.split('-');
+          const reserveDate = date.date.split('-');
           this.daysArray.push(
             this.formBuilder.group({
               index: new FormControl(this.daysArray.controls.length),
               date: new FormControl({
-                year: +reserve_date[0],
-                month: +reserve_date[1],
-                day: +reserve_date[2]
+                year: +reserveDate[0],
+                month: +reserveDate[1],
+                day: +reserveDate[2]
               }, [Validators.required, this.validateDate.bind(this)]),
-              type: 1
+              type: this.scheduleService.SPORADIC_PERIODICITY
             })
           );
         });
       } else {
-        for (var i = 0; i < this.quantity; i++) {
+        for (let i = 0; i < this.quantity; i++) {
           this.daysArray.push(
             this.formBuilder.group({
               index: new FormControl(this.daysArray.controls.length),
               date: new FormControl(null, [Validators.required, this.validateDate.bind(this)]),
-              type: 1
+              type: this.scheduleService.SPORADIC_PERIODICITY
             })
           );
         }

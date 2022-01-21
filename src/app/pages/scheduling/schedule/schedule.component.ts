@@ -56,7 +56,7 @@ export class ScheduleComponent implements OnInit {
 
   quantity = null;
   price = null;
-  days: Array<any> = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+  days: Array<any> = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
 
   today = this.calendar.getToday();
   now: Date = new Date();
@@ -108,6 +108,7 @@ export class ScheduleComponent implements OnInit {
     private modalService: NgbModal,
     private scheduleService: ScheduleService,
     private router: Router,
+    public dateService: CustomDatepickerI18n,
   ) {
     this.getPermissions();
     this.loadForm();
@@ -119,59 +120,136 @@ export class ScheduleComponent implements OnInit {
 
   ngOnInit(): void {
     this.search = '';
-    this.reserves = new Array();
+    this.reserves = [];
     this.cancel();
     this.getReserves();
   }
 
   checkAvailability() {
 
+    this.submitted = true;
 
-    this.loaderService.loading(true);
-    const listDays = [];
-    const days = JSON.parse(JSON.stringify(this.daysArray.value));
-    days.map((day: any) => {
-      if (day.type === 1 && !day.disabled) {
-        const date = day.date;
-        listDays.push({
-          date: date.year + '-' + date.month + '-' + date.day
-        });
-      }
-      if (day.type === 2 && day.selected) {
-        listDays.push({
-          day: day.index++
-        });
-      }
-    });
-    const filter = {
-      type: this.reservation.type,
-      days: listDays
-    };
-    this.loaderService.loading(true);
-    this.professionalService.get().subscribe(resp => {
-      this.professionals = resp.data.filter((professional: any) => professional.status.openSchedule === 1);
-      this.professionalService.checkAvailability(filter).subscribe((resp: any) => {
-        if (this.professionals.length > 0) {
-          this.professionals.map((professional: any) => {
-            const available = resp.find((o: any) => o.id === professional.id);
-            if (available) {
-              professional.available = 1;
-            } else {
-              professional.available = 2;
-            }
-          });
-        }
-        this.validateAvailability = true;
-        this.loaderService.loading(false);
-      }, error => {
-        this.loaderService.loading(false);
+    if (this.reservation.type === this.scheduleService.MONTHLY_PERIODICITY) {
+      if (!this.form.controls.initial_service_date.valid) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Ha ocurrido un error'
+          text: texts.initial_service_date_required
         });
-      });
-    }, error => {
+        return;
+      }
+    }
+
+    this.loaderService.loading(true);
+    this.professionalService.get().subscribe(resp => {
+      this.professionals = resp.data.filter((professional: any) => professional.status.openSchedule === 1);
+      if (this.professionals.length > 0) {
+        this.professionals.forEach((professional: any) => {
+          const reserves = professional.reserve.filter(reserve => reserve.status !== 10);
+          let professionalAvailable = true;
+          reserves.forEach((reserve: any) => {
+            const days = reserve.reserve_day;
+            const initHourReserve = reserve.service.working_day.init_hour.split(':');
+            const initHourNumberReserve = parseFloat(`${initHourReserve[0]}.${initHourReserve[1]}`);
+            const endHourReserve = reserve.service.working_day.end_hour.split(':');
+            const endHourNumberReserve = parseFloat(`${endHourReserve[0]}.${endHourReserve[1]}`);
+
+            const initHourSelected = this.reservation.service.working_day.init_hour.split(':');
+            const initHourNumberSelected = parseFloat(`${initHourSelected[0]}.${initHourSelected[1]}`);
+            const endHourSelected = this.reservation.service.working_day.end_hour.split(':');
+            const endHourNumberSelected = parseFloat(`${endHourSelected[0]}.${endHourSelected[1]}`);
+
+            if (reserve.type === this.scheduleService.SPORADIC_PERIODICITY) {
+              if (this.reservation.type === this.scheduleService.SPORADIC_PERIODICITY) {
+                const selectedDays = this.reservation.reserve_day;
+                selectedDays.forEach((daySel: any) => {
+                  days.forEach((day: any) => {
+                    const splitSelDate = daySel.date.split('-');
+                    const selectedDate = new Date(splitSelDate[0], splitSelDate[1] - 1, splitSelDate[2]);
+                    const splitReserveDate = day.date.split('-');
+                    const reserveDate = new Date(splitReserveDate[0], splitReserveDate[1] - 1, splitReserveDate[2]);
+                    if (selectedDate.getTime() === reserveDate.getTime()) {
+                      if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
+                        (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
+                        professionalAvailable = false;
+                        return;
+                      }
+                    }
+                  });
+                });
+              } else if (this.reservation.type === this.scheduleService.MONTHLY_PERIODICITY) {
+                const iDate = this.form.controls.initial_service_date.value;
+                const selectedInitialServiceDate = new Date(iDate.year, iDate.month - 1, iDate.day);
+                const selectedFinalServiceDate = new Date(selectedInitialServiceDate.getFullYear(),
+                  selectedInitialServiceDate.getMonth() + 1, selectedInitialServiceDate.getDate());
+                days.forEach((day: any) => {
+                  if ((day.date >= selectedInitialServiceDate && day.date <= selectedFinalServiceDate)) {
+                    if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
+                      (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
+                      professionalAvailable = false;
+                      return;
+                    }
+                  }
+                });
+              }
+            } else if (reserve.type === this.scheduleService.MONTHLY_PERIODICITY) {
+              const initialServiceDateSplit = reserve.initial_service_date.split('-');
+              const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
+              const limit = new Date(initialServiceDate.getFullYear(), initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
+
+              const firstAndLastServiceDate = this.getFirstAndLastServiceDate(initialServiceDate, limit, days);
+              const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+              const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
+
+              if (this.reservation.type === this.scheduleService.SPORADIC_PERIODICITY) {
+
+                const selectedDays = this.reservation.reserve_day;
+                selectedDays.forEach((day: any) => {
+                  const splitDate = day.date.split('-');
+                  const selectedDate = new Date(splitDate[0], splitDate[1] - 1, splitDate[2]);
+                  if ((selectedDate >= firstAvailableDay && selectedDate <= lastAvailableDay) &&
+                    this.validateDateInRange(firstAvailableDay, lastAvailableDay, days, selectedDate)) {
+                    if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
+                      (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
+                      professionalAvailable = false;
+                      return;
+                    }
+                  }
+                });
+              } else if (this.reservation.type === this.scheduleService.MONTHLY_PERIODICITY) {
+
+                const iDate = this.form.controls.initial_service_date.value;
+                const selectedInitialServiceDate = new Date(iDate.year, iDate.month - 1, iDate.day);
+                const selectedFinalServiceDate = new Date(iDate.year, iDate.month - 1, iDate.day);
+                selectedFinalServiceDate.setMonth(selectedInitialServiceDate.getMonth() + 1);
+
+                const firstAndLastSelectedServiceDate = this.getFirstAndLastServiceDate(selectedInitialServiceDate,
+                  selectedFinalServiceDate, this.reservation.reserve_day);
+                const firstSelectedDay = firstAndLastSelectedServiceDate.firstAvailableDay;
+                const lastSelectedDay = firstAndLastSelectedServiceDate.lastAvailableDay;
+
+                if ((firstSelectedDay >= firstAvailableDay && firstSelectedDay <= lastAvailableDay) ||
+                  (lastSelectedDay >= firstAvailableDay && lastSelectedDay <= lastAvailableDay)) {
+                  if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
+                    (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
+                    professionalAvailable = false;
+                    return;
+                  }
+                }
+              }
+            }
+
+          }, professionalAvailable);
+          if (professionalAvailable) {
+            professional.available = 1;
+          } else {
+            professional.available = 2;
+          }
+        });
+      }
+      this.validateAvailability = true;
+      this.loaderService.loading(false);
+    }, () => {
       this.loaderService.loading(false);
       Swal.fire({
         icon: 'error',
@@ -182,9 +260,60 @@ export class ScheduleComponent implements OnInit {
 
   }
 
+  validateDateInRange(initialServiceDate: Date, lastServiceDate: Date, days, dateToValidate: Date) {
+    while (initialServiceDate <= lastServiceDate) {
+      if (initialServiceDate.getTime() === dateToValidate.getTime()) {
+        const dayI = initialServiceDate.getDay();
+        return days.find((d: any) => d.day === dayI);
+      } else {
+        initialServiceDate.setDate(initialServiceDate.getDate() + 1);
+      }
+    }
+    return false;
+  }
+
+  getFirstAndLastServiceDate(initialServiceDate, lastServiceDate, days) {
+    let firstAvailableDay: Date = null;
+    let lastAvailableDay: Date = null;
+    while (initialServiceDate <= lastServiceDate) {
+      const dayI = initialServiceDate.getDay();
+      const dayE = lastServiceDate.getDay();
+      const existsI = days.find((d: any) => d.day === dayI);
+      const existsE = days.find((d: any) => d.day === dayE);
+      if (!firstAvailableDay) {
+        if (existsI) {
+          firstAvailableDay = initialServiceDate;
+        } else {
+          initialServiceDate.setDate(initialServiceDate.getDate() + 1);
+        }
+      }
+
+      if (!lastAvailableDay) {
+        if (existsE) {
+          lastAvailableDay = lastServiceDate;
+        } else {
+          lastServiceDate.setDate(lastServiceDate.getDate() - 1);
+        }
+      }
+      if (firstAvailableDay && lastAvailableDay) {
+        break;
+      }
+    }
+    return {firstAvailableDay, lastAvailableDay};
+  }
+
   onSubmit() {
 
     this.submitted = true;
+
+    if (!this.form.controls.professional.valid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: texts.professional_not_available
+      });
+      return;
+    }
 
     if (!this.form.valid) {
       Swal.fire({
@@ -204,19 +333,23 @@ export class ScheduleComponent implements OnInit {
     Swal.showLoading();
 
     this.reserve = this.form.value;
+    if (this.reservation.type === this.scheduleService.MONTHLY_PERIODICITY) {
+      const iDate = this.form.controls.initial_service_date.value;
+      this.reserve.initial_service_date = `${iDate.year}-${iDate.month}-${iDate.day}`;
+    }
 
     const listDays = [];
 
     this.daysArray.value.map((day: any) => {
-      if (day.type === 1) {
+      if (day.type === this.scheduleService.SPORADIC_PERIODICITY) {
         const date = day.date;
         listDays.push({
           date: date.year + '-' + date.month + '-' + date.day
         });
       }
-      if (day.type === 2 && day.selected) {
+      if (day.type === this.scheduleService.MONTHLY_PERIODICITY && day.selected) {
         listDays.push({
-          day: day.index++
+          day: day.index
         });
       }
     });
@@ -271,13 +404,14 @@ export class ScheduleComponent implements OnInit {
     this.schedule = [];
     if (this.professional) {
       if (this.professional.reserve) {
-        const reservesDates = this.professional.reserve.filter((reserve: any) => reserve.type === 1);
+        const reservesDates = this.professional.reserve.filter((reserve: any) =>
+          reserve.type === this.scheduleService.SPORADIC_PERIODICITY);
 
         if (reservesDates.length > 0) {
           reservesDates.map((reserve: any) => {
             reserve.reserve_day.map((day: any) => {
               this.schedule.push({
-                title: reserve.service.working_day.name,
+                title: `${reserve.service.working_day.name} (${reserve.service.working_day.init_hour} - ${reserve.service.working_day.end_hour})`,
                 start: day.date,
                 color: '#f44336',
                 allDay: true
@@ -286,27 +420,22 @@ export class ScheduleComponent implements OnInit {
           });
         }
 
-        const reservesDays = this.professional.reserve.filter((reserve: any) => reserve.type === 2);
+        const reservesDays = this.professional.reserve.filter((reserve: any) => reserve.type === this.scheduleService.MONTHLY_PERIODICITY);
 
         if (reservesDays.length > 0) {
           reservesDays.map((reserve: any) => {
             const days = reserve.reserve_day;
             if (days.length > 0) {
-              const now = new Date(reserve.created_at);
-              const limit = new Date();
-              limit.setMonth(now.getMonth() + 1);
+              const now = new Date(reserve.initial_service_date);
+              now.setDate(now.getDate() + 1);
+              const limit = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate() + 1);
               while (now <= limit) {
-                let day = now.getDay();
-                if (day === 0) {
-                  day = 6;
-                } else {
-                  day--;
-                }
+                const day = now.getDay();
                 const exists = days.find((d: any) => d.day === day);
                 if (exists) {
                   this.schedule.push({
-                    title: reserve.service.working_day.name,
-                    start: new Date(now),
+                    title: `${reserve.service.working_day.name} (${reserve.service.working_day.init_hour} - ${reserve.service.working_day.end_hour})`,
+                    start: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
                     color: '#f44336',
                     allDay: true
                   });
@@ -319,35 +448,31 @@ export class ScheduleComponent implements OnInit {
       }
     }
 
-    const dates = this.daysArray.value.filter((day: any) => day.type === 1 && !day.disabled);
+    const dates = this.daysArray.value.filter((day: any) => day.type === this.scheduleService.SPORADIC_PERIODICITY && !day.disabled);
     if (dates.length > 0) {
       dates.map((day: any) => {
         const date = day.date;
         this.schedule.push({
-          title: this.reservation.service.working_day.name,
+          title: `${this.reservation.service.working_day.name} (${this.reservation.service.working_day.init_hour} - ${this.reservation.service.working_day.end_hour})`,
           start: new Date(date.year + '-' + date.month + '-' + date.day),
           color: '#03a9f4',
           allDay: true
         });
       });
     }
-    const days = this.daysArray.value.filter((day: any) => day.type === 2 && day.selected);
+    const days = this.daysArray.value.filter((day: any) => day.type === this.scheduleService.MONTHLY_PERIODICITY && day.selected);
     if (days.length > 0) {
-      const now = new Date();
-      const limit = new Date();
+      const initialServiceDate = this.form.controls.initial_service_date.value;
+      const now = new Date(initialServiceDate.year, initialServiceDate.month - 1, initialServiceDate.day);
+      const limit = new Date(initialServiceDate.year, initialServiceDate.month - 1, initialServiceDate.day);
       limit.setMonth(now.getMonth() + 1);
       while (now <= limit) {
-        let day = now.getDay();
-        if (day === 0) {
-          day = 6;
-        } else {
-          day--;
-        }
+        const day = now.getDay();
         const exists = days.find((d: any) => d.index === day);
         if (exists) {
           this.schedule.push({
-            title: this.reservation.service.working_day.name,
-            start: new Date(now),
+            title: `${this.reservation.service.working_day.name} (${this.reservation.service.working_day.init_hour} - ${this.reservation.service.working_day.end_hour})`,
+            start: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
             color: '#03a9f4',
             allDay: true
           });
@@ -380,7 +505,7 @@ export class ScheduleComponent implements OnInit {
         ],
         expandRows: true,
         nowIndicator: true,
-        dayHeaders: true
+        dayHeaders: true,
       };
     }, 100);
 
@@ -458,9 +583,13 @@ export class ScheduleComponent implements OnInit {
     this.cancel();
     this.reservation = reserve;
     if (this.reservation.type === 1) {
+      if (this.form.controls.initial_service_date) {
+        this.form.removeControl('initial_service_date');
+      }
       this.loadDates();
     }
     if (this.reservation.type === 2) {
+      this.form.addControl('initial_service_date', new FormControl(null, [Validators.required]));
       this.loadDays();
     }
   }
@@ -513,6 +642,7 @@ export class ScheduleComponent implements OnInit {
     const now = new Date();
     if (date) {
       date = date.year + '-' + (date.month < 10 ? '0' + date.month : date.month) + '-' + (date.day < 10 ? '0' + date.day : date.day);
+      // tslint:disable-next-line:max-line-length
       dateLimit = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' + (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
     }
     return disabled === false ? date !== null ? date > dateLimit ? null : {invalidDate: true} : null : null;
@@ -538,11 +668,6 @@ export class ScheduleComponent implements OnInit {
     return exist ? {repeatedDate: true} : null;
   }
 
-  isWeekend(date: NgbDateStruct) {
-    const d = new Date(date.year, date.month - 1, date.day);
-    return d.getDay() === 0 || d.getDay() === 6;
-  }
-
   isDisabled = (date: NgbDateStruct, current: { month: number, year: number }) => {
     return this.disabledDates.find(x => NgbDate.from(x).equals(date)) ? true : false;
   };
@@ -554,6 +679,7 @@ export class ScheduleComponent implements OnInit {
 
   cancel() {
     this.reservation = null;
+    this.submitted = false;
     this.validateAvailability = false;
     this.professional = null;
     while (this.daysArray.length !== 0) {

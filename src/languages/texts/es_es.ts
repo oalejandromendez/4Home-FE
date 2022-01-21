@@ -70,6 +70,8 @@ export const texts = {
   init_date_required: 'La fecha inicial es requerida',
   end_date_required: 'La fecha final es requerida',
   end_date_less_init_date: 'La fecha final debe ser mayor a la fecha de inicio',
+  initial_service_date_required: 'La fecha inicial de servicio es obligatoria',
+  professional_not_available: 'El profesional seleccionado no tiene disponibilidad para tomar el servicio',
 
   add_address: 'Agregar Dirección',
 

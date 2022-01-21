@@ -161,7 +161,7 @@
 
         <div class="card-body p-2 pl-4">
 
-          <span class="label-customer">Información de la reserva <strong
+          <span class="label-customer">{{labels.reserve_data}} <strong
             class="info-reference-schedule">{{ reservation.reference }}</strong></span>
 
           <div class="row" *ngIf="reservation.status === 1">
@@ -223,6 +223,25 @@
             </div>
           </div>
 
+          <div class="row">
+
+            <div class="col-md-6 p-0">
+              <div>
+                <span class="label-info">{{labels.working_day}}</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ reservation.service.working_day.name }}</label>
+              </div>
+            </div>
+
+            <div class="col-md-6 p-0">
+              <div>
+                <span class="label-info">{{labels.schedule}}</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{reservation.service.working_day.init_hour}} - {{reservation.service.working_day.end_hour}}</label>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -266,11 +285,11 @@
                 </div>
                 <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled"
                              let-focused="focused" let-selected="selected">
-                  <div class="custom-day" [class.weekend]="isWeekend(date)" [class.focused]="focused"
+                  <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
                        [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
                        [class.text-muted]="disabled">
                     {{ date.day }}
-                  </div>
+                  </span>
                 </ng-template>
                 <ng-template #footerTemplate>
                   <hr class="my-0">
@@ -291,6 +310,57 @@
             </div>
 
           </div>
+
+        </div>
+
+      </div>
+
+      <div class="card card-warning mb-3" *ngIf="reservation.type === 2">
+
+        <div class="card-body p-1 text-center">
+
+          <div class="form-group">
+
+            <label class="col-form-label">{{labels.initial_service_date}} <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <input class="form-control" placeholder="YYYY-MM-DD" formControlName="initial_service_date" ngbDatepicker
+                     [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate"
+                     #startDate="ngbDatepicker">
+              <div class="input-group-append bg-default" (click)="startDate.toggle()">
+                                <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+              </div>
+            </div>
+            <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
+                         let-disabled="disabled" let-focused="focused">
+                    <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
+                          [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                          [class.text-muted-day]="disabled">
+                        {{ date.day }}
+                    </span>
+            </ng-template>
+            <span class="is-invalid" *ngIf="submitted && form.get('initial_service_date').hasError('required')">
+              <small class="form-text text-danger">{{texts.initial_service_date_required}}</small>
+            </span>
+            <span class="mt-1"
+                  *ngIf="form.get('initial_service_date').errors && !form.get('initial_service_date').pristine">
+              <small class="form-text text-danger">{{texts.error_date}}</small>
+            </span>
+          </div>
+
+          <ng-template #customStartDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
+                       let-disabled="disabled" let-focused="focused">
+                    <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
+                          [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
+                          [class.text-muted-day]="disabled">
+                        {{ date.day }}
+                    </span>
+          </ng-template>
+          <ng-template #footerTemplateStartDate>
+            <hr class="my-0">
+            <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="startDate.close()">Cerrar</button>
+          </ng-template>
 
         </div>
 
