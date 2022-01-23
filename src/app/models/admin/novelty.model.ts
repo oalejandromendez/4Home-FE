@@ -1,3 +1,5 @@
+import {ReserveModel} from '@src/models/scheduling/reserve.mode';
+
 export class NoveltyModel {
   professional: number;
   type: number;
@@ -11,4 +13,9 @@ export class NoveltyModel {
     this.initial_date = '';
     this.final_date = '';
   }
+}
+
+export class ReserveAffected {
+  daysReschedule: any = [];
+  reserve: ReserveModel;
 }

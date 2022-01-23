@@ -197,7 +197,7 @@ export class ScheduleComponent implements OnInit {
               const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
               const limit = new Date(initialServiceDate.getFullYear(), initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
 
-              const firstAndLastServiceDate = this.getFirstAndLastServiceDate(initialServiceDate, limit, days);
+              const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate, limit, days);
               const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
               const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
 
@@ -208,7 +208,7 @@ export class ScheduleComponent implements OnInit {
                   const splitDate = day.date.split('-');
                   const selectedDate = new Date(splitDate[0], splitDate[1] - 1, splitDate[2]);
                   if ((selectedDate >= firstAvailableDay && selectedDate <= lastAvailableDay) &&
-                    this.validateDateInRange(firstAvailableDay, lastAvailableDay, days, selectedDate)) {
+                    this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, days, selectedDate)) {
                     if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
                       (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
                       professionalAvailable = false;
@@ -223,7 +223,7 @@ export class ScheduleComponent implements OnInit {
                 const selectedFinalServiceDate = new Date(iDate.year, iDate.month - 1, iDate.day);
                 selectedFinalServiceDate.setMonth(selectedInitialServiceDate.getMonth() + 1);
 
-                const firstAndLastSelectedServiceDate = this.getFirstAndLastServiceDate(selectedInitialServiceDate,
+                const firstAndLastSelectedServiceDate = this.reserveService.getFirstAndLastServiceDate(selectedInitialServiceDate,
                   selectedFinalServiceDate, this.reservation.reserve_day);
                 const firstSelectedDay = firstAndLastSelectedServiceDate.firstAvailableDay;
                 const lastSelectedDay = firstAndLastSelectedServiceDate.lastAvailableDay;
@@ -258,48 +258,6 @@ export class ScheduleComponent implements OnInit {
       });
     });
 
-  }
-
-  validateDateInRange(initialServiceDate: Date, lastServiceDate: Date, days, dateToValidate: Date) {
-    while (initialServiceDate <= lastServiceDate) {
-      if (initialServiceDate.getTime() === dateToValidate.getTime()) {
-        const dayI = initialServiceDate.getDay();
-        return days.find((d: any) => d.day === dayI);
-      } else {
-        initialServiceDate.setDate(initialServiceDate.getDate() + 1);
-      }
-    }
-    return false;
-  }
-
-  getFirstAndLastServiceDate(initialServiceDate, lastServiceDate, days) {
-    let firstAvailableDay: Date = null;
-    let lastAvailableDay: Date = null;
-    while (initialServiceDate <= lastServiceDate) {
-      const dayI = initialServiceDate.getDay();
-      const dayE = lastServiceDate.getDay();
-      const existsI = days.find((d: any) => d.day === dayI);
-      const existsE = days.find((d: any) => d.day === dayE);
-      if (!firstAvailableDay) {
-        if (existsI) {
-          firstAvailableDay = initialServiceDate;
-        } else {
-          initialServiceDate.setDate(initialServiceDate.getDate() + 1);
-        }
-      }
-
-      if (!lastAvailableDay) {
-        if (existsE) {
-          lastAvailableDay = lastServiceDate;
-        } else {
-          lastServiceDate.setDate(lastServiceDate.getDate() - 1);
-        }
-      }
-      if (firstAvailableDay && lastAvailableDay) {
-        break;
-      }
-    }
-    return {firstAvailableDay, lastAvailableDay};
   }
 
   onSubmit() {

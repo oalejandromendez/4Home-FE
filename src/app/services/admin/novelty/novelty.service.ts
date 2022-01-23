@@ -35,4 +35,8 @@ export class NoveltyService {
   delete(id: string) {
     return this.headers.delete(sessionStorage.getItem('token'), `${this.url}/api/novelty/${id}`);
   }
+
+  schedule( filter: any) {
+    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/novelty/schedule`, { ...filter });
+  }
 }

@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import {labels} from '@lang/labels/es_es';
 import {messages} from '@lang/messages/es_es';
 import {texts} from '@lang/texts/es_es';
-import {NoveltyModel} from '@src/models/admin/novelty.model';
+import {NoveltyModel, ReserveAffected} from '@src/models/admin/novelty.model';
 import {NoveltyService} from '@src/services/admin/novelty/novelty.service';
 import {ProfessionalService} from '@src/services/admin/professional/professional.service';
 import {CustomDatepickerI18n, I18n} from '@src/services/common/datepicker/datepicker.service';
@@ -22,6 +22,7 @@ import {ServicetypeService} from '@src/services/admin/servicetype/servicetype.se
 import {WorkingdayService} from '@src/services/admin/workingday/workingday.service';
 import {ServiceService} from '@src/services/admin/service/service.service';
 import {ReserveModel} from '@src/models/scheduling/reserve.mode';
+import {ReserveService} from '@src/services/scheduling/reserve/reserve.service';
 
 @Component({
   selector: 'app-novelties',
@@ -49,7 +50,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   dtOptions: any = {};
   novelties: any[];
   reservesDays: any[] = [];
-  reserves: any[] = [];
+  reservesAffected: Array<ReserveAffected> = [];
   novelty: NoveltyModel = new NoveltyModel();
   submitted = false;
   submittedReSchedule = false;
@@ -87,7 +88,8 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   }
 
   now: Date = new Date();
-  minDate = {year: this.now.getFullYear(), month: this.now.getMonth() + 1, day: this.now.getDate() + 2};
+  minDateNovelty = {year: this.now.getFullYear(), month: this.now.getMonth() + 1, day: this.now.getDate()};
+  minDateReschedule = {year: this.now.getFullYear(), month: this.now.getMonth() + 1, day: this.now.getDate() + 1};
 
   constructor(
     private router: Router,
@@ -105,10 +107,12 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     private servicetypeService: ServicetypeService,
     private formBuilder: FormBuilder,
     private serviceService: ServiceService,
-    private workingdayService: WorkingdayService
+    private workingdayService: WorkingdayService,
+    private reserveService: ReserveService
   ) {
     this.loaderService.loading(true);
     this.loadForm();
+    this.loadReScheduleForm();
     this.getPermissions();
     this.toastyConfig.theme = 'material';
     this.types = this.noveltyService.Type;
@@ -406,7 +410,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     this.submitted = false;
     this.novelty = new NoveltyModel();
     this.reservesDays = [];
-    this.reserves = [];
+    this.reservesAffected = [];
     if (!this.canCreate) {
       this.form.disable();
     }
@@ -418,7 +422,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     this.submitted = false;
     this.novelty = new NoveltyModel();
     this.reservesDays = [];
-    this.reserves = [];
+    this.reservesAffected = [];
     if (!this.canCreate) {
       this.form.disable();
     }
@@ -508,7 +512,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
 
     this.reservesDays = [];
 
-    this.reportService.schedule({init, end, status, professionals}).subscribe((data: any) => {
+    this.noveltyService.schedule({init, end, status, professionals}).subscribe((data: any) => {
 
       if (data.monthly.length === 0 && data.sporadic.length === 0) {
         const toastOptions: ToastOptions = {
@@ -520,56 +524,67 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
         };
         this.toastyService.warning(toastOptions);
       } else {
+
         if (data.monthly.length > 0) {
           data.monthly.map((reserve: any) => {
-            let scheduling_date = new Date(reserve.reserve.scheduling_date);
-            let original_scheduling_date = new Date(reserve.reserve.scheduling_date);
-            scheduling_date.setMonth(scheduling_date.getMonth() + 1);
-            const endDate = new Date(end);
-            const startDate = new Date(init);
+            const initialServiceDateSplit = reserve.initial_service_date.split('-');
+            const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
+            const latsServiceDate = new Date(initialServiceDate.getFullYear(),
+              initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
 
-            let limit: Date;
-            let initDate: Date;
+            const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
+              latsServiceDate, reserve.reserve_day);
+            const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+            const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
 
-            if (scheduling_date < endDate) {
-              limit = scheduling_date;
-            } else {
-              limit = endDate;
-            }
-            if (startDate > original_scheduling_date) {
-              initDate = startDate;
-            } else {
-              initDate = original_scheduling_date;
-            }
-            limit.setDate(limit.getDate() + 1);
-            while (initDate <= limit) {
-              let dayOfWeek = initDate.getDay();
-              if (dayOfWeek == 0) {
-                dayOfWeek = 6;
-              } else {
-                dayOfWeek--;
-              }
-              if (dayOfWeek === reserve.day) {
-                this.reservesDays.push({
-                  date: JSON.parse(JSON.stringify(initDate)),
-                  reserve: reserve.reserve
+            const initDateSplit = init.split('-');
+            const endDateSplit = end.split('-');
+            const startDate = new Date(initDateSplit[0], initDateSplit[1] - 1, initDateSplit[2]);
+            const endDate = new Date(endDateSplit[0], endDateSplit[1] - 1, endDateSplit[2]);
+
+            const reserveAffected = new ReserveAffected();
+            reserveAffected.reserve = reserve;
+
+            while (startDate <= endDate) {
+              if (this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, reserve.reserve_day, startDate)) {
+                reserveAffected.daysReschedule.push({
+                  date: JSON.parse(JSON.stringify(startDate))
                 });
               }
-              initDate.setDate(initDate.getDate() + 1);
+              startDate.setDate(startDate.getDate() + 1);
+            }
+            if (reserveAffected.daysReschedule.length > 0) {
+              this.reservesAffected.push(reserveAffected);
             }
           });
         }
         if (data.sporadic.length > 0) {
+          const initDateSplit = init.split('-');
+          const endDateSplit = end.split('-');
+          const startDate = new Date(initDateSplit[0], initDateSplit[1] - 1, initDateSplit[2]);
+          const endDate = new Date(endDateSplit[0], endDateSplit[1] - 1, endDateSplit[2]);
           data.sporadic.map((reserve: any) => {
-            this.reservesDays.push({
-              date: reserve.date,
-              reserve: reserve.reserve
-            });
+            const reserveAffected = new ReserveAffected();
+            reserveAffected.reserve = reserve;
+            while (startDate <= endDate) {
+              reserve.reserve_day.forEach((day: any) => {
+
+                const splitReserveDate = day.date.split('-');
+                const reserveDate = new Date(splitReserveDate[0], splitReserveDate[1] - 1, splitReserveDate[2]);
+
+                if (startDate.getTime() === reserveDate.getTime()) {
+                  reserveAffected.daysReschedule.push({
+                    date: JSON.parse(JSON.stringify(startDate))
+                  });
+                }
+              });
+              startDate.setDate(startDate.getDate() + 1);
+            }
+            if (reserveAffected.daysReschedule.length > 0) {
+              this.reservesAffected.push(reserveAffected);
+            }
           });
         }
-        const reservesDays = _.orderBy(this.reservesDays, ['date'], ['asc']);
-        this.orderPerReserves(reservesDays);
-
       }
       Swal.close();
     }, (err) => {
@@ -593,26 +608,6 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       } else {
         if (err.status === 401) {
           this.router.navigateByUrl('/login');
-        }
-      }
-    });
-  }
-
-  orderPerReserves(reservesDays) {
-
-    reservesDays.forEach((reserveday: any) => {
-      const auxReserveday = reserveday;
-      let reserveIndex = this.reserves.findIndex(data => data.reference === auxReserveday.reserve.reference);
-      if (reserveIndex !== -1) {
-        delete auxReserveday.reserve;
-        this.reserves[reserveIndex].reserve_days.push(auxReserveday);
-      } else {
-        this.reserves.push(auxReserveday.reserve);
-        reserveIndex = this.reserves.findIndex(data => data.reference === auxReserveday.reserve.reference);
-        if (reserveIndex !== -1) {
-          this.reserves[reserveIndex].reserve_days = [];
-          delete auxReserveday.reserve;
-          this.reserves[reserveIndex].reserve_days.push(auxReserveday);
         }
       }
     });
@@ -677,8 +672,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
 
   re_Schedule(reserve: any) {
     console.log(reserve);
-    this.loadReScheduleForm();
-    this.loadDates(reserve.reserve_days.length);
+    this.loadDates(reserve.daysReschedule.length);
     this.openReScheduleModal.nativeElement.click();
   }
 
@@ -840,8 +834,6 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   }
 
   checkAvailability() {
-
-
 
 
   }

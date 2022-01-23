@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { ReserveModel } from 'src/app/models/scheduling/reserve.mode';
-import { environment } from 'src/environments/environment';
-import { HeaderService } from '../../common/header/header.service';
+import {Injectable} from '@angular/core';
+import {ReserveModel} from 'src/app/models/scheduling/reserve.mode';
+import {environment} from 'src/environments/environment';
+import {HeaderService} from '../../common/header/header.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,35 +17,77 @@ export class ReserveService {
   }
 
   get() {
-    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve`);
+    return this.headers.get(sessionStorage.getItem('token'), `${this.url}/api/reserve`);
   }
 
   getByCustomer(idCustomer: any) {
-    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/customer/${idCustomer}`);
+    return this.headers.get(sessionStorage.getItem('token'), `${this.url}/api/reserve/filter/customer/${idCustomer}`);
   }
 
   getByStatus(status: number) {
-    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/status/${status}`);
+    return this.headers.get(sessionStorage.getItem('token'), `${this.url}/api/reserve/filter/status/${status}`);
   }
 
   getScheduleByCustomer(idCustomer: any) {
-    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/schedule/customer/${idCustomer}`);
+    return this.headers.get(sessionStorage.getItem('token'), `${this.url}/api/reserve/filter/schedule/customer/${idCustomer}`);
   }
 
   getByReference(reference: any) {
-    return this.headers.get(sessionStorage.getItem('token'), `${ this.url}/api/reserve/filter/reference/${reference}`);
+    return this.headers.get(sessionStorage.getItem('token'), `${this.url}/api/reserve/filter/reference/${reference}`);
   }
 
-  post( reserve: ReserveModel) {
-    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/reserve`, { ...reserve });
+  post(reserve: ReserveModel) {
+    return this.headers.post(sessionStorage.getItem('token'), `${this.url}/api/reserve`, {...reserve});
   }
 
-  put( reserve: ReserveModel, id: string) {
-    return this.headers.put(sessionStorage.getItem('token'), `${ this.url}/api/reserve/${id}`, { ...reserve });
+  put(reserve: ReserveModel, id: string) {
+    return this.headers.put(sessionStorage.getItem('token'), `${this.url}/api/reserve/${id}`, {...reserve});
   }
 
-  delete( id: string) {
-    return this.headers.delete(sessionStorage.getItem('token'), `${ this.url}/api/reserve/${id}`);
+  delete(id: string) {
+    return this.headers.delete(sessionStorage.getItem('token'), `${this.url}/api/reserve/${id}`);
+  }
+
+  validateDateInRange(initialServiceDate: Date, lastServiceDate: Date, serviceDays, dateToValidate: Date) {
+    while (initialServiceDate <= lastServiceDate) {
+      if (initialServiceDate.getTime() === dateToValidate.getTime()) {
+        const dayI = initialServiceDate.getDay();
+        return serviceDays.find((d: any) => d.day === dayI);
+      } else {
+        initialServiceDate.setDate(initialServiceDate.getDate() + 1);
+      }
+    }
+    return false;
+  }
+
+  getFirstAndLastServiceDate(initialServiceDate, lastServiceDate, serviceDays) {
+    let firstAvailableDay: Date = null;
+    let lastAvailableDay: Date = null;
+    while (initialServiceDate <= lastServiceDate) {
+      const dayI = initialServiceDate.getDay();
+      const dayE = lastServiceDate.getDay();
+      const existsI = serviceDays.find((d: any) => d.day === dayI);
+      const existsE = serviceDays.find((d: any) => d.day === dayE);
+      if (!firstAvailableDay) {
+        if (existsI) {
+          firstAvailableDay = initialServiceDate;
+        } else {
+          initialServiceDate.setDate(initialServiceDate.getDate() + 1);
+        }
+      }
+
+      if (!lastAvailableDay) {
+        if (existsE) {
+          lastAvailableDay = lastServiceDate;
+        } else {
+          lastServiceDate.setDate(lastServiceDate.getDate() - 1);
+        }
+      }
+      if (firstAvailableDay && lastAvailableDay) {
+        break;
+      }
+    }
+    return {firstAvailableDay, lastAvailableDay};
   }
 
 }

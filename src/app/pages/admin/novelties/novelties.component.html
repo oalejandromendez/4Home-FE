@@ -110,7 +110,7 @@
         <div class="input-group">
           <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker
                  [dayTemplate]="customStartDay" [footerTemplate]="footerTemplateStartDate" #startDate="ngbDatepicker"
-                 [minDate]="minDate">
+                 [minDate]="minDateNovelty">
           <div class="input-group-append bg-default" (click)="startDate.toggle()">
                                 <span class="input-group-text">
                                 <i class="fa fa-calendar"></i>
@@ -146,7 +146,8 @@
         <label class="col-form-label">{{labels.final_date}} <span class="text-danger">*</span></label>
         <div class="input-group">
           <input class="form-control" placeholder="YYYY-MM-DD" formControlName="end" ngbDatepicker
-                 [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker">
+                 [dayTemplate]="customEndDay" [footerTemplate]="footerTemplateEndDate" #endDate="ngbDatepicker"
+                 [minDate]="minDateNovelty">
           <div class="input-group-append bg-default" (click)="endDate.toggle()">
                                 <span class="input-group-text">
                                 <i class="fa fa-calendar"></i>
@@ -159,13 +160,14 @@
         <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
           <small class="form-text text-danger">{{texts.valid_date}}</small>
         </div>
-        <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
+        <div class="mt-1" *ngIf="submitted && form.hasError('dates')">
           <small class="form-text text-danger">{{texts.end_date_less_init_date}}</small>
         </div>
 
         <ng-template #customEndDay let-date="date" let-currentMonth="currentMonth" let-selected="selected"
                      let-disabled="disabled" let-focused="focused">
-                    <span class="custom-day" [class.focused]="focused" [class.bg-primary]="selected"
+                    <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
+                          [class.bg-primary]="selected"
                           [class.hidden]="date.month !== currentMonth" [class.text-muted-day]="disabled">
                         {{ date.day }}
                     </span>
@@ -218,30 +220,32 @@
           <th>{{labels.price}}</th>
           <th>{{labels.address}}</th>
           <th>{{labels.status}}</th>
+          <th>{{labels.days_to_reschedule}}</th>
           <th>{{labels.actions}}</th>
         </tr>
         </thead>
-        <tbody *ngIf="reserves?.length !=0 ">
-        <tr *ngFor="let reserve of reserves; let index = index">
-          <td>{{ reserve.reference }}</td>
-          <td>{{ reserve.user.name }} {{ reserve.user.lastname }}</td>
-          <td>{{ reserve.service.name }}</td>
-          <td *ngIf="reserve.type === 1">Esporádico</td>
-          <td *ngIf="reserve.type === 2">Mensualidad</td>
-          <td>{{ reserve.service.working_day.name }}</td>
-          <td *ngIf="reserve.type === 1">
-            ${{ (reserve.service.price * reserve.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
-          <td *ngIf="reserve.type === 2">
-            ${{ ((reserve.service.price * reserve.service.quantity) * 4) | currency: '' : '' : '1.0-0' }}</td>
-          <td>{{ reserve.customer_address.address }}</td>
+        <tbody *ngIf="reservesAffected?.length !=0 ">
+        <tr *ngFor="let reserve of reservesAffected; let index = index">
+          <td>{{ reserve.reserve.reference }}</td>
+          <td>{{ reserve.reserve.user.name }} {{ reserve.reserve.user.lastname }}</td>
+          <td>{{ reserve.reserve.service.name }}</td>
+          <td *ngIf="reserve.reserve.type === 1">Esporádico</td>
+          <td *ngIf="reserve.reserve.type === 2">Mensualidad</td>
+          <td>{{ reserve.reserve.service.working_day.name }}</td>
+          <td *ngIf="reserve.reserve.type === 1">
+            ${{ (reserve.reserve.service.price * reserve.reserve.service.quantity) | currency: '' : '' : '1.0-0' }}</td>
+          <td *ngIf="reserve.reserve.type === 2">
+            ${{ ((reserve.reserve.service.price * reserve.reserve.service.quantity) * 4) | currency: '' : '' : '1.0-0' }}</td>
+          <td>{{ reserve.reserve.customer_address.address }}</td>
           <td>
-            <span *ngIf="reserve.status === 1" class="badge badge-warning">RESERVADO</span>
-            <span *ngIf="reserve.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
-            <span *ngIf="reserve.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
-            <span *ngIf="reserve.status === 4" class="badge badge-success">PAGO APROBADO</span>
-            <span *ngIf="reserve.status === 9" class="badge badge-primary">REPROGRAMADA</span>
-            <span *ngIf="reserve.status === 10" class="badge badge-primary">TERMINADO</span>
+            <span *ngIf="reserve.reserve.status === 1" class="badge badge-warning">RESERVADO</span>
+            <span *ngIf="reserve.reserve.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
+            <span *ngIf="reserve.reserve.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
+            <span *ngIf="reserve.reserve.status === 4" class="badge badge-success">PAGO APROBADO</span>
+            <span *ngIf="reserve.reserve.status === 9" class="badge badge-primary">REPROGRAMADA</span>
+            <span *ngIf="reserve.reserve.status === 10" class="badge badge-primary">TERMINADO</span>
           </td>
+          <td>{{ reserve.daysReschedule.length }}</td>
           <td>
             <button type="button"
                     class="btn_preschedule btn btn-icon btn-delete btn-datatable"
@@ -351,7 +355,7 @@
                   <input class="form-control" formControlName="date" placeholder="YYYY-MM-DD" ngbDatepicker
                          #date="ngbDatepicker" [dayTemplate]="customDay" [placement]="'bottom'"
                          (ngModelChange)="changeDate()"
-                         [footerTemplate]="footerTemplate">
+                         [footerTemplate]="footerTemplate" [minDate]="minDateReschedule">
                   <div class="input-group-append bg-default" (click)="date.toggle()">
                                         <span class="input-group-text">
                                           <i class="fa fa-calendar"></i>
@@ -364,18 +368,20 @@
                 <div class="mt-1" *ngIf="day.get('date').hasError('repeatedDate')">
                   <small class="form-text text-danger">{{texts.repeatedDate}}</small>
                 </div>
+
                 <ng-template #customDay let-date="date" let-currentMonth="currentMonth" let-disabled="disabled"
                              let-focused="focused" let-selected="selected">
                   <span class="custom-day" [class.weekend]="dateService.isWeekend(date)" [class.focused]="focused"
                         [class.bg-primary]="selected" [class.hidden]="date.month !== currentMonth"
-                        [class.text-muted]="disabled">
+                        [class.text-muted-day]="disabled">
                     {{ date.day }}
                   </span>
                 </ng-template>
 
                 <ng-template #footerTemplate>
                   <hr class="my-0">
-                  <button class="btn btn-danger btn-sm m-2 float-right btn-dp" (click)="date.close()">Cerrar</button>
+                  <button class="btn btn-danger btn-sm m-2 float-right btn-dp"
+                          (click)="date.close()">{{labels.btn_close}}</button>
                 </ng-template>
               </div>
 
@@ -394,7 +400,8 @@
 
           </div>
           <button type="buttom" class="btn btn-success btn-sm m-0" (click)="checkAvailability()"
-                  [disabled]="formReSchedule.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar Disponibilidad
+                  [disabled]="formReSchedule.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar
+            Disponibilidad
           </button>
         </div>
       </div>
