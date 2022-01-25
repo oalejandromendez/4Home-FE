@@ -66,8 +66,8 @@ export class ReserveService {
     while (initialServiceDate <= lastServiceDate) {
       const dayI = initialServiceDate.getDay();
       const dayE = lastServiceDate.getDay();
-      const existsI = serviceDays.find((d: any) => d.day === dayI);
-      const existsE = serviceDays.find((d: any) => d.day === dayE);
+      const existsI = serviceDays.find((d: any) => d.day === dayI || d.index === dayI);
+      const existsE = serviceDays.find((d: any) => d.day === dayE || d.index === dayE);
       if (!firstAvailableDay) {
         if (existsI) {
           firstAvailableDay = initialServiceDate;
