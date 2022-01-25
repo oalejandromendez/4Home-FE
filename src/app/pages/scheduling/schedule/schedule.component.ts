@@ -148,7 +148,7 @@ export class ScheduleComponent implements OnInit {
       this.professionals = resp.data.filter((professional: any) => professional.status.openSchedule === 1);
       if (this.professionals.length > 0) {
         this.scheduleService.checkAvailability(this.professionals, this.reservation, this.daysArray,
-          this.form.controls.initial_service_date.value);
+          (this.form.controls.initial_service_date) ? this.form.controls.initial_service_date.value : '');
       }
       this.validateAvailability = true;
       this.loaderService.loading(false);
