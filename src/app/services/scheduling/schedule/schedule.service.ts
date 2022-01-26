@@ -3,6 +3,8 @@ import {ReserveModel} from 'src/app/models/scheduling/reserve.mode';
 import {environment} from 'src/environments/environment';
 import {HeaderService} from '../../common/header/header.service';
 import {ReserveService} from '@src/services/scheduling/reserve/reserve.service';
+import {NoveltiesComponent} from '@src/pages/admin/novelties/novelties.component';
+import {NoveltyService} from '@src/services/admin/novelty/novelty.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +18,7 @@ export class ScheduleService {
 
   constructor(
     private reserveService: ReserveService,
+    private noveltyService: NoveltyService,
     private headers: HeaderService
   ) {
     this.url = environment.host;
@@ -150,10 +153,10 @@ export class ScheduleService {
 
           if (reservation.type === this.SPORADIC_PERIODICITY) {
 
-            const selectedDays = reservation.reserve_day;
-            selectedDays.forEach((day: any) => {
-              const splitDate = day.date.split('-');
-              const selectedDate = new Date(splitDate[0], splitDate[1] - 1, splitDate[2]);
+            const selectedDays = daysArray.value.filter((day: any) => day.type === this.SPORADIC_PERIODICITY);
+            selectedDays.forEach((daySel: any) => {
+              const splitSelDate = daySel.date;
+              const selectedDate = new Date(splitSelDate.year, splitSelDate.month - 1, splitSelDate.day);
               if ((selectedDate >= firstAvailableDay && selectedDate <= lastAvailableDay) &&
                 this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, days, selectedDate)) {
                 if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
@@ -200,5 +203,109 @@ export class ScheduleService {
         professional.available = 2;
       }
     });
+  }
+
+  loadSchedule(professional, reservation, daysArray, initialServiceDateValue) {
+    const schedule = [];
+    if (professional) {
+      if (professional.novelties) {
+        professional.novelties.map((novelty: any) => {
+          const initialNoveltyDateSplit = novelty.initial_date.split('-');
+          const initialNoveltyDate = new Date(initialNoveltyDateSplit[0], initialNoveltyDateSplit[1] - 1, initialNoveltyDateSplit[2]);
+          const finalNoveltyDateSplit = novelty.final_date.split('-');
+          const finalNoveltyDate = new Date(finalNoveltyDateSplit[0], finalNoveltyDateSplit[1] - 1, finalNoveltyDateSplit[2]);
+
+          while (initialNoveltyDate <= finalNoveltyDate) {
+            const title = this.noveltyService.Type.filter(data => data.value === novelty.type);
+
+            schedule.push({
+              title: `${title[0].label}`,
+              start: new Date(initialNoveltyDate),
+              color: '#13f403',
+              allDay: true
+            });
+
+            initialNoveltyDate.setDate(initialNoveltyDate.getDate() + 1);
+          }
+        });
+      }
+      if (professional.reserve) {
+        const reservesDates = professional.reserve.filter((reserve: any) =>
+          reserve.type === this.SPORADIC_PERIODICITY);
+
+        if (reservesDates.length > 0) {
+          reservesDates.map((reserve: any) => {
+            reserve.reserve_day.map((day: any) => {
+              schedule.push({
+                title: `${reserve.service.working_day.name} (${reserve.service.working_day.init_hour} - ${reserve.service.working_day.end_hour})`,
+                start: day.date,
+                color: '#f44336',
+                allDay: true
+              });
+            });
+          });
+        }
+
+        const reservesDays = professional.reserve.filter((reserve: any) => reserve.type === this.MONTHLY_PERIODICITY);
+
+        if (reservesDays.length > 0) {
+          reservesDays.map((reserve: any) => {
+            const days = reserve.reserve_day;
+            if (days.length > 0) {
+              const now = new Date(reserve.initial_service_date);
+              now.setDate(now.getDate() + 1);
+              const limit = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate() + 1);
+              while (now <= limit) {
+                const day = now.getDay();
+                const exists = days.find((d: any) => d.day === day);
+                if (exists) {
+                  schedule.push({
+                    title: `${reserve.service.working_day.name} (${reserve.service.working_day.init_hour} - ${reserve.service.working_day.end_hour})`,
+                    start: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+                    color: '#f44336',
+                    allDay: true
+                  });
+                }
+                now.setDate(now.getDate() + 1);
+              }
+            }
+          });
+        }
+      }
+    }
+
+    const dates = daysArray.value.filter((day: any) => day.type === this.SPORADIC_PERIODICITY && !day.disabled);
+    if (dates.length > 0) {
+      dates.map((day: any) => {
+        const date = day.date;
+        schedule.push({
+          title: `${reservation.service.working_day.name} (${reservation.service.working_day.init_hour} - ${reservation.service.working_day.end_hour})`,
+          start: new Date(date.year + '-' + date.month + '-' + date.day),
+          color: '#03a9f4',
+          allDay: true
+        });
+      });
+    }
+    const days = daysArray.value.filter((day: any) => day.type === this.MONTHLY_PERIODICITY && day.selected);
+    if (days.length > 0) {
+      const initialServiceDate = initialServiceDateValue;
+      const now = new Date(initialServiceDate.year, initialServiceDate.month - 1, initialServiceDate.day);
+      const limit = new Date(initialServiceDate.year, initialServiceDate.month - 1, initialServiceDate.day);
+      limit.setMonth(now.getMonth() + 1);
+      while (now <= limit) {
+        const day = now.getDay();
+        const exists = days.find((d: any) => d.index === day);
+        if (exists) {
+          schedule.push({
+            title: `${reservation.service.working_day.name} (${reservation.service.working_day.init_hour} - ${reservation.service.working_day.end_hour})`,
+            start: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+            color: '#03a9f4',
+            allDay: true
+          });
+        }
+        now.setDate(now.getDate() + 1);
+      }
+    }
+    return schedule;
   }
 }

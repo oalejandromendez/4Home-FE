@@ -23,6 +23,12 @@ import {WorkingdayService} from '@src/services/admin/workingday/workingday.servi
 import {ServiceService} from '@src/services/admin/service/service.service';
 import {ReserveModel} from '@src/models/scheduling/reserve.mode';
 import {ReserveService} from '@src/services/scheduling/reserve/reserve.service';
+import {ScheduleService} from '@src/services/scheduling/schedule/schedule.service';
+import {CalendarOptions} from '@fullcalendar/common';
+import listPlugin from '@fullcalendar/list';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import esLocale from '@fullcalendar/core/locales/es';
 
 @Component({
   selector: 'app-novelties',
@@ -39,9 +45,11 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   @ViewChild('openModal') openModal: ElementRef;
   @ViewChild('openScheduleModal') openScheduleModal: ElementRef;
   @ViewChild('openReScheduleModal') openReScheduleModal: ElementRef;
+  @ViewChild('openCalendarModal') openCalendarModal: ElementRef;
   @ViewChild('closeModal') closeModal: ElementRef;
   @ViewChild('closeScheduleModal') closeScheduleModal: ElementRef;
   @ViewChild('closeReScheduleModal') closeReScheduleModal: ElementRef;
+  @ViewChild('closeModalCalendar') closeModalCalendar: ElementRef;
 
   @ViewChild(DataTableDirective, {static: false})
   dtElement: DataTableDirective;
@@ -64,10 +72,12 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   quantity = 0;
 
   professionals: Array<any> = [];
+  supervisors: Array<any> = [];
   professionalsReSchedule: Array<any> = [];
   types: Array<any> = [];
   serviceTypes: Array<any> = [];
   workingDays: Array<any> = [];
+  workingDay: any;
   services: Array<any> = [];
   service = null;
   listServices: Array<any> = [];
@@ -75,6 +85,12 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   today = this.calendar.getToday();
 
   reserve: ReserveModel = new ReserveModel();
+
+  validateAvailability = false;
+  searchProfessional = '';
+  professional = null;
+  calendarOptions: CalendarOptions = {};
+  reservation = null;
 
   typesPeriodicity: Array<any> = [
     {
@@ -108,7 +124,8 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private serviceService: ServiceService,
     private workingdayService: WorkingdayService,
-    private reserveService: ReserveService
+    private reserveService: ReserveService,
+    private scheduleService: ScheduleService
   ) {
     this.loaderService.loading(true);
     this.loadForm();
@@ -440,6 +457,11 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     }
   }
 
+  cancelCalendar() {
+    this.submitted = false;
+    this.formReSchedule.controls.type.reset();
+  }
+
   delete(id: any, index: any) {
     if (id) {
       Swal.fire({
@@ -486,6 +508,14 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   openModalReschedule(modal: any) {
     this.modalService.open(modal, {
       backdrop: 'static',
+      windowClass: 'modal-reschedule'
+    });
+  }
+
+  openModalCalendar(modal: any) {
+    this.modalService.open(modal, {
+      backdrop: 'static',
+      backdropClass: 'modal-calendar-backdrop',
       windowClass: 'modal-reschedule'
     });
   }
@@ -655,6 +685,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       resp.data.map((type: any) => {
         this.professionals.push({value: String(type.id), label: `${type.identification} - ${type.name} ${type.lastname}`});
       });
+      this.professionalsReSchedule = resp.data.filter((professional: any) => professional.status.openSchedule === 1);
       this.loaderService.loading(false);
     }, error => {
       Swal.fire({
@@ -683,7 +714,8 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       working_day: new FormControl('', [Validators.required]),
       type: new FormControl('', [Validators.required]),
       service: new FormControl('', [Validators.required]),
-      days: this.formBuilder.array([], {validators: this.minDaySelected})
+      days: this.formBuilder.array([], {validators: this.minDaySelected}),
+      supervisor: new FormControl(null, [Validators.required]),
     });
 
     this.formReSchedule.controls.professional.disable();
@@ -717,6 +749,12 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       this.service = null;
       this.getServices();
     });
+
+    this.formReSchedule.get('service').valueChanges.subscribe(() => {
+      const id = this.formReSchedule.controls.working_day.value;
+      const filterWorkingDay = this.workingDays.filter(data => data.value === id);
+      this.workingDay = filterWorkingDay[0];
+    });
   }
 
   getServiceTypes() {
@@ -741,7 +779,10 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       this.loaderService.loading(true);
       this.workingdayService.findByServiceType(serviceType).subscribe(resp => {
         resp.data.filter((workingDay: any) => workingDay.status === 1).map((workingDay: any) => {
-          this.workingDays.push({value: workingDay.id, label: workingDay.name});
+          this.workingDays.push({
+            value: workingDay.id, label: workingDay.name,
+            init_hour: workingDay.init_hour, end_hour: workingDay.end_hour
+          });
           this.workingDays = this.workingDays.slice();
         });
         this.loaderService.loading(false);
@@ -834,8 +875,74 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   }
 
   checkAvailability() {
+    if (this.professionalsReSchedule.length > 0) {
+      this.reservation = {
+        type: this.scheduleService.SPORADIC_PERIODICITY,
+        service: {
+          working_day: {
+            name: this.workingDay.label,
+            init_hour: this.workingDay.init_hour,
+            end_hour: this.workingDay.end_hour
+          }
+        }
+      };
+      this.scheduleService.checkAvailability(this.professionalsReSchedule, this.reservation, this.daysArray, '');
+    }
+    this.validateAvailability = true;
+  }
 
+  selectProfessionals(professional: any) {
+    this.formReSchedule.controls.professional.setValue(null);
+    this.professional = professional;
+    if (professional.available === 1) {
+      this.formReSchedule.controls.professional.setValue(this.professional.id);
+    }
+    this.setSupervisors();
+    this.loadSchedule();
+    this.openCalendarModal.nativeElement.click();
+  }
 
+  loadSchedule() {
+    const schedule = this.scheduleService.loadSchedule(this.professional, this.reservation, this.daysArray, '');
+    setTimeout(() => {
+      this.calendarOptions = {
+        plugins: [listPlugin, timeGridPlugin, dayGridPlugin],
+        locale: esLocale,
+        height: 420,
+        initialView: 'dayGridMonth',
+        timeZone: 'America/Bogota',
+        events: schedule,
+        eventColor: '#378006',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth'
+        },
+        slotEventOverlap: false,
+        slotLabelFormat: [
+          {
+            hour: 'numeric',
+            minute: '2-digit',
+            omitZeroMinute: false,
+            meridiem: false
+          }
+        ],
+        expandRows: true,
+        nowIndicator: true,
+        dayHeaders: true,
+      };
+    }, 100);
+
+  }
+
+  setSupervisors() {
+    this.supervisors = [];
+    this.professionalsReSchedule.map((professional: any) => {
+      if (professional.id !== this.professional.id) {
+        this.supervisors.push({value: String(professional.id), label: professional.name + ' ' + professional.lastname});
+        this.supervisors = this.supervisors.slice();
+      }
+    });
   }
 
 }

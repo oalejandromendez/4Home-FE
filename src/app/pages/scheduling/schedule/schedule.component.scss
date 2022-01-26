@@ -9,16 +9,16 @@
 }
 
 .filter {
-    background-color: #dee2e6;
-    text-align-last: center;
-    border-radius: 10px;
+  background-color: #dee2e6;
+  text-align-last: center;
+  border-radius: 10px;
 }
 
 .label-filter {
-    color: black;
-    font-size: 11px;
-    font-weight: bold;
-    margin-bottom: 0;
+  color: black;
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 0;
 }
 
 .wid-25 {
@@ -26,13 +26,13 @@
 }
 
 .bottom {
-    position: fixed;
-    bottom: 0;
-    width: calc(100% - 110px);
+  position: fixed;
+  bottom: 0;
+  width: calc(100% - 110px);
 }
 
 .active .label-filter {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .container {
@@ -41,20 +41,20 @@
 }
 
 .body-search {
-    padding: 10px !important;
+  padding: 10px !important;
 }
 
 .input-search {
-    height: 25px;
+  height: 25px;
 }
 
 .br-10 {
-    border-radius: 10px;
-    border: 1px solid #d6d6d6;
+  border-radius: 10px;
+  border: 1px solid #d6d6d6;
 }
 
 .wid-26 {
-    width: 26px;
+  width: 26px;
 }
 
 .label-reserves {
@@ -208,6 +208,11 @@
 
 .reservation-days {
   background-color: #03a9f4;
+  padding: 0px 10px;
+}
+
+.novelty-calendar {
+  background-color: #13f403;
   padding: 0px 10px;
 }
 

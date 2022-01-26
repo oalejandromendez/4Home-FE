@@ -287,7 +287,7 @@
 
       <div class="row">
 
-        <div class="col-md-6">
+        <div class="col-md-4">
 
           <div class='form-group'>
             <label class="col-form-label">{{labels.service_type}} <span class="text-danger">*</span></label>
@@ -340,9 +340,29 @@
             </div>
           </div>
 
+          <div class="card card-primary mb-2" *ngIf="formReSchedule.controls.service.value">
+
+            <div class="card-body p-2 pl-4">
+
+              <div class="row">
+
+                <div class="col-md-6 p-0">
+                  <div>
+                    <span class="label-info">{{labels.schedule}}</span>
+                    <br>
+                    <label class="font-weight-bold label-info-customer">{{workingDay.init_hour}}
+                      - {{workingDay.end_hour}}</label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
-        <div class="col-md-6" style="border-left: 4px solid #c1c1c1;">
+        <div class="col-md-4" style="border-left: 4px solid #c1c1c1;">
 
           <div class="content-days">
 
@@ -399,26 +419,210 @@
             </div>
 
           </div>
-          <button type="buttom" class="btn btn-success btn-sm m-0" (click)="checkAvailability()"
-                  [disabled]="formReSchedule.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar
-            Disponibilidad
-          </button>
+        </div>
+        <div class="col-md-4" style="border-left: 4px solid #c1c1c1;" *ngIf="validateAvailability">
+          <div class="card br-10 mb-3">
+            <div class="card-body body-search">
+              <div class="d-flex">
+                <img alt="Theme-Logo" class="img-fluid mr-2 wid-26" src="assets/img/search.png">
+                <input type="text" class="form-control input-search" placeholder="Buscar"
+                       [(ngModel)]="searchProfessional"
+                       [ngModelOptions]="{standalone: true}" maxlength="250" autofocus>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+
+              <div class="card-header p-0 text-center">
+                <div class="label-reserves">
+                  Profesionales
+                  <span class="badge badge-warning">{{ (professionalsReSchedule | filter: searchProfessional).length  }}</span>
+                </div>
+              </div>
+              <div class="card-body body-list-reserves">
+                <div class="list-reserve">
+                  <div class="card br-10 mb-1 cursor-pointer card-reserve"
+                       *ngFor="let professional of professionalsReSchedule | filter:searchProfessional"
+                       (click)="selectProfessionals(professional)">
+                    <div class="card-body p-2">
+                      <div class="row text-center">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="d-flex">
+
+                              <div class="d-flex col-md-7">
+                                <div class="col-md-2">
+                                  <img class="img-reserve" src="assets/img/customer/id.png">
+                                </div>
+                                <label
+                                  class="col-md-10 font-weight-bold f-12 text-left">{{ professional.identification }}</label>
+                              </div>
+
+                              <div class="d-flex col-md-4" *ngIf="professional.available === 1">
+                                <label class="text-left badge badge-success mb-3">Disponible</label>
+                              </div>
+
+                              <div class="d-flex col-md-4" *ngIf="professional.available === 2">
+                                <label class="text-left badge badge-danger mb-3">No disponible</label>
+                              </div>
+
+                            </div>
+                            <div class="d-flex">
+                              <div class="d-flex col-md-12">
+                                <div class="col-md-2">
+                                  <img class="img-reserve" [src]="professional.photo">
+                                </div>
+                                <label
+                                  class="col-md-10 font-weight-bold f-12 text-left">{{ professional.name | titlecase }} {{ professional.lastname | titlecase }}</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </div>
     <div class="modal-footer">
+      <button type="buttom" class="btn btn-success mr-2" (click)="checkAvailability()"
+              [disabled]="formReSchedule.get('days').hasError('invalidQuantity') || !daysArray.valid">Buscar
+        Disponibilidad
+      </button>
       <button type="button" class="btn btn-secondary mr-2" (click)="cancelReSchedule(); d('Cross click')">
         {{labels.btn_cancel}}
       </button>
-      <button *ngIf="canCreate && !id" type="submit" class="btn btn-success mr-2"
-              (click)="onSubmitReSchedule()">{{labels.btn_save}}
-      </button>
-      <button *ngIf="canEdit && id" type="submit" class="btn btn-primary mr-2"
-              (click)="onSubmitReSchedule()">{{labels.btn_edit}}
-      </button>
     </div>
   </ng-template>
+
+
+  <ng-template #modalCalendar let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title">Agenda</h5>
+      <button type="button" class="close basic-close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body p-2">
+
+      <div class="row">
+
+        <div class="col-md-4" *ngIf="reservation && professional">
+
+          <div class="card card-success br-10">
+
+            <div class="card-body pt-2">
+
+              <div>
+                <div class="container-image-schedule">
+                  <img [src]="professional.photo" class="img-schedule"/>
+                </div>
+              </div>
+
+              <div class="text-center">
+                <span *ngIf="professional.available === 1" class="text-left badge badge-success mb-2 mt-2 f-14">Disponible</span>
+                <span *ngIf="professional.available === 2" class="text-left badge badge-danger mb-2 mt-2 f-14">No disponible</span>
+              </div>
+
+              <div>
+                <span class="label-info">Identificación</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.identification }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Profesional</span>
+                <br>
+                <label
+                  class="font-weight-bold label-info-customer">{{ professional.name | titlecase }} {{ professional.lastname | titlecase }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Edad</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.age }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Cargo</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.position.name }}</label>
+              </div>
+
+              <div>
+                <span class="label-info">Email</span>
+                <br>
+                <label class="font-weight-bold label-info-customer">{{ professional.email }}</label>
+              </div>
+
+              <div class='form-group mb-0'>
+                <label class="label-info">{{labels.supervisor}} <span class="text-danger">*</span></label>
+                <div class="align-self-center">
+                  <ng-select [items]="supervisors" bindLabel="label" bindValue="value" [clearable]="true"
+                             placeholder="Seleccione..." formControlName="supervisor"
+                             notFoundText="No se encontraron resultados"></ng-select>
+                </div>
+                <span class="is-invalid" *ngIf="submitted && formReSchedule.get('supervisor').hasError('required')">
+                  <small class="form-text text-danger">{{texts.supervisor_required}}</small>
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="col-md-8">
+
+          <div class="card br-10 mb-0">
+
+            <div class="card-header p-0">
+
+              <div class="col-md-12 mt-2">
+
+                <span>Convenciones:</span>
+
+                <ul class="ul-conventions mb-2">
+                  <li class="mr-2">
+                    <span class="not-available"></span>
+                    <span class="conventions">No disponible</span>
+                  </li>
+                  <li class="mr-2">
+                    <span class="reservation-days"></span>
+                    <span class="conventions">Días de la reserva</span>
+                  </li>
+                  <li class="mr-2">
+                    <span class="novelty-calendar"></span>
+                    <span class="conventions">{{texts.service_novelty}}</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            <div class="card-body calendar">
+              <full-calendar deepChangeDetection="true" [options]="calendarOptions"></full-calendar>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary mr-2" (click)="cancelCalendar(); d('Cross click')">Cancelar</button>
+      <button *ngIf="canEdit" type="submit" class="btn btn-success mr-2" (click)="onSubmit()">Agendar</button>
+    </div>
+  </ng-template>
+
 </form>
 <button #openModal type="button" class="btn btn-primary hidden" (click)="open(modalForm)"></button>
 <button #closeModal type="button" class="close basic-close" aria-label="Close" (click)="close(modalForm)"></button>
@@ -431,3 +635,8 @@
         (click)="openModalReschedule(modalReScheduleForm)"></button>
 <button #closeReScheduleModal type="button" class="btn btn-primary hidden"
         (click)="close(modalReScheduleForm)"></button>
+
+<button #openCalendarModal type="button" class="btn btn-primary hidden"
+        (click)="openModalCalendar(modalCalendar)"></button>
+<button #closeModalCalendar type="button" class="btn btn-primary hidden"
+        (click)="close(modalCalendar)"></button>
