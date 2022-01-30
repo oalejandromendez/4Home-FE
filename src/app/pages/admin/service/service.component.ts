@@ -234,7 +234,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
     if (this.id) {
 
-      this.serviceService.put(this.service, this.id).subscribe((data: any) => {
+      this.serviceService.put(this.service, this.id).subscribe(() => {
 
         const toastOptions: ToastOptions = {
           title: '¡Proceso Exitoso!',
@@ -277,7 +277,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
 
     } else {
 
-      this.serviceService.post(this.service).subscribe((data: any) => {
+      this.serviceService.post(this.service).subscribe(() => {
         Swal.close();
         const toastOptions: ToastOptions = {
           title: '¡Proceso Exitoso!',
@@ -430,6 +430,7 @@ export class ServiceComponent implements OnInit, OnDestroy {
   changeNovelty() {
     this.is_novelty = this.form.get('is_novelty').value;
     this.form.controls.quantity.setValue((this.is_novelty) ? 0 : '');
+    this.form.controls.price.setValue((this.is_novelty) ? 0 : null);
     this.form.controls.type.setValue((this.is_novelty) ? 1 : '');
   }
 

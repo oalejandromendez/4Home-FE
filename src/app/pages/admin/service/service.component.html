@@ -88,7 +88,7 @@
           </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-6" *ngIf="!is_novelty">
           <div class="form-group">
             <label class="col-form-label">{{labels.price_per_service}} <span class="text-danger">*</span></label>
             <div class="align-self-center">

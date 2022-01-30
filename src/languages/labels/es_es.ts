@@ -62,4 +62,5 @@ export const labels = {
   reserve_data: 'Información de la reserva',
   schedule: 'Horario',
   days_to_reschedule: 'Días a reagendar',
+  reserves_to_reschedule: 'Reservas a re agendar',
 };

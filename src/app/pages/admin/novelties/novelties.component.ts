@@ -91,6 +91,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   professional = null;
   calendarOptions: CalendarOptions = {};
   reservation = null;
+  idSelectedReserve: number;
 
   typesPeriodicity: Array<any> = [
     {
@@ -110,7 +111,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private toastyService: ToastyService,
-    private noveltyService: NoveltyService,
+    public noveltyService: NoveltyService,
     private loaderService: LoaderService,
     private userService: UserService,
     private language: DataTableLanguage,
@@ -125,7 +126,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     private serviceService: ServiceService,
     private workingdayService: WorkingdayService,
     private reserveService: ReserveService,
-    private scheduleService: ScheduleService
+    public scheduleService: ScheduleService
   ) {
     this.loaderService.loading(true);
     this.loadForm();
@@ -154,23 +155,34 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     }, {validators: this.dateService.ValidateDates});
   }
 
-  rerender(): void {
-    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      dtInstance.destroy();
-      this.loadData();
+  rerender() {
+    return new Promise<any>(resolve => {
+      this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+        dtInstance.destroy();
+        this.loadData().then(r => {
+          if (r.status) {
+            this.novelties = r.data;
+            resolve();
+          }
+        });
+      });
     });
   }
 
   loadData() {
-    this.noveltyService.get().subscribe(resp => {
-      this.novelties = resp.data;
-      this.dtTrigger.next();
-      this.loaderService.loading(false);
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ha ocurrido un error'
+    return new Promise<any>(resolve => {
+      this.noveltyService.get().subscribe(resp => {
+        resp.data.sort((x, y) => +new Date(y.created_at) - +new Date(x.created_at));
+        this.dtTrigger.next();
+        this.loaderService.loading(false);
+        resolve({status: true, data: resp.data});
+      }, () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ha ocurrido un error'
+        });
+        resolve({status: false, data: null});
       });
     });
   }
@@ -267,7 +279,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       type: this.form.value.type,
       status: 0,
       initial_date: `${initDate.year}-${initDate.month}-${initDate.day}`,
-      final_date: `${endDate.year}-${endDate.month}-${endDate.day}`,
+      final_date: `${endDate.year}-${endDate.month}-${endDate.day}`
     };
 
     if (this.id) {
@@ -284,9 +296,9 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
         this.toastyService.success(toastOptions);
         this.cancel();
         this.closeModal.nativeElement.click();
-        this.rerender();
-
-        Swal.close();
+        this.rerender().then(() => {
+          Swal.close();
+        });
 
       }, (err) => {
         Swal.close();
@@ -329,7 +341,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
         this.submitted = false;
         this.closeModal.nativeElement.click();
         this.novelty = new NoveltyModel();
-        this.rerender();
+        this.rerender().then();
       }, (err) => {
         Swal.close();
         if (err.error.errors) {
@@ -359,7 +371,15 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   onSubmitReSchedule() {
 
     this.submittedReSchedule = true;
-    console.log(this.formReSchedule);
+
+    if (!this.formReSchedule.controls.professional.valid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: texts.professional_not_available
+      });
+      return;
+    }
 
     if (!this.formReSchedule.valid) {
       Swal.fire({
@@ -370,6 +390,22 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.reserve = {...this.reserve, ...this.formReSchedule.value};
+
+    const listDays = [];
+
+    this.daysArray.value.map((day: any) => {
+
+      if (day.type === this.scheduleService.SPORADIC_PERIODICITY) {
+        const date = day.date;
+        listDays.push({
+          date: date.year + '-' + date.month + '-' + date.day
+        });
+      }
+
+    });
+    this.reserve.days = listDays;
+
     Swal.fire({
       allowOutsideClick: false,
       icon: 'info',
@@ -378,25 +414,62 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
 
     Swal.showLoading();
 
-    this.reserve = this.formReSchedule.value;
-    //this.reserve.user = this.customer.id;
-
-    const listDays = [];
-
-    this.daysArray.value.map((day: any) => {
-
-      if (day.type === 1) {
-        const date = day.date;
-        listDays.push({
-          date: date.year + '-' + date.month + '-' + date.day
-        });
+    this.noveltyService.reschedule(this.reserve).subscribe(() => {
+      let idReserves: string;
+      let idReservesArray = [];
+      if (this.novelty.ids_reserves) {
+        idReservesArray = this.novelty.ids_reserves.split(',');
+        idReservesArray.push(this.idSelectedReserve.toString());
+        idReserves = idReservesArray.join(',');
+      } else {
+        idReserves = this.idSelectedReserve.toString();
       }
 
+      let callPreschedule = true;
+      let status = this.noveltyService.STATUS_EN_PROCESO.value;
+      if (idReservesArray.length === this.reservesAffected.length) {
+        status = this.noveltyService.STATUS_AGENDADA.value;
+        callPreschedule = false;
+      }
+
+      const novelty: NoveltyModel = {
+        professional: this.novelty.professional.id,
+        status,
+        type: this.novelty.type,
+        ids_reserves: idReserves,
+      };
+
+      this.updateNovelty(novelty, callPreschedule);
+
+
+    }, (err) => {
+      Swal.close();
+      if (err.error.errors) {
+        let mensage = '';
+
+        Object.keys(err.error.errors).forEach((data, index) => {
+          mensage += err.error.errors[data][0] + '<br>';
+        });
+        const toastOptions: ToastOptions = {
+          title: 'Error',
+          msg: mensage,
+          showClose: false,
+          timeout: 2000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.error(toastOptions);
+      } else {
+        if (err.status === 401) {
+          this.router.navigateByUrl('/login');
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: messages.service_error
+          });
+        }
+      }
     });
-
-    console.log(listDays);
-
-    Swal.close();
   }
 
   edit(id: any) {
@@ -419,6 +492,66 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
         this.openModal.nativeElement.click();
       }
     }
+  }
+
+  updateNovelty(novelty, callPreschedule) {
+    this.noveltyService.put(novelty, this.novelty.id.toString()).subscribe(() => {
+      Swal.close();
+
+      const toastOptions: ToastOptions = {
+        title: '¡Proceso Exitoso!',
+        msg: 'Se ha re agendado la reserva exitosamente',
+        showClose: false,
+        timeout: 3000,
+        theme: 'bootstrap',
+      };
+      this.toastyService.success(toastOptions);
+      this.rerender().then(() => {
+        this.closeModalCalendar.nativeElement.click();
+        this.closeReScheduleModal.nativeElement.click();
+        this.reservesAffected = [];
+        this.form.reset();
+        this.formReSchedule.controls.service.reset();
+        this.formReSchedule.controls.service_type.reset();
+        this.formReSchedule.controls.working_day.reset();
+        this.formReSchedule.controls.type.reset();
+        this.formReSchedule.controls.supervisor.reset();
+        this.formReSchedule.controls.professional.reset();
+        this.submitted = false;
+        this.submittedReSchedule = false;
+        this.validateAvailability = false;
+        this.novelty = this.novelties.filter(data => data.id === this.novelty.id)[0];
+        if (callPreschedule) {
+          this.getSchedule(this.novelty).then(() => {
+            this.openScheduleModal.nativeElement.click();
+          });
+        }
+      });
+
+    }, (err) => {
+      Swal.close();
+
+      if (err.error.errors) {
+        let mensage = '';
+
+        Object.keys(err.error.errors).forEach((data, index) => {
+          mensage += err.error.errors[data][0] + '<br>';
+        });
+
+        const toastOptions: ToastOptions = {
+          title: 'Error',
+          msg: mensage,
+          showClose: false,
+          timeout: 2000,
+          theme: 'bootstrap',
+        };
+        this.toastyService.error(toastOptions);
+      } else {
+        if (err.status === 401) {
+          this.router.navigateByUrl('/auth/login');
+        }
+      }
+    });
   }
 
   cancel() {
@@ -448,18 +581,27 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   cancelReSchedule() {
     this.id = null;
     this.form.reset();
-    this.formReSchedule.reset();
+    this.formReSchedule.controls.service.reset();
+    this.formReSchedule.controls.service_type.reset();
+    this.formReSchedule.controls.working_day.reset();
+    this.formReSchedule.controls.type.reset();
+    this.formReSchedule.controls.supervisor.reset();
+    this.formReSchedule.controls.professional.reset();
     this.submitted = false;
+    this.submittedReSchedule = false;
     this.novelty = new NoveltyModel();
+    this.validateAvailability = false;
     if (!this.canCreate) {
       this.form.disable();
       this.formReSchedule.disable();
     }
+    this.openScheduleModal.nativeElement.click();
   }
 
   cancelCalendar() {
     this.submitted = false;
-    this.formReSchedule.controls.type.reset();
+    this.formReSchedule.controls.supervisor.reset();
+    this.formReSchedule.controls.professional.reset();
   }
 
   delete(id: any, index: any) {
@@ -479,9 +621,10 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
               this.novelties.splice(index, 1);
               this.dtOptions = {};
               this.loadTable();
-              this.rerender();
-              this.cancel();
-              Swal.fire('Proceso Exitoso!', 'Se ha eliminado el cargo exitosamente', 'success');
+              this.rerender().then(() => {
+                this.cancel();
+                Swal.fire('Proceso Exitoso!', 'Se ha eliminado el cargo exitosamente', 'success');
+              });
             }, (err: any) => {
               Swal.fire('Error', err.error.message, 'error');
             });
@@ -525,121 +668,147 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   }
 
   getSchedule(novelty: any) {
+    return new Promise<any>(resolve => {
+      Swal.fire({
+        allowOutsideClick: false,
+        icon: 'info',
+        text: 'Espere...'
+      });
 
-    Swal.fire({
-      allowOutsideClick: false,
-      icon: 'info',
-      text: 'Espere...'
-    });
+      Swal.showLoading();
 
-    Swal.showLoading();
+      const init = novelty.initial_date;
+      const end = novelty.final_date;
+      const professionals = [{id: novelty.professional.id}];
 
-    const init = novelty.initial_date;
-    const end = novelty.final_date;
-    const professionals = [{id: novelty.professional.id}];
+      const status = 4;
 
-    const status = 4;
+      this.reservesDays = [];
 
-    this.reservesDays = [];
+      this.noveltyService.schedule({init, end, status, professionals}).subscribe((data: any) => {
 
-    this.noveltyService.schedule({init, end, status, professionals}).subscribe((data: any) => {
+        if (data.monthly.length === 0 && data.sporadic.length === 0) {
 
-      if (data.monthly.length === 0 && data.sporadic.length === 0) {
-        const toastOptions: ToastOptions = {
-          title: 'No existen datos',
-          msg: 'No existen datos para los filtros seleccionados',
-          showClose: false,
-          timeout: 2000,
-          theme: 'bootstrap',
-        };
-        this.toastyService.warning(toastOptions);
-      } else {
+          const noveltyUpdate: NoveltyModel = {
+            professional: this.novelty.professional.id,
+            status: this.noveltyService.STATUS_AGENDADA.value,
+            type: this.novelty.type,
+          };
 
-        if (data.monthly.length > 0) {
-          data.monthly.map((reserve: any) => {
-            const initialServiceDateSplit = reserve.initial_service_date.split('-');
-            const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
-            const latsServiceDate = new Date(initialServiceDate.getFullYear(),
-              initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
+          this.updateNovelty(noveltyUpdate, false);
+          const toastOptions: ToastOptions = {
+            title: 'No existen datos',
+            msg: texts.no_reserves_affected,
+            showClose: false,
+            timeout: 2000,
+            theme: 'bootstrap',
+          };
+          this.toastyService.warning(toastOptions);
+          resolve();
+        } else {
 
-            const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
-              latsServiceDate, reserve.reserve_day);
-            const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
-            const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
+          if (data.monthly.length > 0) {
+            data.monthly.map((reserve: any) => {
+              const initialServiceDateSplit = reserve.initial_service_date.split('-');
+              const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
+              const latsServiceDate = new Date(initialServiceDate.getFullYear(),
+                initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
 
-            const initDateSplit = init.split('-');
-            const endDateSplit = end.split('-');
-            const startDate = new Date(initDateSplit[0], initDateSplit[1] - 1, initDateSplit[2]);
-            const endDate = new Date(endDateSplit[0], endDateSplit[1] - 1, endDateSplit[2]);
+              const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
+                latsServiceDate, reserve.reserve_day);
+              const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+              const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
 
-            const reserveAffected = new ReserveAffected();
-            reserveAffected.reserve = reserve;
+              const initDateSplit = init.split('-');
+              const endDateSplit = end.split('-');
+              const startDate = new Date(initDateSplit[0], initDateSplit[1] - 1, initDateSplit[2]);
+              const endDate = new Date(endDateSplit[0], endDateSplit[1] - 1, endDateSplit[2]);
 
-            while (startDate <= endDate) {
-              if (this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, reserve.reserve_day, startDate)) {
-                reserveAffected.daysReschedule.push({
-                  date: JSON.parse(JSON.stringify(startDate))
-                });
-              }
-              startDate.setDate(startDate.getDate() + 1);
-            }
-            if (reserveAffected.daysReschedule.length > 0) {
-              this.reservesAffected.push(reserveAffected);
-            }
-          });
-        }
-        if (data.sporadic.length > 0) {
-          const initDateSplit = init.split('-');
-          const endDateSplit = end.split('-');
-          const startDate = new Date(initDateSplit[0], initDateSplit[1] - 1, initDateSplit[2]);
-          const endDate = new Date(endDateSplit[0], endDateSplit[1] - 1, endDateSplit[2]);
-          data.sporadic.map((reserve: any) => {
-            const reserveAffected = new ReserveAffected();
-            reserveAffected.reserve = reserve;
-            while (startDate <= endDate) {
-              reserve.reserve_day.forEach((day: any) => {
+              const reserveAffected = new ReserveAffected();
+              reserveAffected.reserve = reserve;
+              reserveAffected.status = 0;
 
-                const splitReserveDate = day.date.split('-');
-                const reserveDate = new Date(splitReserveDate[0], splitReserveDate[1] - 1, splitReserveDate[2]);
-
-                if (startDate.getTime() === reserveDate.getTime()) {
+              while (startDate <= endDate) {
+                if (this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, reserve.reserve_day, startDate)) {
                   reserveAffected.daysReschedule.push({
                     date: JSON.parse(JSON.stringify(startDate))
                   });
                 }
-              });
-              startDate.setDate(startDate.getDate() + 1);
-            }
-            if (reserveAffected.daysReschedule.length > 0) {
-              this.reservesAffected.push(reserveAffected);
-            }
+                startDate.setDate(startDate.getDate() + 1);
+              }
+              if (reserveAffected.daysReschedule.length > 0) {
+                reserveAffected.scheduled = false;
+                if (novelty.ids_reserves) {
+                  const reservesIds = novelty.ids_reserves.split(',');
+
+                  reserveAffected.scheduled = !!reservesIds.some(dataIds => dataIds === reserveAffected.reserve.id.toString());
+                }
+                this.reservesAffected.push(reserveAffected);
+              }
+            });
+          }
+          if (data.sporadic.length > 0) {
+            const initDateSplit = init.split('-');
+            const endDateSplit = end.split('-');
+            const startDate = new Date(initDateSplit[0], initDateSplit[1] - 1, initDateSplit[2]);
+            const endDate = new Date(endDateSplit[0], endDateSplit[1] - 1, endDateSplit[2]);
+            data.sporadic.map((reserve: any) => {
+              const reserveAffected = new ReserveAffected();
+              reserveAffected.reserve = reserve;
+              reserveAffected.status = 0;
+              while (startDate <= endDate) {
+                reserve.reserve_day.forEach((day: any) => {
+
+                  const splitReserveDate = day.date.split('-');
+                  const reserveDate = new Date(splitReserveDate[0], splitReserveDate[1] - 1, splitReserveDate[2]);
+
+                  if (startDate.getTime() === reserveDate.getTime()) {
+                    reserveAffected.daysReschedule.push({
+                      date: JSON.parse(JSON.stringify(startDate))
+                    });
+                  }
+                });
+                startDate.setDate(startDate.getDate() + 1);
+              }
+              if (reserveAffected.daysReschedule.length > 0) {
+                reserveAffected.scheduled = false;
+                if (novelty.ids_reserves) {
+                  const reservesIds = novelty.ids_reserves.split(',');
+
+                  reserveAffected.scheduled = !!reservesIds.some(dataIds => dataIds === reserveAffected.reserve.id.toString());
+                }
+                this.reservesAffected.push(reserveAffected);
+              }
+            });
+          }
+        }
+        Swal.close();
+        resolve();
+      }, (err) => {
+        Swal.close();
+
+        if (err.error.errors) {
+          let mensage = '';
+
+          Object.keys(err.error.errors).forEach((data, index) => {
+            mensage += err.error.errors[data][0] + '<br>';
           });
+
+          const toastOptions: ToastOptions = {
+            title: 'Error',
+            msg: mensage,
+            showClose: false,
+            timeout: 2000,
+            theme: 'bootstrap',
+          };
+          this.toastyService.error(toastOptions);
+        } else {
+          if (err.status === 401) {
+            this.router.navigateByUrl('/login');
+          }
         }
-      }
-      Swal.close();
-    }, (err) => {
-      Swal.close();
-
-      if (err.error.errors) {
-        let mensage = '';
-
-        Object.keys(err.error.errors).forEach((data, index) => {
-          mensage += err.error.errors[data][0] + '<br>';
-        });
-
-        const toastOptions: ToastOptions = {
-          title: 'Error',
-          msg: mensage,
-          showClose: false,
-          timeout: 2000,
-          theme: 'bootstrap',
-        };
-        this.toastyService.error(toastOptions);
-      } else {
-        if (err.status === 401) {
-          this.router.navigateByUrl('/login');
-        }
-      }
+        resolve();
+      });
     });
   }
 
@@ -665,7 +834,11 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       if (!that.canCreate) {
         this.form.disable();
       }
-      this.loadData();
+      this.loadData().then(r => {
+        if (r.status) {
+          this.novelties = r.data;
+        }
+      });
     }, error => {
       const toastOptions: ToastOptions = {
         title: 'Error',
@@ -683,11 +856,10 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     this.loaderService.loading(true);
     this.professionalService.get().subscribe((resp: any) => {
       resp.data.map((type: any) => {
-        this.professionals.push({value: String(type.id), label: `${type.identification} - ${type.name} ${type.lastname}`});
+        this.professionals.push({value: type.id.toString(), label: `${type.identification} - ${type.name} ${type.lastname}`});
       });
-      this.professionalsReSchedule = resp.data.filter((professional: any) => professional.status.openSchedule === 1);
       this.loaderService.loading(false);
-    }, error => {
+    }, () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -697,13 +869,19 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   }
 
   preschedule(novelty: any) {
-    this.getSchedule(novelty);
-    this.openScheduleModal.nativeElement.click();
+    this.novelty = novelty;
+    this.getSchedule(novelty).then(() => {
+      this.openScheduleModal.nativeElement.click();
+    });
+
   }
 
   re_Schedule(reserve: any) {
-    console.log(reserve);
     this.loadDates(reserve.daysReschedule.length);
+    this.reserve.user = reserve.reserve.user.id;
+    this.reserve.customer_address = reserve.reserve.customer_address.id;
+    this.idSelectedReserve = reserve.reserve.id;
+    this.closeScheduleModal.nativeElement.click();
     this.openReScheduleModal.nativeElement.click();
   }
 
@@ -718,8 +896,6 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       supervisor: new FormControl(null, [Validators.required]),
     });
 
-    this.formReSchedule.controls.professional.disable();
-
     this.formReSchedule.get('service_type').valueChanges.subscribe(resp => {
       this.workingDays = [];
       this.services = [];
@@ -727,7 +903,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       this.formReSchedule.controls.type.reset();
       this.formReSchedule.controls.service.reset();
       this.formReSchedule.controls.professional.reset();
-      this.formReSchedule.controls.professional.disable();
+      this.formReSchedule.controls.supervisor.reset();
       this.service = null;
       this.getWorkingDays(resp);
     });
@@ -737,7 +913,6 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       this.formReSchedule.controls.type.reset();
       this.formReSchedule.controls.service.reset();
       this.formReSchedule.controls.professional.reset();
-      this.formReSchedule.controls.professional.disable();
       this.service = null;
     });
 
@@ -745,7 +920,6 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
       this.services = [];
       this.formReSchedule.controls.service.reset();
       this.formReSchedule.controls.professional.reset();
-      this.formReSchedule.controls.professional.disable();
       this.service = null;
       this.getServices();
     });
@@ -875,27 +1049,39 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
   }
 
   checkAvailability() {
-    if (this.professionalsReSchedule.length > 0) {
-      this.reservation = {
-        type: this.scheduleService.SPORADIC_PERIODICITY,
-        service: {
-          working_day: {
-            name: this.workingDay.label,
-            init_hour: this.workingDay.init_hour,
-            end_hour: this.workingDay.end_hour
+    this.loaderService.loading(true);
+    this.professionalService.get().subscribe(resp => {
+      this.professionalsReSchedule = resp.data.filter((professional: any) => professional.status.openSchedule === 1);
+      if (this.professionalsReSchedule.length > 0) {
+        this.reservation = {
+          type: this.scheduleService.SPORADIC_PERIODICITY,
+          service: {
+            working_day: {
+              name: this.workingDay.label,
+              init_hour: this.workingDay.init_hour,
+              end_hour: this.workingDay.end_hour
+            }
           }
-        }
-      };
-      this.scheduleService.checkAvailability(this.professionalsReSchedule, this.reservation, this.daysArray, '');
-    }
-    this.validateAvailability = true;
+        };
+        this.scheduleService.checkAvailability(this.professionalsReSchedule, this.reservation, this.daysArray, '');
+      }
+      this.validateAvailability = true;
+      this.loaderService.loading(false);
+    }, () => {
+      this.loaderService.loading(false);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error'
+      });
+    });
   }
 
-  selectProfessionals(professional: any) {
+  selectProfessionals(professionalSelected: any) {
     this.formReSchedule.controls.professional.setValue(null);
-    this.professional = professional;
-    if (professional.available === 1) {
-      this.formReSchedule.controls.professional.setValue(this.professional.id);
+    this.professional = professionalSelected;
+    if (professionalSelected.available === 1) {
+      this.formReSchedule.controls.professional.setValue(professionalSelected.id);
     }
     this.setSupervisors();
     this.loadSchedule();

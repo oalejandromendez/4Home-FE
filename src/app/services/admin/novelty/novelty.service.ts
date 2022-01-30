@@ -16,6 +16,10 @@ export class NoveltyService {
     {value: 4, label: 'Licencia no remunerada'},
   ];
 
+  public STATUS_SIN_REAGENDAMIENTO = {value: 0, label: 'Sin re agendamiento', class: 'badge-warning'};
+  public STATUS_EN_PROCESO = {value: 1, label: 'En proceso de re agendamiento', class: 'badge-info'};
+  public STATUS_AGENDADA = {value: 2, label: 'Re agendada', class: 'badge-success'};
+
   constructor(private headers: HeaderService) {
     this.url = environment.host;
   }
@@ -36,7 +40,11 @@ export class NoveltyService {
     return this.headers.delete(sessionStorage.getItem('token'), `${this.url}/api/novelty/${id}`);
   }
 
-  schedule( filter: any) {
-    return this.headers.post(sessionStorage.getItem('token'), `${ this.url}/api/novelty/schedule`, { ...filter });
+  schedule(filter: any) {
+    return this.headers.post(sessionStorage.getItem('token'), `${this.url}/api/novelty/schedule`, {...filter});
+  }
+
+  reschedule(filter: any) {
+    return this.headers.post(sessionStorage.getItem('token'), `${this.url}/api/novelty/reschedule`, {...filter});
   }
 }

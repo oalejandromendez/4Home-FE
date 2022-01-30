@@ -92,4 +92,7 @@ export const texts = {
 
   service_novelty: 'Novedad de servicio',
   normal_service: 'Servicio normal',
+
+  no_reserves_affected: 'No existen reservas afectadas por la novedad en las fechas cargadas',
+  novelty_service_advice: 'Recuerde crear un servicio marcado para reposición por un novedad',
 };
