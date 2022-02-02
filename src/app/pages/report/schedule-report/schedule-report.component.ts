@@ -6,15 +6,19 @@ import {DataTableDirective} from 'angular-datatables';
 import {ToastOptions, ToastyService} from 'ng2-toasty';
 import {Subject, Subscription} from 'rxjs';
 import {DataTableLanguage} from 'src/app/models/common/datatable';
+import {ProfessionalService} from 'src/app/services/admin/professional/professional.service';
+import {AuthService} from 'src/app/services/auth/auth.service';
 import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
 import {LoaderService} from 'src/app/services/common/loader/loader.service';
 import {ReportService} from 'src/app/services/report/report.service';
 import Swal from 'sweetalert2';
 import * as _ from 'lodash';
-import {CustomerService} from '@src/services/scheduling/customer/customer.service';
+import {ReserveService} from '@src/services/scheduling/reserve/reserve.service';
 import {labels} from '@lang/labels/es_es';
-import {messages} from '@lang/messages/es_es';
 import {texts} from '@lang/texts/es_es';
+import {messages} from '@lang/messages/es_es';
+import {CustomerService} from '@src/services/scheduling/customer/customer.service';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-schedule-report',
@@ -26,8 +30,8 @@ import {texts} from '@lang/texts/es_es';
 export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit {
 
   labels = labels;
-  messages = messages;
   texts = texts;
+  messages = messages;
 
   @ViewChild(DataTableDirective, {static: false})
 
@@ -42,7 +46,6 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
   submitted = false;
 
   reserves: any[] = [];
-
   customers: any[] = [];
   dropdownCustomers: {};
 
@@ -55,10 +58,14 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     private loaderService: LoaderService,
     private language: DataTableLanguage,
     private reportService: ReportService,
-    private dateService: CustomDatepickerI18n,
+    private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private toastyService: ToastyService,
-    private customerService: CustomerService
+    private authService: AuthService,
+    private professionalService: ProfessionalService,
+    private reserveService: ReserveService,
+    private customerService: CustomerService,
+    public datepipe: DatePipe
   ) {
     this.dropdownCustomers = {
       idField: 'id',
@@ -79,11 +86,28 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     this.getCustomers();
   }
 
+  getCustomers() {
+    this.loaderService.loading(true);
+    this.customerService.get().subscribe(resp => {
+      this.customers = resp.map(data => {
+        const label = `${data.identification} - ${data.name} ${data.lastname}`;
+        return {id: data.id, label};
+      });
+      this.loaderService.loading(false);
+    }, () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error'
+      });
+    });
+  }
+
   loadForm() {
     this.form = new FormGroup({
       init: new FormControl(this.today, [Validators.required]),
       end: new FormControl(this.today, [Validators.required]),
-    }, {validators: this.dateService.ValidateDates});
+    }, {validators: this.ValidateDates});
   }
 
   ngAfterViewInit(): void {
@@ -155,8 +179,26 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   isWeekend(date: NgbDateStruct) {
-    return this.dateService.isWeekend(date);
+    const d = new Date(date.year, date.month - 1, date.day);
+    return d.getDay() === 0 || d.getDay() === 6;
   }
+
+  ValidateDates: ValidatorFn = (formG: FormGroup) => {
+    let startDate = formG.get('init').value;
+    let endDate = formG.get('end').value;
+    const now = new Date();
+    let dateLimit: string;
+    if (startDate && endDate) {
+      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month) + '-' +
+        (startDate.day < 10 ? '0' + startDate.day : startDate.day);
+      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month) + '-' +
+        (endDate.day < 10 ? '0' + endDate.day : endDate.day);
+
+      dateLimit = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' +
+        (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
+    }
+    return startDate !== null && endDate != null ? startDate <= endDate ? startDate >= dateLimit ? {errorStartDate: true} : endDate >= dateLimit ? {errorEndDate: true} : null : {dates: true} : null;
+  };
 
   onSubmit() {
 
@@ -197,39 +239,29 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
       } else {
         if (data.monthly.length > 0) {
           data.monthly.map((reserve: any) => {
-            let scheduling_date = new Date(reserve.reserve.scheduling_date);
-            let original_scheduling_date = new Date(reserve.reserve.scheduling_date);
-            scheduling_date.setMonth(scheduling_date.getMonth() + 1);
-            const end = new Date(endDate.year, endDate.month - 1, endDate.day);
-            const start = new Date(startDate.year, startDate.month - 1, startDate.day);
 
-            let limit: Date;
-            let init: Date;
-            if (scheduling_date < end) {
-              limit = scheduling_date;
-            } else {
-              limit = end;
-            }
-            if (start > original_scheduling_date) {
-              init = start;
-            } else {
-              init = original_scheduling_date;
-            }
-            limit.setDate(limit.getDate() + 1);
-            while (init <= limit) {
-              let dayOfWeek = init.getDay();
-              if (dayOfWeek == 0) {
-                dayOfWeek = 6;
-              } else {
-                dayOfWeek--;
-              }
-              if (dayOfWeek === reserve.day) {
+            const initialServiceDateSplit = reserve.initial_service_date.split('-');
+            const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
+            const latsServiceDate = new Date(initialServiceDate.getFullYear(),
+              initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
+
+            const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
+              latsServiceDate, reserve.reserve_day);
+            const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+            const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
+
+            const initSelectedDate = new Date(startDate.year, startDate.month - 1, startDate.day);
+            const endSelectedDate = new Date(endDate.year, endDate.month - 1, endDate.day);
+
+            while (initSelectedDate <= endSelectedDate) {
+              if (this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, reserve.reserve_day, initSelectedDate)) {
+                const dateSelectedValid = this.datepipe.transform(initSelectedDate, 'yyyy-MM-dd');
                 this.reserves.push({
-                  date: JSON.parse(JSON.stringify(init)),
-                  reserve: reserve.reserve
+                  date: dateSelectedValid,
+                  reserve
                 });
               }
-              init.setDate(init.getDate() + 1);
+              initSelectedDate.setDate(initSelectedDate.getDate() + 1);
             }
           });
         }
@@ -273,28 +305,10 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
 
   clear() {
     this.form.reset();
-    this.customersSelected = [];
+    this.changeDetectorRef.detectChanges();
     if (this.reserves) {
-      this.reserves = [];
+      this.reserves = new Array();
       this.dtTrigger.next();
     }
   }
-
-  getCustomers() {
-    this.loaderService.loading(true);
-    this.customerService.get().subscribe(resp => {
-      this.customers = resp.map(data => {
-        const label = `${data.identification} - ${data.name} ${data.lastname}`;
-        return {id: data.id, label};
-      });
-      this.loaderService.loading(false);
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ha ocurrido un error'
-      });
-    });
-  }
-
 }

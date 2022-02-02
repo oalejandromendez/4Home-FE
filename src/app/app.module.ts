@@ -27,7 +27,7 @@ import { ToastyService } from 'ng2-toasty';
 import { PaymentComponent } from './pages/payment/payment.component';
 import { LOCALE_ID } from '@angular/core';
 import localeEs from '@angular/common/locales/es';
-import { registerLocaleData } from '@angular/common';
+import {DatePipe, registerLocaleData} from '@angular/common';
 import {PipesModule} from '@src/pipes/pipes.module';
 
 registerLocaleData(localeEs, 'es-CO');
@@ -64,7 +64,7 @@ registerLocaleData(localeEs, 'es-CO');
     HttpClientModule,
     PipesModule
   ],
-  providers: [NavigationItem, DataTableLanguage, ToastyService,
+  providers: [NavigationItem, DataTableLanguage, ToastyService, DatePipe,
     { provide: LOCALE_ID, useValue: 'es-CO' },
     { provide: DEFAULT_CURRENCY_CODE, useValue: ''}],
   bootstrap: [AppComponent]
