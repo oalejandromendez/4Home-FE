@@ -5,6 +5,7 @@ import {HeaderService} from '../../common/header/header.service';
 import {ReserveService} from '@src/services/scheduling/reserve/reserve.service';
 import {NoveltiesComponent} from '@src/pages/admin/novelties/novelties.component';
 import {NoveltyService} from '@src/services/admin/novelty/novelty.service';
+import {DatePipe} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,8 @@ export class ScheduleService {
   constructor(
     private reserveService: ReserveService,
     private noveltyService: NoveltyService,
-    private headers: HeaderService
+    private headers: HeaderService,
+    private datepipe: DatePipe
   ) {
     this.url = environment.host;
   }
@@ -149,6 +151,7 @@ export class ScheduleService {
 
           const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate, limit, days);
           const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+          const firstAvailableDayString = this.datepipe.transform(firstAvailableDay, 'yyyy-MM-dd');
           const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
 
           if (reservation.type === this.SPORADIC_PERIODICITY) {
@@ -158,7 +161,7 @@ export class ScheduleService {
               const splitSelDate = daySel.date;
               const selectedDate = new Date(splitSelDate.year, splitSelDate.month - 1, splitSelDate.day);
               if ((selectedDate >= firstAvailableDay && selectedDate <= lastAvailableDay) &&
-                this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, days, selectedDate)) {
+                this.reserveService.validateDateInRange(firstAvailableDayString, lastAvailableDay, days, selectedDate)) {
                 if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
                   (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
                   professionalAvailable = false;
@@ -184,7 +187,7 @@ export class ScheduleService {
             while (firstSelectedDay <= lastSelectedDay) {
               const dayS = firstSelectedDay.getDay();
               const existsS = selectedDays.find((d: any) => d.day === dayS || d.index === dayS);
-              if (existsS && this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, days, firstSelectedDay)) {
+              if (existsS && this.reserveService.validateDateInRange(firstAvailableDayString, lastAvailableDay, days, firstSelectedDay)) {
                 if ((initHourNumberSelected >= initHourNumberReserve && initHourNumberSelected <= endHourNumberReserve) ||
                   (endHourNumberSelected >= initHourNumberReserve && endHourNumberSelected <= endHourNumberReserve)) {
                   professionalAvailable = false;

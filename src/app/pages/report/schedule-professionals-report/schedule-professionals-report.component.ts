@@ -1,20 +1,24 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-
-import {labels} from '@lang/labels/es_es';
-import {messages} from '@lang/messages/es_es';
-import {texts} from '@lang/texts/es_es';
-import Swal from 'sweetalert2';
-import {LoaderService} from '@src/services/common/loader/loader.service';
-import {ProfessionalService} from '@src/services/admin/professional/professional.service';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
-import {CustomDatepickerI18n, I18n} from '@src/services/common/datepicker/datepicker.service';
-import {Subject} from 'rxjs';
-import {DataTableLanguage} from '@src/models/common/datatable';
-import {ToastyService} from 'ng2-toasty';
-import {ReportService} from '@src/services/report/report.service';
-import {DataTableDirective} from 'angular-datatables';
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
+import {NgbCalendar, NgbDatepickerConfig, NgbDatepickerI18n, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+import {DataTableDirective} from 'angular-datatables';
+import {ToastOptions, ToastyService} from 'ng2-toasty';
+import {Subject, Subscription} from 'rxjs';
+import {DataTableLanguage} from 'src/app/models/common/datatable';
+import {ProfessionalService} from 'src/app/services/admin/professional/professional.service';
+import {AuthService} from 'src/app/services/auth/auth.service';
+import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
+import {LoaderService} from 'src/app/services/common/loader/loader.service';
+import {ReportService} from 'src/app/services/report/report.service';
+import Swal from 'sweetalert2';
+import * as _ from 'lodash';
+import {ReserveService} from '@src/services/scheduling/reserve/reserve.service';
+import {labels} from '@lang/labels/es_es';
+import {texts} from '@lang/texts/es_es';
+import {messages} from '@lang/messages/es_es';
+import {DatePipe} from '@angular/common';
+import {NoveltyService} from '@src/services/admin/novelty/novelty.service';
 
 @Component({
   selector: 'app-schedule-professionals-report',
@@ -25,34 +29,44 @@ import {Router} from '@angular/router';
 })
 export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  dates: any[] = [];
-  today = this.calendar.getToday();
-  form: FormGroup;
+  labels = labels;
+  texts = texts;
+  messages = messages;
 
   @ViewChild(DataTableDirective, {static: false})
 
   dtElement: DataTableDirective;
+  dtOptions: any = {};
+  dtTrigger: Subject<any> = new Subject();
+
+  today = this.calendar.getToday();
+  now: Date = new Date();
+
+  form: FormGroup;
+  submitted = false;
 
   reserves: any[] = [];
   professionals: any[] = [];
-  professionalsSelected: any[] = [];
-
-  dtOptions: any = {};
-  dtTrigger: Subject<any> = new Subject();
   dropdownProfessionals: {};
 
-  labels = labels;
-  messages = messages;
-  texts = texts;
+  professionalsSelected: any[] = [];
 
-  constructor(private loaderService: LoaderService,
-              private professionalService: ProfessionalService,
-              private dateService: CustomDatepickerI18n,
-              private language: DataTableLanguage,
-              private toastyService: ToastyService,
-              private reportService: ReportService,
-              private router: Router,
-              private calendar: NgbCalendar) {
+  constructor(
+    private I18n: I18n,
+    private config: NgbDatepickerConfig,
+    private calendar: NgbCalendar,
+    private loaderService: LoaderService,
+    private language: DataTableLanguage,
+    private reportService: ReportService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private router: Router,
+    private toastyService: ToastyService,
+    private authService: AuthService,
+    private professionalService: ProfessionalService,
+    private reserveService: ReserveService,
+    public datepipe: DatePipe,
+    public noveltyService: NoveltyService
+  ) {
     this.dropdownProfessionals = {
       idField: 'id',
       textField: 'label',
@@ -72,6 +86,30 @@ export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, 
     this.getProfessionals();
   }
 
+  getProfessionals() {
+    this.loaderService.loading(true);
+    this.professionalService.get().subscribe(resp => {
+      this.professionals = resp.data.map(data => {
+        const label = `${data.identification} - ${data.name} ${data.lastname}`;
+        return {id: data.id, label};
+      });
+      this.loaderService.loading(false);
+    }, () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error'
+      });
+    });
+  }
+
+  loadForm() {
+    this.form = new FormGroup({
+      init: new FormControl(this.today, [Validators.required]),
+      end: new FormControl(this.today, [Validators.required]),
+    }, {validators: this.ValidateDates});
+  }
+
   ngAfterViewInit(): void {
     this.dtTrigger.next();
   }
@@ -80,11 +118,12 @@ export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, 
     this.dtTrigger.unsubscribe();
   }
 
-  loadForm() {
-    this.form = new FormGroup({
-      init: new FormControl(this.today, [Validators.required]),
-      end: new FormControl(this.today, [Validators.required]),
-    }, {validators: this.dateService.ValidateDates});
+  rerender(): void {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      dtInstance.destroy();
+      this.dtTrigger.next();
+      this.loaderService.loading(false);
+    });
   }
 
   loadTable() {
@@ -139,31 +178,33 @@ export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, 
     };
   }
 
-  getProfessionals() {
-    this.loaderService.loading(true);
-    this.professionalService.get().subscribe(resp => {
-      this.professionals = resp.data.map(data => {
-        const label = `${data.identification} - ${data.name} ${data.lastname}`;
-        return {id: data.id, label};
-      });
-      this.loaderService.loading(false);
-    }, error => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ha ocurrido un error'
-      });
-    });
+  isWeekend(date: NgbDateStruct) {
+    const d = new Date(date.year, date.month - 1, date.day);
+    return d.getDay() === 0 || d.getDay() === 6;
   }
+
+  ValidateDates: ValidatorFn = (formG: FormGroup) => {
+    let startDate = formG.get('init').value;
+    let endDate = formG.get('end').value;
+    const now = new Date();
+    let dateLimit: string;
+    if (startDate && endDate) {
+      startDate = startDate.year + '-' + (startDate.month < 10 ? '0' + startDate.month : startDate.month) + '-' +
+        (startDate.day < 10 ? '0' + startDate.day : startDate.day);
+      endDate = endDate.year + '-' + (endDate.month < 10 ? '0' + endDate.month : endDate.month) + '-' +
+        (endDate.day < 10 ? '0' + endDate.day : endDate.day);
+
+      dateLimit = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ? '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' +
+        (now.getDate() + 1 < 10 ? '0' + now.getDate() + 1 : now.getDate() + 1);
+    }
+    return startDate !== null && endDate != null ? startDate <= endDate ? startDate >= dateLimit ? {errorStartDate: true} : endDate >= dateLimit ? {errorEndDate: true} : null : {dates: true} : null;
+  };
 
   onSubmit() {
 
+    this.submitted = true;
+
     if (!this.form.valid) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: messages.not_valid_form
-      });
       return;
     }
 
@@ -182,19 +223,11 @@ export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, 
     const end = endDate.year + '-' + endDate.month + '-' + endDate.day;
     const professionals = this.professionalsSelected;
 
-    const initD = new Date(startDate.year, startDate.month - 1, startDate.day);
-    const endD = new Date(endDate.year, endDate.month - 1, endDate.day);
+    this.reserves = [];
 
-    while (initD <= endD) {
-      console.log(initD);
-      this.dates.push(initD.toDateString());
-      initD.setDate(initD.getDate() + 1);
-    }
+    this.reportService.schedule({init, end, professionals}).subscribe((data: any) => {
 
-    console.log(this.dates);
-    console.log(new Date(this.dates[0]));
-
-    /*this.reportService.schedule({init, end, professionals}).subscribe((data: any) => {
+      const noveltiesArray = [];
 
       if (data.monthly.length === 0 && data.sporadic.length === 0) {
         const toastOptions: ToastOptions = {
@@ -206,39 +239,48 @@ export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, 
         };
         this.toastyService.warning(toastOptions);
       } else {
+        const initSelectedDate = new Date(startDate.year, startDate.month - 1, startDate.day);
+        const endSelectedDate = new Date(endDate.year, endDate.month - 1, endDate.day);
         if (data.monthly.length > 0) {
           data.monthly.map((reserve: any) => {
-            let scheduling_date = new Date(reserve.reserve.scheduling_date);
-            scheduling_date.setMonth(scheduling_date.getMonth() + 1);
-            let end = new Date(endDate.year, endDate.month - 1, endDate.day);
-            let limit: Date;
-            if (scheduling_date < end) {
-              limit = scheduling_date;
-            } else {
-              limit = end;
-            }
-            let today = new Date(startDate.year, startDate.month - 1, startDate.day);
-            while (today <= limit) {
-              let dayOfWeek = today.getDay();
-              if (dayOfWeek == 0) {
-                dayOfWeek = 6;
-              } else {
-                dayOfWeek--;
-              }
-              if (dayOfWeek === reserve.day) {
+
+            this.getNoveltiesData(reserve, initSelectedDate, endSelectedDate);
+
+            const initialServiceDateSplit = reserve.initial_service_date.split('-');
+            const initialServiceDate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
+            const latsServiceDate = new Date(initialServiceDate.getFullYear(),
+              initialServiceDate.getMonth() + 1, initialServiceDate.getDate());
+
+            const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
+              latsServiceDate, reserve.reserve_day);
+            const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+            const firstAvailableDayString = this.datepipe.transform(firstAvailableDay, 'yyyy-MM-dd');
+            const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
+
+            while (initSelectedDate <= endSelectedDate) {
+
+              if (this.reserveService.validateDateInRange(firstAvailableDayString, lastAvailableDay,
+                reserve.reserve_day, initSelectedDate)) {
+
+                const dateSelectedValid = this.datepipe.transform(initSelectedDate, 'yyyy-MM-dd');
                 this.reserves.push({
-                  date: JSON.parse(JSON.stringify(today)),
-                  reserve: reserve.reserve
+                  date: dateSelectedValid,
+                  isNovelty: false,
+                  reserve
                 });
               }
-              today.setDate(today.getDate() + 1);
+              initSelectedDate.setDate(initSelectedDate.getDate() + 1);
             }
           });
         }
         if (data.sporadic.length > 0) {
           data.sporadic.map((reserve: any) => {
+
+            this.getNoveltiesData(reserve.reserve, initSelectedDate, endSelectedDate);
+
             this.reserves.push({
               date: reserve.date,
+              isNovelty: false,
               reserve: reserve.reserve
             });
           });
@@ -270,24 +312,67 @@ export class ScheduleProfessionalsReportComponent implements OnInit, OnDestroy, 
           this.router.navigateByUrl('/login');
         }
       }
-    });*/
-  }
-
-  rerender(): void {
-    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      dtInstance.destroy();
-      this.dtTrigger.next();
-      this.loaderService.loading(false);
     });
   }
 
-  isWeekend(date: NgbDateStruct) {
-    return this.dateService.isWeekend(date);
+  getNoveltiesData(reserve, initSelectedDate, endSelectedDate) {
+    if (reserve.professional.novelties) {
+      reserve.professional.novelties.map(novelty => {
+        if (novelty.status === this.noveltyService.STATUS_EN_PROCESO.value ||
+          novelty.status === this.noveltyService.STATUS_AGENDADA.value) {
+
+          const initialNoveltyDateSplit = novelty.initial_date.split('-');
+          const initialNoveltyDate = new Date(initialNoveltyDateSplit[0], initialNoveltyDateSplit[1] - 1, initialNoveltyDateSplit[2]);
+          const finalNoveltyDateSplit = novelty.final_date.split('-');
+          const finalNoveltyDate = new Date(finalNoveltyDateSplit[0], finalNoveltyDateSplit[1] - 1, finalNoveltyDateSplit[2]);
+
+          let initialDateToEvaluate = null;
+          let finalDateToEvaluate = null;
+          if ((initSelectedDate >= initialNoveltyDate && initSelectedDate <= finalNoveltyDate) &&
+            (endSelectedDate >= initialNoveltyDate && endSelectedDate >= finalNoveltyDate)) {
+            initialDateToEvaluate = initSelectedDate;
+            finalDateToEvaluate = finalNoveltyDate;
+          }
+          if ((initSelectedDate <= initialNoveltyDate && initSelectedDate <= finalNoveltyDate) &&
+            (endSelectedDate >= initialNoveltyDate && endSelectedDate <= finalNoveltyDate)) {
+            initialDateToEvaluate = initialNoveltyDate;
+            finalDateToEvaluate = endSelectedDate;
+          }
+          if ((initSelectedDate <= initialNoveltyDate && initSelectedDate <= finalNoveltyDate) &&
+            (endSelectedDate >= initialNoveltyDate && endSelectedDate >= finalNoveltyDate)) {
+            initialDateToEvaluate = initialNoveltyDate;
+            finalDateToEvaluate = finalNoveltyDate;
+          }
+          if (initialDateToEvaluate && finalDateToEvaluate) {
+            if (!this.reserves.some(exists => exists.reserve.idNovelty === novelty.id)) {
+              while (initialDateToEvaluate <= finalDateToEvaluate) {
+                const noveltyObj = {
+                  professional: {
+                    name: reserve.professional.name,
+                    lastname: reserve.professional.lastname
+                  },
+                  type: novelty.type,
+                  idNovelty: novelty.id,
+                  id: novelty.id
+                };
+                const dateNoveltyValid = this.datepipe.transform(initialDateToEvaluate, 'yyyy-MM-dd');
+                this.reserves.push({
+                  date: dateNoveltyValid,
+                  isNovelty: true,
+                  reserve: noveltyObj
+                });
+                initialDateToEvaluate.setDate(initialDateToEvaluate.getDate() + 1);
+              }
+            }
+          }
+        }
+      });
+    }
   }
 
   clear() {
     this.form.reset();
-    this.professionalsSelected = [];
+    this.changeDetectorRef.detectChanges();
     if (this.reserves) {
       this.reserves = [];
       this.dtTrigger.next();

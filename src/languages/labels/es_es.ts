@@ -1,5 +1,6 @@
 export const labels = {
   id: 'id',
+  date: 'Fecha',
   client_type: 'Tipo de Cliente',
   document_type: 'Tipo de Documento',
   identification: 'Identificación',

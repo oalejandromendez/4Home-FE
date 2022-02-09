@@ -14,18 +14,20 @@ import { ServiceReportComponent } from './service-report/service-report.componen
 import { ActivityComponent } from './activity/activity.component';
 import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
 import { ScheduleProfessionalsReportComponent } from './schedule-professionals-report/schedule-professionals-report.component';
+import {PipesModule} from '@src/pipes/pipes.module';
 
 
 @NgModule({
   declarations: [ScheduleReportComponent, ExpirationComponent, HistoryReportComponent, PendingReportComponent, ProfessionalReportComponent, PaymentReportComponent, ServiceReportComponent, ActivityComponent, ScheduleProfessionalsReportComponent],
-  imports: [
-    CommonModule,
-    ReportRoutingModule,
-    SharedModule,
-    NgbTooltipModule,
-    NgbDatepickerModule,
-    NgbTabsetModule,
-    NgMultiSelectDropDownModule
-  ]
+    imports: [
+        CommonModule,
+        ReportRoutingModule,
+        SharedModule,
+        NgbTooltipModule,
+        NgbDatepickerModule,
+        NgbTabsetModule,
+        NgMultiSelectDropDownModule,
+        PipesModule
+    ]
 })
 export class ReportModule { }

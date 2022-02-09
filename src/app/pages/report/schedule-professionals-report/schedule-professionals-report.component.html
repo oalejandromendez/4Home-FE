@@ -6,7 +6,7 @@
 
         <div class="card-header">
 
-          <span class="label-report-shedule">{{labels.scheduling_report_professionals}}</span>
+          <span class="label-report-professional">{{labels.scheduling_report_customers}}</span>
 
         </div>
 
@@ -14,7 +14,7 @@
 
           <div class="form-group">
             <div>
-              <span class="label">Fecha Inicial <span class="text-danger">*</span></span>
+              <span class="label">{{labels.initial_date}} <span class="text-danger">*</span></span>
             </div>
             <div class="input-group">
               <input class="form-control" placeholder="YYYY-MM-DD" formControlName="init" ngbDatepicker
@@ -26,17 +26,17 @@
                   </span>
               </div>
             </div>
-            <div class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
-              <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
+            <div class="is-invalid" *ngIf="submitted && form.get('init').hasError('required')">
+              <small class="form-text text-danger">{{texts.init_date_required}}</small>
             </div>
-            <div class="mt-1" *ngIf="form.hasError('errorStartDate') && !form.get('init').pristine">
-              <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
+            <div class="mt-1" *ngIf="form.get('init').errors && !form.get('init').pristine">
+              <small class="form-text text-danger">{{texts.valid_date}}</small>
             </div>
           </div>
 
           <div class="form-group">
             <div>
-              <span class="label">Fecha Final <span class="text-danger">*</span></span>
+              <span class="label">{{labels.final_date}} <span class="text-danger">*</span></span>
             </div>
             <div class="input-group">
               <input class="form-control" placeholder="YYYY-MM-DD" formControlName="end" ngbDatepicker
@@ -47,20 +47,20 @@
                   </span>
               </div>
             </div>
+            <div class="is-invalid" *ngIf="submitted && form.get('end').hasError('required')">
+              <small class="form-text text-danger">{{texts.end_date_required}}</small>
+            </div>
             <div class="mt-1" *ngIf="form.get('end').errors && !form.get('end').pristine">
-              <span class="badge m-r-5 badge-danger">Digite una fecha válida</span>
+              <small class="form-text text-danger">{{texts.valid_date}}</small>
             </div>
             <div class="mt-1" *ngIf="form.hasError('dates') && !form.get('end').pristine">
-              <span class="badge m-r-5 badge-danger">La fecha final debe ser mayor a la fecha de inicio</span>
-            </div>
-            <div class="mt-1" *ngIf="form.hasError('errorEndDate') && !form.get('end').pristine">
-              <span class="badge m-r-5 badge-danger" style="white-space: break-spaces;">La fecha de consulta debe ser mayor a la fecha actual</span>
+              <small class="form-text text-danger">{{texts.end_date_less_init_date}}</small>
             </div>
           </div>
 
           <div class="form-group">
             <div>
-              <span class="label">{{labels.customer}}</span>
+              <span class="label">{{labels.professional}}</span>
             </div>
             <div class="input-group">
               <ng-multiselect-dropdown class="form-control"
@@ -115,8 +115,9 @@
               <div class="card-submit">
                 <div class="form-group text-center">
                   <div class="col-md-12 col-md-offset-3">
-                    <button type="button" class="btn btn-secondary btn-sm" (click)="clear()">Limpiar</button>
-                    <button type="submit" class="btn btn-success btn-sm" [disabled]="!form.valid">Consultar</button>
+                    <button type="button" class="btn btn-secondary btn-sm"
+                            (click)="clear()">{{labels.btn_clean}}</button>
+                    <button type="submit" class="btn btn-success btn-sm">{{labels.btn_consult}}</button>
                   </div>
                 </div>
               </div>
@@ -137,23 +138,44 @@
                  class="display row-border hover table-striped" style="width:100%">
             <thead>
             <tr>
+            <tr>
+              <th>id</th>
+              <th>{{labels.reference}}</th>
+              <th>{{labels.date}}</th>
+              <th>{{labels.init_time}}</th>
+              <th>{{labels.end_time}}</th>
+              <th>{{labels.type}}</th>
               <th>{{labels.professional}}</th>
+              <th>{{labels.customer}}</th>
+              <th>{{labels.address}}</th>
               <th>{{labels.status}}</th>
             </tr>
             </thead>
             <tbody *ngIf="reserves?.length != 0">
-            <tr *ngFor="let reserve of reserves; let index = index">
+            <tr *ngFor="let reserve of reserves;">
               <td>{{ reserve.reserve.id }}</td>
-              <td>{{ reserve.reserve.reference }}</td>
+              <td *ngIf="reserve.isNovelty">
+                <span class="badge badge-danger f-12">{{ reserve.reserve.type| transformData: 'NoveltyType' }}</span>
+              </td>
+              <td *ngIf="!reserve.isNovelty">{{ reserve.reserve.reference }}</td>
               <td>{{ reserve.date | date:'fullDate' }}</td>
-              <td>
+              <td *ngIf="!reserve.isNovelty">{{ reserve.reserve.service.working_day.init_hour }}</td>
+              <td *ngIf="reserve.isNovelty"></td>
+              <td *ngIf="!reserve.isNovelty">{{ reserve.reserve.service.working_day.end_hour }}</td>
+              <td *ngIf="reserve.isNovelty"></td>
+              <td *ngIf="!reserve.isNovelty">
                 <span *ngIf="reserve.reserve.type === 1" class="badge badge-primary f-12">Esporadico</span>
                 <span *ngIf="reserve.reserve.type === 2" class="badge badge-warning f-12">Mensualidad</span>
               </td>
+              <td *ngIf="reserve.isNovelty">
+                <span class="badge badge-danger f-12">{{ reserve.reserve.type| transformData: 'NoveltyType' }}</span>
+              </td>
               <td>{{ reserve.reserve.professional.name }} {{ reserve.reserve.professional.lastname }}</td>
-              <td>{{ reserve.reserve.user.name }} {{ reserve.reserve.user.lastname }}</td>
-              <td>{{ reserve.reserve.customer_address.address }}</td>
-              <td>
+              <td *ngIf="!reserve.isNovelty">{{ reserve.reserve.user.name }} {{ reserve.reserve.user.lastname }}</td>
+              <td *ngIf="reserve.isNovelty"></td>
+              <td *ngIf="!reserve.isNovelty">{{ reserve.reserve.customer_address.address }}</td>
+              <td *ngIf="reserve.isNovelty"></td>
+              <td *ngIf="!reserve.isNovelty">
                 <span *ngIf="reserve.reserve.status === 1" class="badge badge-warning">RESERVADO</span>
                 <span *ngIf="reserve.reserve.status === 2" class="badge badge-success">AGENDADO SIN PAGO</span>
                 <span *ngIf="reserve.reserve.status === 3" class="badge badge-danger">PAGO VENCIDO</span>
@@ -161,9 +183,7 @@
                 <span *ngIf="reserve.reserve.status === 9" class="badge badge-primary">REPROGRAMADA</span>
                 <span *ngIf="reserve.reserve.status === 10" class="badge badge-primary">TERMINADO</span>
               </td>
-            </tr>
-            <tr *ngIf="reserves?.length === 0">
-              <td colspan="6" class="no-data-available">No existen pagos registrados</td>
+              <td *ngIf="reserve.isNovelty"></td>
             </tr>
             </tbody>
           </table>

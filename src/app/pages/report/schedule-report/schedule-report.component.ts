@@ -6,7 +6,6 @@ import {DataTableDirective} from 'angular-datatables';
 import {ToastOptions, ToastyService} from 'ng2-toasty';
 import {Subject, Subscription} from 'rxjs';
 import {DataTableLanguage} from 'src/app/models/common/datatable';
-import {ProfessionalService} from 'src/app/services/admin/professional/professional.service';
 import {AuthService} from 'src/app/services/auth/auth.service';
 import {CustomDatepickerI18n, I18n} from 'src/app/services/common/datepicker/datepicker.service';
 import {LoaderService} from 'src/app/services/common/loader/loader.service';
@@ -62,7 +61,6 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     private router: Router,
     private toastyService: ToastyService,
     private authService: AuthService,
-    private professionalService: ProfessionalService,
     private reserveService: ReserveService,
     private customerService: CustomerService,
     public datepipe: DatePipe
@@ -248,13 +246,15 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
             const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
               latsServiceDate, reserve.reserve_day);
             const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+            const firstAvailableDayString = this.datepipe.transform(firstAvailableDay, 'yyyy-MM-dd');
             const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
 
             const initSelectedDate = new Date(startDate.year, startDate.month - 1, startDate.day);
             const endSelectedDate = new Date(endDate.year, endDate.month - 1, endDate.day);
 
             while (initSelectedDate <= endSelectedDate) {
-              if (this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, reserve.reserve_day, initSelectedDate)) {
+              if (this.reserveService.validateDateInRange(firstAvailableDayString, lastAvailableDay,
+                reserve.reserve_day, initSelectedDate)) {
                 const dateSelectedValid = this.datepipe.transform(initSelectedDate, 'yyyy-MM-dd');
                 this.reserves.push({
                   date: dateSelectedValid,
@@ -307,7 +307,7 @@ export class ScheduleReportComponent implements OnInit, OnDestroy, AfterViewInit
     this.form.reset();
     this.changeDetectorRef.detectChanges();
     if (this.reserves) {
-      this.reserves = new Array();
+      this.reserves = [];
       this.dtTrigger.next();
     }
   }

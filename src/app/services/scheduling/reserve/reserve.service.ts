@@ -48,13 +48,17 @@ export class ReserveService {
     return this.headers.delete(sessionStorage.getItem('token'), `${this.url}/api/reserve/${id}`);
   }
 
-  validateDateInRange(initialServiceDate: Date, lastServiceDate: Date, serviceDays, dateToValidate: Date) {
-    while (initialServiceDate <= lastServiceDate) {
-      if (initialServiceDate.getTime() === dateToValidate.getTime()) {
-        const dayI = initialServiceDate.getDay();
+  validateDateInRange(initialServiceDate: any, lastServiceDate: Date, serviceDays, dateToValidate: Date) {
+
+    const initialServiceDateSplit = initialServiceDate.split('-');
+    const initialdate = new Date(initialServiceDateSplit[0], initialServiceDateSplit[1] - 1, initialServiceDateSplit[2]);
+
+    while (initialdate <= lastServiceDate) {
+      if (initialdate.getTime() === dateToValidate.getTime()) {
+        const dayI = initialdate.getDay();
         return serviceDays.find((d: any) => d.day === dayI);
       } else {
-        initialServiceDate.setDate(initialServiceDate.getDate() + 1);
+        initialdate.setDate(initialdate.getDate() + 1);
       }
     }
     return false;

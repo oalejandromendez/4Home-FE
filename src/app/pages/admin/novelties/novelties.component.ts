@@ -29,6 +29,7 @@ import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import esLocale from '@fullcalendar/core/locales/es';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-novelties',
@@ -126,7 +127,8 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
     private serviceService: ServiceService,
     private workingdayService: WorkingdayService,
     private reserveService: ReserveService,
-    public scheduleService: ScheduleService
+    public scheduleService: ScheduleService,
+    private datepipe: DatePipe,
   ) {
     this.loaderService.loading(true);
     this.loadForm();
@@ -717,6 +719,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
               const firstAndLastServiceDate = this.reserveService.getFirstAndLastServiceDate(initialServiceDate,
                 latsServiceDate, reserve.reserve_day);
               const firstAvailableDay = firstAndLastServiceDate.firstAvailableDay;
+              const firstAvailableDayString = this.datepipe.transform(firstAvailableDay, 'yyyy-MM-dd');
               const lastAvailableDay = firstAndLastServiceDate.lastAvailableDay;
 
               const initDateSplit = init.split('-');
@@ -729,7 +732,7 @@ export class NoveltiesComponent implements OnInit, OnDestroy {
               reserveAffected.status = 0;
 
               while (startDate <= endDate) {
-                if (this.reserveService.validateDateInRange(firstAvailableDay, lastAvailableDay, reserve.reserve_day, startDate)) {
+                if (this.reserveService.validateDateInRange(firstAvailableDayString, lastAvailableDay, reserve.reserve_day, startDate)) {
                   reserveAffected.daysReschedule.push({
                     date: JSON.parse(JSON.stringify(startDate))
                   });
